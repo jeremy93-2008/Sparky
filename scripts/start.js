@@ -17,9 +17,7 @@ const options = {
   const bundler = new Bundler(entryFiles, options);
 
   bundler.on('bundled', (bundle) => {
-      if(already_Open) return;
       Child.exec("start cmd /k npm run jest");
-      already_Open = true;
   });
 
   // Run the bundler, this returns the main bundle
