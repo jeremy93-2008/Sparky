@@ -1,0 +1,32 @@
+{
+  "name": "sparky",
+  "version": "1.0.0",
+  "description": "New framework to develop web application quicker",
+  "main": "index.js",
+  "directories": {
+    "test": "test",
+    "src": "src"
+  },
+  "scripts": {
+    "start": "node ./scripts/start.js",
+    "jest": "jest ./test",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeremy93-2008/Sparky.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jeremy93-2008/Sparky/issues"
+  },
+  "homepage": "https://github.com/jeremy93-2008/Sparky#readme",
+  "dependencies": {
+    "jest": "^25.1.0",
+    "parcel-bundler": "^1.12.4"
+  },
+  "devDependencies": {
+    "typescript": "^3.8.2"
+  }
+}
