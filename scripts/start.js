@@ -8,7 +8,8 @@ let already_Open = false;
 const options = {
     outDir: './.dist',
     publicUrl: './',
-    target: "web"
+    hmr: false,
+    target: "browser"
 };
 
 (async function() {
