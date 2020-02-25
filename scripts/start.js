@@ -18,7 +18,7 @@ const options = {
 
   bundler.on('bundled', (bundle) => {
       if(already_Open) return;
-      Child.exec("npm run jest");
+      Child.exec("start cmd /k npm run jest");
       already_Open = true;
   });
 
