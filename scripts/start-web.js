@@ -1,13 +1,13 @@
 const Bundler = require('parcel-bundler');
 const Path = require('path');
 const Child = require("child_process");
-const entryFiles = Path.join(__dirname, '../src/sparky.ts');
+const entryFiles = Path.join(__dirname, '../test/e2e/index.html');
 
 const options = {
     outDir: './.dist',
     publicUrl: './',
-    hmr: false,
-    target: "browser"
+    target: "browser",
+    hmr: false
 };
 
 (async function() {
@@ -15,7 +15,7 @@ const options = {
   const bundler = new Bundler(entryFiles, options);
 
   bundler.on('bundled', (bundle) => {
-      Child.exec("start cmd /k npm run jest");
+      Child.exec("start chrome " + Path.resolve(".dist/index.html"));
   });
 
   // Run the bundler, this returns the main bundle
