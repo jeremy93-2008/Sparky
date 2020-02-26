@@ -1,12 +1,18 @@
 import { SparkyFunction } from "./sparky.function";
+import { populateDOMwithDiff } from "./sparky.diff";
 
 export class Sparky {
     static component(renderFunc: () => HTMLElement) {
-        return renderFunc.call(new SparkyFunction(renderFunc));
+        const thisFunction = new SparkyFunction(renderFunc);
+        return {self: thisFunction, func: renderFunc.bind(thisFunction)};
     }
 
-    static mount(component: Document, dom: HTMLElement) {
-        dom.appendChild(component);
+    static mount(component: {self: SparkyFunction, func: () => HTMLElement}, dom?: HTMLElement) {
+        const { self, func } = component;
+        const finalDOM = populateDOMwithDiff(self.currentDom, func())
+        if(!finalDOM.isConnected && dom)
+            dom.appendChild(finalDOM);
+        return finalDOM;
     }
 }
 
