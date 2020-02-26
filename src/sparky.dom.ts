@@ -1,5 +1,11 @@
-export function populateDOMwithDiff(currentDom: HTMLElement, dom: HTMLElement) {
-    if(!currentDom) return dom;
+import { setEvents } from "./sparky.event";
+import { SparkyFunction } from "./sparky.function";
+
+export function generateDOM(currentDom: HTMLElement, dom: HTMLElement, self: SparkyFunction) {
+    if(!currentDom) {
+        dom = setEvents(dom, self);
+        return dom;
+    } 
 
     const currentNodesStack = [{node: currentDom, parent: null}];
     const nextDomStack = [{node: dom, parent: null}];
@@ -12,31 +18,39 @@ export function populateDOMwithDiff(currentDom: HTMLElement, dom: HTMLElement) {
         let nextNode = nextStack.node;
 
         if(node && !nextNode) {
+            node = null;
             node.remove();
             return;
         }
 
         if(nextNode && !node) {
+            node = nextNode;
             (currentStack.parent as HTMLElement).appendChild(nextNode);
             return;
         }
-
-        if(node.nodeName != nextNode.nodeName) {
-            node = diffName(nextNode, node);
-        }
-
-        if(node.nodeName !== "#text") {
-            diffAttribute(node, nextNode);            
-        }
-
-        if(node.children.length > 0) {
-            Array.from(node.children).map((child: HTMLElement) => currentNodesStack.push({node: child, parent: node}))
-        }
-
-        if(nextNode.children.length > 0) {
-            Array.from(nextNode.children).map((child: HTMLElement) => nextDomStack.push({node: child, parent: nextNode}))
-        }
+        node = diffDOM(node, nextNode, currentNodesStack, nextDomStack);
+        node = setEvents(node, self)
     }
+    return currentDom;
+}
+
+function diffDOM(node: HTMLElement, nextNode: HTMLElement, currentNodesStack: { node: HTMLElement; parent: any; }[], nextDomStack: { node: HTMLElement; parent: any; }[]) {
+    if (node.nodeName != nextNode.nodeName) {
+        node = diffName(nextNode, node);
+    }
+    if (node.nodeName !== "#text") {
+        diffAttribute(node, nextNode);
+    }
+    if (nextNode.children.length == 0 && node.textContent !== nextNode.textContent) {
+        node.textContent = nextNode.textContent;
+    }
+    if (node.children.length > 0) {
+        Array.from(node.children).map((child: HTMLElement) => currentNodesStack.push({ node: child, parent: node }));
+    }
+    if (nextNode.children.length > 0) {
+        Array.from(nextNode.children).map((child: HTMLElement) => nextDomStack.push({ node: child, parent: nextNode }));
+    }
+    return node;
 }
 
 function diffName(nextNode: HTMLElement, node: HTMLElement) {

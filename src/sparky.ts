@@ -1,26 +1,24 @@
 import { SparkyFunction } from "./sparky.function";
-import { populateDOMwithDiff } from "./sparky.diff";
+import { generateDOM } from "./sparky.dom";
 
 export class Sparky {
-    static component(renderFunc: () => HTMLElement) {
+    private static currentDom: HTMLElement;
+    static component(renderFunc: (S: SparkyFunction) => HTMLElement) {
         const thisFunction = new SparkyFunction(renderFunc);
-        return {self: thisFunction, func: renderFunc.bind(thisFunction)};
+        return {self: thisFunction, func: renderFunc};
     }
 
-    static mount(component: {self: SparkyFunction, func: () => HTMLElement}, dom?: HTMLElement) {
+    static mount(component: {self: SparkyFunction, func: (S: SparkyFunction) => HTMLElement}, dom?: HTMLElement) { 
         const { self, func } = component;
-        const finalDOM = populateDOMwithDiff(self.currentDom, func())
+        const finalDOM = generateDOM(this.currentDom, func.call(window, self), self);
         if(!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
-        return finalDOM;
+        this.currentDom = finalDOM as HTMLElement;
     }
 }
 
 export function render(html: string) {
-    // We need to create a DOM tree each time that a new string is giving and after we call a diff one to modify only the one that had changed based in nodeName and attributes, and if children exist going down recursively
-    // One DOM is the current one shown in the browser
-    // The Second is the new one, we just need to do a diff between them and apply those in the first one.
     const domNode = document.createElement("div");
     domNode.innerHTML = html;
-    return domNode;
+    return domNode.firstElementChild as HTMLElement;
 }

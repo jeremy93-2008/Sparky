@@ -1,13 +1,10 @@
-import { populateDOMwithDiff } from "./sparky.diff";
 import { Sparky } from "./sparky";
 
 export class SparkyFunction {
-    public currentDom: HTMLElement;
-
     private state: any;
-    private renderFunc: () => HTMLElement;
+    private renderFunc: (S: SparkyFunction) => HTMLElement;
     
-    constructor(renderFunc: () => HTMLElement) {
+    constructor(renderFunc: (S: SparkyFunction) => HTMLElement) {
         this.state = {};
         this.renderFunc = renderFunc;
     }
@@ -18,10 +15,9 @@ export class SparkyFunction {
 
     setState = (newState: any) => {
         this.state = {...this.state, ...newState};
-        const finalDOM = Sparky.mount({
+        Sparky.mount({
             self: this,
             func: this.renderFunc
         });
-        this.currentDom = finalDOM;
     }
 }
