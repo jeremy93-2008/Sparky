@@ -15,7 +15,7 @@ const options = {
   const bundler = new Bundler(entryFiles, options);
 
   bundler.on('bundled', (bundle) => {
-      Child.exec("start chrome " + Path.resolve(".dist/index.html"));
+      Child.exec("start " + Path.resolve(".dist/index.html"));
   });
 
   // Run the bundler, this returns the main bundle
