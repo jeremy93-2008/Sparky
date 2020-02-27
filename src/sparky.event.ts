@@ -1,11 +1,13 @@
 import { SparkyFunction } from "./sparky.function";
+import { renderReturn } from "./sparky";
 
-export function setEvents(dom: HTMLElement, self: SparkyFunction) : HTMLElement {
+export function setEvents(render: renderReturn, self: SparkyFunction) : HTMLElement {
+    const { dom, func } = render;
     Array.from(dom.attributes).forEach((attr: Attr) => {
         if(attr.name.startsWith("on")) {
-            dom.addEventListener(attr.name.replace("on", ""), (event) => {
-                const fn = eval(`(${attr.value})`);
-                fn.bind(self)(event);
+            const execFun = func.shift();
+            dom.addEventListener(attr.name.replace("on", ""), (event) => {    
+                execFun.call(self)
             })
             dom.attributes.removeNamedItem(attr.name)
         }

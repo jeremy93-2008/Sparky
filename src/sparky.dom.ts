@@ -1,14 +1,15 @@
 import { setEvents } from "./sparky.event";
 import { SparkyFunction } from "./sparky.function";
+import { renderReturn } from "./sparky";
 
-export function generateDOM(currentDom: HTMLElement, dom: HTMLElement, self: SparkyFunction) {
+export function generateDOM(currentDom: HTMLElement, render: renderReturn, self: SparkyFunction) {
     if(!currentDom) {
-        dom = setEvents(dom, self);
-        return dom;
+        render.dom = setEvents(render, self);
+        return render.dom;
     } 
 
     const currentNodesStack = [{node: currentDom, parent: null}];
-    const nextDomStack = [{node: dom, parent: null}];
+    const nextDomStack = [{node: render.dom, parent: null}];
 
     while(currentNodesStack.length > 0 || nextDomStack.length > 0) {
         let currentStack = currentNodesStack.pop();
@@ -29,7 +30,7 @@ export function generateDOM(currentDom: HTMLElement, dom: HTMLElement, self: Spa
             return;
         }
         node = diffDOM(node, nextNode, currentNodesStack, nextDomStack);
-        node = setEvents(node, self)
+        node = setEvents({dom: node, func: render.func}, self)
     }
     return currentDom;
 }

@@ -1,10 +1,10 @@
-import { Sparky } from "./sparky";
+import { Sparky, renderReturn } from "./sparky";
 
 export class SparkyFunction {
     private state: any;
-    private renderFunc: (S: SparkyFunction) => HTMLElement;
+    private renderFunc: (self: SparkyFunction) => renderReturn;
     
-    constructor(renderFunc: (S: SparkyFunction) => HTMLElement) {
+    constructor(renderFunc: (self: SparkyFunction) => renderReturn) {
         this.state = {};
         this.renderFunc = renderFunc;
     }

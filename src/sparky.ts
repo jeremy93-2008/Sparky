@@ -1,14 +1,19 @@
 import { SparkyFunction } from "./sparky.function";
 import { generateDOM } from "./sparky.dom";
 
+export interface renderReturn {
+    dom: HTMLElement,
+    func: Function[]
+}
+
 export class Sparky {
     private static currentDom: HTMLElement;
-    static component(renderFunc: (S: SparkyFunction) => HTMLElement) {
+    static component(renderFunc: (self: SparkyFunction) => renderReturn) {
         const thisFunction = new SparkyFunction(renderFunc);
         return {self: thisFunction, func: renderFunc};
     }
 
-    static mount(component: {self: SparkyFunction, func: (S: SparkyFunction) => HTMLElement}, dom?: HTMLElement) { 
+    static mount(component: {self: SparkyFunction, func: (self: SparkyFunction) => renderReturn}, dom?: HTMLElement) { 
         const { self, func } = component;
         const finalDOM = generateDOM(this.currentDom, func.call(window, self), self);
         if(!finalDOM.isConnected && dom)
@@ -17,8 +22,20 @@ export class Sparky {
     }
 }
 
-export function render(html: string) {
+export function render(html: TemplateStringsArray, ...computed: any[]): renderReturn {
     const domNode = document.createElement("div");
-    domNode.innerHTML = html;
-    return domNode.firstElementChild as HTMLElement;
+    const func: Function[] = [];
+    const newHTML = html.map((stringHTML, i) => {
+        let htmlLine = ""
+        htmlLine += stringHTML
+        if(typeof computed[i] == "function") { 
+            func.push(computed[i])
+            htmlLine += "'functionScoped'";
+        } else {
+            htmlLine += computed[i]
+        }
+        return htmlLine;
+    })
+    domNode.innerHTML = newHTML.join("");
+    return {dom: domNode.firstElementChild as HTMLElement, func};
 }
