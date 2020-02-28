@@ -1,36 +1,41 @@
-import { setEvents } from "./sparky.event";
+import { setEvents, setAllEvents } from "./sparky.event";
 import { SparkyFunction } from "./sparky.function";
-import { renderReturn } from "./sparky";
+import { IRenderReturn } from "./sparky";
 
-export function generateDOM(currentDom: HTMLElement, render: renderReturn, self: SparkyFunction) {
+export function generateDOM(currentDom: HTMLElement, render: IRenderReturn, self: SparkyFunction) {
     if(!currentDom) {
-        render.dom = setEvents(render, self);
+        render.dom = setAllEvents(render, self);
         return render.dom;
     } 
 
     const currentNodesStack = [{node: currentDom, parent: null}];
-    const nextDomStack = [{node: render.dom, parent: null}];
+    const nextNodeStack = [{node: render.dom, parent: null}];
 
-    while(currentNodesStack.length > 0 || nextDomStack.length > 0) {
+    let lastParentCurrentNode = null;
+
+    while(currentNodesStack.length > 0 || nextNodeStack.length > 0) {
         let currentStack = currentNodesStack.pop();
-        let nextStack = nextDomStack.pop();
+        let nextStack = nextNodeStack.pop();
+        
+        let node = currentStack ? currentStack.node : null;
+        let nextNode = nextStack ? nextStack.node : null;
 
-        let node = currentStack.node;
-        let nextNode = nextStack.node;
+        if(currentStack) lastParentCurrentNode = currentStack.parent;
 
         if(node && !nextNode) {
             node = null;
             node.remove();
-            return;
+            break;
         }
 
         if(nextNode && !node) {
             node = nextNode;
-            (currentStack.parent as HTMLElement).appendChild(nextNode);
-            return;
+            (lastParentCurrentNode as HTMLElement).innerHTML = nextStack.parent.innerHTML;
+            setAllEvents({dom: lastParentCurrentNode, func: render.func}, self)
+            break;
         }
-        node = diffDOM(node, nextNode, currentNodesStack, nextDomStack);
-        node = setEvents({dom: node, func: render.func}, self)
+        diffDOM(node, nextNode, currentNodesStack, nextNodeStack);
+        setEvents({dom: node, func: render.func}, self)
     }
     return currentDom;
 }
@@ -50,8 +55,9 @@ function diffDOM(node: HTMLElement, nextNode: HTMLElement, currentNodesStack: { 
     }
     if (nextNode.children.length > 0) {
         Array.from(nextNode.children).map((child: HTMLElement) => nextDomStack.push({ node: child, parent: nextNode }));
+        if(node.children.length == 0)
+            currentNodesStack.push({node: null, parent: node});
     }
-    return node;
 }
 
 function diffName(nextNode: HTMLElement, node: HTMLElement) {
@@ -60,12 +66,14 @@ function diffName(nextNode: HTMLElement, node: HTMLElement) {
         newNode.attributes.setNamedItem(attr.cloneNode(true) as Attr);
     });
     newNode.innerHTML = node.innerHTML;
+    node.parentElement.replaceChild(newNode, node)
     node = newNode;
     return node;
 }
 
 function diffAttribute(node: HTMLElement, nextNode: HTMLElement) {
     Array.from(node.attributes).forEach((attr: Attr, i: number) => {
+        if(!nextNode.attributes[i]) return;
         const nextAttr = nextNode.attributes[i];
         if (attr.name != nextAttr.name) {
             node.attributes.removeNamedItem(attr.name);
