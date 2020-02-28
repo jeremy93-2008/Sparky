@@ -1,5 +1,6 @@
 import { SparkyFunction } from "./sparky.function";
-import { generateDOM } from "./sparky.dom";
+import { diff } from "./sparky.dom";
+import { setAllEvents } from "./sparky.event";
 
 export interface IRenderReturn {
     dom: HTMLElement,
@@ -10,7 +11,7 @@ type ISelfFunction = (self: SparkyFunction) => IRenderReturn;
 
 interface ISparkyComponent {
     self: SparkyFunction;
-    func: ISelfFunction;
+    selfFunc: ISelfFunction;
 }
 
 export class Sparky {
@@ -22,7 +23,7 @@ export class Sparky {
      */
     static component(renderFunc: ISelfFunction) {
         const thisFunction = new SparkyFunction(renderFunc);
-        return {self: thisFunction, func: renderFunc} as ISparkyComponent;
+        return { self: thisFunction, selfFunc: renderFunc } as ISparkyComponent;
     }
 
     /**
@@ -30,12 +31,21 @@ export class Sparky {
      * @param component - Sparky Component
      * @param dom - The dom element where you want to mount this component
      */
-    static mount(component: ISparkyComponent, dom?: HTMLElement) { 
-        const { self, func } = component;
-        const finalDOM = generateDOM(this.currentDom, func.call(window, self), self);
-        if(!finalDOM.isConnected && dom)
+    static mount(component: ISparkyComponent, dom?: HTMLElement) {
+        const { self, selfFunc } = component;
+        const render = selfFunc.call(window, self) as IRenderReturn;
+
+        let finalDOM = diff(this.currentDom, render.dom);
+        finalDOM = setAllEvents({dom: finalDOM, func: render.func}, self);
+        
+        if (!finalDOM) return;
+        if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
         this.currentDom = finalDOM as HTMLElement;
+    }
+
+    static diff(oldNode: HTMLElement, newNode: HTMLElement) {
+        return diff(oldNode, newNode)
     }
 }
 
@@ -45,23 +55,27 @@ export class Sparky {
  * @param computedProps - Computed Props used to pass Javascript into template
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
  */
-export function render(html: TemplateStringsArray, ...computedProps: any[]): IRenderReturn {
+export function render(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn {
     const domNode = document.createElement("div");
     const func: Function[] = [];
-    const newHTML = html.map((stringHTML, i) => {
-        let htmlLine = ""
-        htmlLine += stringHTML
-        if(typeof computedProps[i] == "function") { 
-            func.push(computedProps[i])
-            htmlLine += "'functionScoped'";
-        } else {
-            if(computedProps[i] && (computedProps[i] as string).startsWith("<"))
-                htmlLine += computedProps[i]
-            else if(typeof computedProps[i] == "string")
-                htmlLine += `<span class='computed'>${computedProps[i]}</span>`
-        }
-        return htmlLine;
-    })
-    domNode.innerHTML = newHTML.join("");
-    return {dom: domNode.firstElementChild as HTMLElement, func};
+
+    const newHTML = (typeof html == "string") ? html
+        : html.map((stringHTML, i) => {
+            let htmlLine = ""
+            htmlLine += stringHTML
+            if (typeof computedProps[i] == "function") {
+                func.push(computedProps[i])
+                htmlLine += "'functionScoped'";
+            } else {
+                computedProps[i] = new String(computedProps[i]);
+                if (computedProps[i] && (computedProps[i] as string).startsWith("<"))
+                    htmlLine += computedProps[i]
+                else
+                    htmlLine += `<span class='computed'>${computedProps[i]}</span>`
+            }
+            return htmlLine;
+        })
+        
+    domNode.innerHTML = Array.isArray(newHTML) ? newHTML.join("") : newHTML;
+    return { dom: domNode.firstElementChild as HTMLElement, func };
 }

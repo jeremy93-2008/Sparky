@@ -1,86 +1,92 @@
-import { setEvents, setAllEvents } from "./sparky.event";
-import { SparkyFunction } from "./sparky.function";
-import { IRenderReturn } from "./sparky";
+export function diff(currentDom: HTMLElement, newDom: HTMLElement) {
+    if (!currentDom && !newDom) return null;
+    if (currentDom && !newDom) return null;
+    if (!currentDom && newDom) return newDom;
 
-export function generateDOM(currentDom: HTMLElement, render: IRenderReturn, self: SparkyFunction) {
-    if(!currentDom) {
-        render.dom = setAllEvents(render, self);
-        return render.dom;
-    } 
+    const currentDomStack = [currentDom];
+    let newDomStack = [newDom];
 
-    const currentNodesStack = [{node: currentDom, parent: null}];
-    const nextNodeStack = [{node: render.dom, parent: null}];
+    let currentDomToAttach = currentDom;
 
-    let lastParentCurrentNode = null;
+    while (currentDomStack.length > 0 || newDomStack.length > 0) {
+        let dom = currentDomStack.shift();
+        let nextDom = newDomStack.shift();
 
-    while(currentNodesStack.length > 0 || nextNodeStack.length > 0) {
-        let currentStack = currentNodesStack.pop();
-        let nextStack = nextNodeStack.pop();
+        if (dom && !nextDom) {
+            dom.parentElement.removeChild(dom);
+            continue;
+        }
+
+        if (!dom && nextDom) {
+            currentDomToAttach.appendChild(nextDom);
+            continue;
+        }
         
-        let node = currentStack ? currentStack.node : null;
-        let nextNode = nextStack ? nextStack.node : null;
+        setAttributes(dom, nextDom);
 
-        if(currentStack) lastParentCurrentNode = currentStack.parent;
-
-        if(node && !nextNode) {
-            node = null;
-            node.remove();
-            break;
+        if (dom.nodeName !== nextDom.nodeName) {
+            dom.parentElement.replaceChild(nextDom, dom);
         }
 
-        if(nextNode && !node) {
-            node = nextNode;
-            (lastParentCurrentNode as HTMLElement).innerHTML = nextStack.parent.innerHTML;
-            setAllEvents({dom: lastParentCurrentNode, func: render.func}, self)
-            break;
+        if (dom.nodeName == "#text" && nextDom.nodeName == "#text") {
+            if (dom.textContent !== nextDom.textContent)
+                dom.textContent = nextDom.textContent
         }
-        diffDOM(node, nextNode, currentNodesStack, nextNodeStack);
-        setEvents({dom: node, func: render.func}, self)
+
+        if (dom.childNodes.length > 0) {
+            currentDomToAttach = dom;
+            Array.from(dom.childNodes).forEach((child: HTMLElement) => currentDomStack.push(child))
+        }
+
+        if (nextDom.childNodes.length > 0) {
+            if (dom)
+                currentDomToAttach = dom;
+            Array.from(nextDom.childNodes).forEach((child: HTMLElement) => newDomStack.push(child))
+        }
     }
+
     return currentDom;
 }
 
-function diffDOM(node: HTMLElement, nextNode: HTMLElement, currentNodesStack: { node: HTMLElement; parent: any; }[], nextDomStack: { node: HTMLElement; parent: any; }[]) {
-    if (node.nodeName != nextNode.nodeName) {
-        node = diffName(nextNode, node);
+function setAttributes(currentDom: HTMLElement, nextDom: HTMLElement) {
+    const currentAttributesList = currentDom && currentDom.attributes
+        ? transformAttributesToSortedArray(currentDom.attributes) : [];
+
+    const nextAttributesList = nextDom && nextDom.attributes
+        ? transformAttributesToSortedArray(nextDom.attributes) : [];
+
+    while(nextAttributesList.length > 0) {
+        const currentAttr = currentAttributesList.shift();
+        const nextAttr = nextAttributesList.shift();
+
+        if(currentAttr && !nextAttr) {
+            currentDom.removeAttribute(currentAttr.name);
+            continue;
+        }
+
+        if(!currentAttr && nextAttr) {
+            currentDom.setAttribute(nextAttr.name, nextAttr.value);
+            continue;
+        }
+
+        if(currentAttr.name != nextAttr.name) {
+            currentDom.removeAttribute(currentAttr.name);
+            currentDom.setAttribute(nextAttr.name, nextAttr.value);
+            continue;
+        }
+
+        if(currentAttr.value != nextAttr.value) {
+            currentDom.getAttributeNode(nextAttr.name).value = nextAttr.value;
+        }
     }
-    if (node.nodeName !== "#text") {
-        diffAttribute(node, nextNode);
-    }
-    if (nextNode.children.length == 0 && node.textContent !== nextNode.textContent) {
-        node.textContent = nextNode.textContent;
-    }
-    if (node.children.length > 0) {
-        Array.from(node.children).map((child: HTMLElement) => currentNodesStack.push({ node: child, parent: node }));
-    }
-    if (nextNode.children.length > 0) {
-        Array.from(nextNode.children).map((child: HTMLElement) => nextDomStack.push({ node: child, parent: nextNode }));
-        if(node.children.length == 0)
-            currentNodesStack.push({node: null, parent: node});
+    
+    if(currentAttributesList.length > 0) {
+        currentAttributesList.forEach(attr => currentDom.attributes.removeNamedItem(attr.name))
     }
 }
 
-function diffName(nextNode: HTMLElement, node: HTMLElement) {
-    const newNode = document.createElement(nextNode.nodeName);
-    Array.from(node.attributes).map((attr: Attr) => {
-        newNode.attributes.setNamedItem(attr.cloneNode(true) as Attr);
-    });
-    newNode.innerHTML = node.innerHTML;
-    node.parentElement.replaceChild(newNode, node)
-    node = newNode;
-    return node;
-}
-
-function diffAttribute(node: HTMLElement, nextNode: HTMLElement) {
-    Array.from(node.attributes).forEach((attr: Attr, i: number) => {
-        if(!nextNode.attributes[i]) return;
-        const nextAttr = nextNode.attributes[i];
-        if (attr.name != nextAttr.name) {
-            node.attributes.removeNamedItem(attr.name);
-            node.attributes.setNamedItem(nextAttr.cloneNode(true) as Attr);
-        }
-        if (attr.value != nextAttr.value) {
-            attr.value = nextAttr.value;
-        }
-    });
+function transformAttributesToSortedArray(arrayLike: ArrayLike<Attr>) {
+    return Array.from(arrayLike).sort((a: Attr, b: Attr) => {
+        return a.name.localeCompare(b.name);
+    })
 }

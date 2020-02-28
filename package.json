@@ -10,6 +10,7 @@
   "scripts": {
     "start:test": "node ./scripts/start.js",
     "start:web": "node ./scripts/start-web.js",
+    "build": "node ./scripts/build.js",
     "jest": "jest ./test",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

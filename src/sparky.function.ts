@@ -44,7 +44,7 @@ export class SparkyFunction {
         this.state = { ...this.state, ...newState };
         Sparky.mount({
             self: this,
-            func: this.renderFunc
+            selfFunc: this.renderFunc
         });
     }
 }

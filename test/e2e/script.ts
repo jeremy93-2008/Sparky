@@ -16,16 +16,10 @@ function Main(self: SparkyFunction) {
         self.setState({boton: "Jeremy"});
     }
 
-    const onChange = (event) => {
-        console.log(event);
-        self.setState({texto: "Jeremy"});
-    }
-
     return render /*html*/`
         <div id="uno" class="lol">
             Hola a todos ${ a ? `<b>${a}</b>` : `no hay nada`} 
             <button onclick=${onClick}>Hey!</button>
-            <input type="text" oninput=${onChange} />
             ${text}
         </div>
     `;    
