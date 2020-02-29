@@ -1,6 +1,7 @@
 import { SparkyFunction } from "./sparky.function";
 import { diff } from "./sparky.dom";
 import { setAllEvents } from "./sparky.event";
+import { EventManager } from "./sparky.eventmanager";
 
 export interface IRenderReturn {
     dom: HTMLElement,
@@ -37,8 +38,8 @@ export class Sparky {
 
         let finalDOM = diff(this.currentDom, render.dom);
         finalDOM = setAllEvents({dom: finalDOM, func: render.func}, self);
-        
         if (!finalDOM) return;
+        EventManager.listen();
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
         this.currentDom = finalDOM as HTMLElement;

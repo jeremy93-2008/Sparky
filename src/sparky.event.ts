@@ -1,14 +1,13 @@
 import { SparkyFunction } from "./sparky.function";
 import { IRenderReturn } from "./sparky";
+import { EventManager } from "./sparky.eventmanager";
 
 export function setEvents(render: IRenderReturn, self: SparkyFunction) : HTMLElement {
     const { dom, func } = render;
     Array.from(dom.attributes).forEach((attr: Attr) => {
         if(attr.name.startsWith("on")) {
             const execFun = func.shift();
-            dom.addEventListener(attr.name.replace("on", ""), (event) => {    
-                execFun.call(self, event)
-            })
+            EventManager.addEventMethod(dom, attr.name.replace("on", ""), execFun.bind(window, self, event))
             dom.attributes.removeNamedItem(attr.name)
         }
     })
@@ -16,6 +15,8 @@ export function setEvents(render: IRenderReturn, self: SparkyFunction) : HTMLEle
 }
 
 export function setAllEvents(render: IRenderReturn, self: SparkyFunction) : HTMLElement {
+    EventManager.clearEvents();
+    
     const { dom, func } = render;
     const currentStack = [dom];
     while(currentStack.length > 0) {
