@@ -1,4 +1,4 @@
-import { Sparky, IRenderReturn } from "./sparky";
+import { Sparky, IRenderReturn, ISelfFunction, ISparkyComponent } from "./sparky";
 
 type UpdateCallback = () => void;
 
@@ -44,7 +44,12 @@ export class SparkyFunction {
         this.state = { ...this.state, ...newState };
         Sparky.mount({
             self: this,
-            selfFunc: this.renderFunc
+            selfFn: this.renderFunc
         });
+    }
+
+    component = (comp: ISparkyComponent) => {
+        if(!comp.self || !comp.selfFn) throw "ArgumentError: Pass a Sparky Component"
+        return {type:"SparkyComponent", ...comp};
     }
 }

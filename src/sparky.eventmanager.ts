@@ -10,16 +10,22 @@ type eventCallbackFn = (evt: Event) => void;
 
 
 export class EventManager {
-    static isListening = false;
+    static isReRendering = false;
+    static oldEventType: string[] = [];
     static eventType: string[] = [];
     static eventList: eventListSingle[];
 
     static listen() {
-        if(this.isListening) return;
-        this.eventType.forEach((type) => {
+        let eventTypeArray = this.eventType;
+        
+        if(this.isReRendering)
+            eventTypeArray = this.eventType.filter((type) => !this.oldEventType.includes(type));
+        
+        eventTypeArray.forEach((type) => {
             document.body.addEventListener(type,(event) => this.dispatchEvent(event))
         });
-        this.isListening = true;
+        
+        this.isReRendering = true;
     }
 
     static dispatchEvent(event: Event) {
@@ -38,6 +44,7 @@ export class EventManager {
     }
 
     static clearEvents() {
+        this.oldEventType = this.eventType;
         this.eventList = [];
         this.eventType = [];
     }

@@ -8,11 +8,11 @@ export interface IRenderReturn {
     func: Function[]
 }
 
-type ISelfFunction = (self: SparkyFunction) => IRenderReturn;
+export type ISelfFunction = (self: SparkyFunction) => IRenderReturn;
 
-interface ISparkyComponent {
+export interface ISparkyComponent {
     self: SparkyFunction;
-    selfFunc: ISelfFunction;
+    selfFn: ISelfFunction;
 }
 
 export class Sparky {
@@ -20,21 +20,21 @@ export class Sparky {
 
     /**
      * Generate a Sparky Component that can be mount.
-     * @param renderFunc - The function that going to be execute to render html template
+     * @param renderFunc The function that going to be execute to render html template
      */
     static component(renderFunc: ISelfFunction) {
         const thisFunction = new SparkyFunction(renderFunc);
-        return { self: thisFunction, selfFunc: renderFunc } as ISparkyComponent;
+        return { self: thisFunction, selfFn: renderFunc } as ISparkyComponent;
     }
 
     /**
      * Mount a Sparky Component in the DOM Tree and keep it hydrate.
-     * @param component - Sparky Component
-     * @param dom - The dom element where you want to mount this component
+     * @param component Sparky Component
+     * @param dom The dom element where you want to mount this component
      */
     static mount(component: ISparkyComponent, dom?: HTMLElement) {
-        const { self, selfFunc } = component;
-        const render = selfFunc.call(window, self) as IRenderReturn;
+        const { self, selfFn } = component;
+        const render = selfFn.call(window, self) as IRenderReturn;
 
         let finalDOM = diff(this.currentDom, render.dom);
         finalDOM = setAllEvents({dom: finalDOM, func: render.func}, self);
@@ -52,8 +52,8 @@ export class Sparky {
 
 /**
  * Render the html string template to HTML elements
- * @param html - Array of HTML String 
- * @param computedProps - Computed Props used to pass Javascript into template
+ * @param html Array of HTML String 
+ * @param computedProps Computed Props used to pass Javascript into template
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
  */
 export function render(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn {
@@ -64,12 +64,22 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
         : html.map((stringHTML, i) => {
             let htmlLine = ""
             htmlLine += stringHTML
+            if(!computedProps[i]) return htmlLine;
             if (typeof computedProps[i] == "function") {
                 func.push(computedProps[i])
                 htmlLine += "'functionScoped'";
+            } else if(computedProps[i].type && computedProps[i].type == "SparkyComponent") {
+                const comp = computedProps[i] as ISparkyComponent;
+                const render =  comp.selfFn.call(window, comp.self) as IRenderReturn;
+                
+                const div = document.createElement("div");
+                div.appendChild(render.dom)
+
+                func.push(...render.func);
+                htmlLine += div.innerHTML;
             } else {
                 computedProps[i] = new String(computedProps[i]);
-                if (computedProps[i] && (computedProps[i] as string).startsWith("<"))
+                if ((computedProps[i] as string).startsWith("<"))
                     htmlLine += computedProps[i]
                 else
                     htmlLine += `<span class='computed'>${computedProps[i]}</span>`
