@@ -7,7 +7,7 @@ export function setEvents(render: IRenderReturn, self: SparkyFunction) : HTMLEle
     Array.from(dom.attributes).forEach((attr: Attr) => {
         if(attr.name.startsWith("on")) {
             const execFun = func.shift();
-            EventManager.addEventMethod(dom, attr.name.replace("on", ""), execFun.bind(window, self, event))
+            EventManager.addEvent(dom, attr.name.replace("on", ""), execFun.bind(window, event))
             dom.attributes.removeNamedItem(attr.name)
         }
     })
