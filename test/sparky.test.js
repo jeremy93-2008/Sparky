@@ -3,17 +3,17 @@ const Sparky = lib.Sparky;
 
 describe("Diff method", () => {
     test("Nothing to render", () => {
-        const diff = Sparky.diff(null, null);
+        const diff = Sparky.reconciliate(null, null);
         expect(diff).toBe(null);
     });
     test("Only oldNode provided", () => {
-        const diff = Sparky.diff(lib.render(`<div>Hola a todos</div>`).dom, null);
+        const diff = Sparky.reconciliate(lib.render(`<div>Hola a todos</div>`).dom, null);
         expect(diff).toBe(null);
     });
 
     test("Only newNode provided", () => {
         const currentDom = lib.render(`<div>Hola a todos</div>`).dom;
-        const diff = Sparky.diff(null, currentDom);
+        const diff = Sparky.reconciliate(null, currentDom);
         expect(diff).toBe(currentDom);
 
         expect(diff.innerHTML).toBe(lib.render(`<div>Hola a todos</div>`).dom.innerHTML);
@@ -21,7 +21,7 @@ describe("Diff method", () => {
 
     test("If same nodes are provided the result must be the same", () => {
         const currentDom = lib.render(`<div>Hola a todos</div>`).dom;
-        const diff = Sparky.diff(currentDom, lib.render(`<div>Hola a todos</div>`).dom);
+        const diff = Sparky.reconciliate(currentDom, lib.render(`<div>Hola a todos</div>`).dom);
 
         expect(diff).toBe(currentDom);
         expect(diff.innerHTML).toBe(lib.render(`<div>Hola a todos</div>`).dom.innerHTML);
@@ -29,7 +29,7 @@ describe("Diff method", () => {
 
     test("Add a new node by diff", () => {
         const currentDom = lib.render(`<div>Hola a todos</div>`).dom;
-        const diff = Sparky.diff(currentDom, lib.render(`<div>Hola a todos <span>Jeremy</span></div>`).dom);
+        const diff = Sparky.reconciliate(currentDom, lib.render(`<div>Hola a todos <span>Jeremy</span></div>`).dom);
 
         expect(diff).toBe(currentDom);
         expect(diff.innerHTML).toBe(lib.render(`<div>Hola a todos <span>Jeremy</span></div>`).dom.innerHTML);
@@ -37,7 +37,7 @@ describe("Diff method", () => {
 
     test("Replace a existing node by diff", () => {
         const currentDom = lib.render(`<div>Hola a todos <b>Before</b></div>`).dom;
-        const diff = Sparky.diff(currentDom, lib.render(`<div>Hola a todos <em>After</em></div>`).dom);
+        const diff = Sparky.reconciliate(currentDom, lib.render(`<div>Hola a todos <em>After</em></div>`).dom);
 
         expect(diff).toBe(currentDom);
         expect(diff.innerHTML).toBe(lib.render(`<div>Hola a todos <em>After</em></div>`).dom.innerHTML);
@@ -45,7 +45,7 @@ describe("Diff method", () => {
 
     test("Adding a new nodes as a list by diff", () => {
         const currentDom = lib.render(`<div>Hola a todos <ul></ul></div>`).dom;
-        const diff = Sparky.diff(currentDom, lib.render(`<div>Hola a todos <ul>
+        const diff = Sparky.reconciliate(currentDom, lib.render(`<div>Hola a todos <ul>
             <li>Hola</li>
             <li>Adios</li>
             <li>Buenas</li>
@@ -61,7 +61,7 @@ describe("Diff method", () => {
 
     test("Add new attributes to an element", () => {
         const currentDom = lib.render(`<div>Hola a todos <b>Before</b></div>`).dom;
-        const diff = Sparky.diff(currentDom, lib.render(`<div>Hola a todos <b class='selected'>After</b></div>`).dom);
+        const diff = Sparky.reconciliate(currentDom, lib.render(`<div>Hola a todos <b class='selected'>After</b></div>`).dom);
 
         expect(diff).toBe(currentDom);
         expect(diff.innerHTML).toBe(lib.render(`<div>Hola a todos <b class='selected'>After</b></div>`).dom.innerHTML);
@@ -69,7 +69,7 @@ describe("Diff method", () => {
 
     test("Add more attributes to an element", () => {
         const currentDom = lib.render(`<div>Hola a todos <b class='selected'>Before</b></div>`).dom;
-        const diff = Sparky.diff(currentDom, lib.render(`<div>Hola a todos <b id='uno' class='selected more'>After</b></div>`).dom);
+        const diff = Sparky.reconciliate(currentDom, lib.render(`<div>Hola a todos <b id='uno' class='selected more'>After</b></div>`).dom);
 
         expect(diff).toBe(currentDom);
         expect(diff.innerHTML).toBe(lib.render(`<div>Hola a todos <b class='selected more' id='uno'>After</b></div>`).dom.innerHTML);
@@ -77,7 +77,7 @@ describe("Diff method", () => {
 
     test("Add less attributes to an element", () => {
         const currentDom = lib.render(`<div>Hola a todos <b id='uno' class='selected more'>Before</b></div>`).dom;
-        const diff = Sparky.diff(currentDom, lib.render(`<div>Hola a todos <b class='selected'>After</b></div>`).dom);
+        const diff = Sparky.reconciliate(currentDom, lib.render(`<div>Hola a todos <b class='selected'>After</b></div>`).dom);
 
         expect(diff).toBe(currentDom);
         expect(diff.innerHTML).toBe(lib.render(`<div>Hola a todos <b class='selected'>After</b></div>`).dom.innerHTML);
@@ -85,7 +85,7 @@ describe("Diff method", () => {
 
     test("Change attributes to an element", () => {
         const currentDom = lib.render(`<div>Hola a todos <b class='selected more'>Before</b></div>`).dom;
-        const diff = Sparky.diff(currentDom, lib.render(`<div>Hola a todos <b class='selected'>After</b></div>`).dom);
+        const diff = Sparky.reconciliate(currentDom, lib.render(`<div>Hola a todos <b class='selected'>After</b></div>`).dom);
 
         expect(diff).toBe(currentDom);
         expect(diff.innerHTML).toBe(lib.render(`<div>Hola a todos <b class='selected'>After</b></div>`).dom.innerHTML);

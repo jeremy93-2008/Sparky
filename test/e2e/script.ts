@@ -15,7 +15,7 @@ function Main(self: SparkyFunction) {
     }, [])
 
     const onClick = () => {
-        self.setState({boton: "Jeremy", ver: true});
+        self.setState({ boton: "Jeremy" });
     }
 
     return render /*html*/`
@@ -34,8 +34,10 @@ function Span(self: SparkyFunction) {
         self.setState({ver: "Hola mundo nested"})
     }
     return render/*html*/`
-        <span ondblclick=${doIt}>Hazlo</span>
-        ${ver}
+        <div>
+            <span ondblclick=${doIt}>Hazlo</span>
+            <span>${ver}</span>
+        </div>
     `
 }
 

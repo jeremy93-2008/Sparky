@@ -1,9 +1,9 @@
 import { SparkyFunction } from "./sparky.function";
-import { IRenderReturn } from "./sparky";
+import { IReconciliateProps } from "./sparky";
 import { EventManager } from "./sparky.eventmanager";
 
-export function setEvents(render: IRenderReturn, self: SparkyFunction) : HTMLElement {
-    const { dom, func } = render;
+export function setEvents(reconciliate: IReconciliateProps, self: SparkyFunction) : HTMLElement {
+    const { dom, func } = reconciliate;
     Array.from(dom.attributes).forEach((attr: Attr) => {
         if(attr.name.startsWith("on")) {
             const execFun = func.shift();
@@ -14,14 +14,14 @@ export function setEvents(render: IRenderReturn, self: SparkyFunction) : HTMLEle
     return dom;
 }
 
-export function setAllEvents(render: IRenderReturn, self: SparkyFunction) : HTMLElement {
+export function setAllEvents(reconciliate: IReconciliateProps, self: SparkyFunction) : HTMLElement {
     EventManager.clearEvents();
     
-    const { dom, func } = render;
+    const { dom, func } = reconciliate;
     const currentStack = [dom];
     while(currentStack.length > 0) {
-        const ele = currentStack.pop();
-        setEvents({dom: ele, func: render.func}, self);
+        const ele = currentStack.shift();
+        setEvents({dom: ele, func: reconciliate.func}, self);
         if(ele.children.length > 0) {
             Array.from(ele.children).map((child: HTMLElement) => currentStack.push(child))
         }

@@ -1,11 +1,15 @@
 import { SparkyFunction } from "./sparky.function";
-import { diff } from "./sparky.dom";
+import { reconciliate } from "./sparky.dom";
 import { setAllEvents } from "./sparky.event";
 import { EventManager } from "./sparky.eventmanager";
 
-export interface IRenderReturn {
+export interface IRenderReturn extends IReconciliateProps {
+    children: ISparkyComponent[];
+}
+
+export interface IReconciliateProps {
     dom: HTMLElement,
-    func: Function[]
+    func: Function[],
 }
 
 export type ISelfFunction = (self: SparkyFunction) => IRenderReturn;
@@ -35,8 +39,9 @@ export class Sparky {
     static mount(component: ISparkyComponent, dom?: HTMLElement) {
         const { self, selfFn } = component;
         const render = selfFn.call(window, self) as IRenderReturn;
+        render.children.forEach((child) => child.self.__parent = component);
 
-        let finalDOM = diff(this.currentDom, render.dom);
+        let finalDOM = reconciliate(this.currentDom, render.dom);
         finalDOM = setAllEvents({dom: finalDOM, func: render.func}, self);
         if (!finalDOM) return;
         EventManager.listen();
@@ -45,8 +50,13 @@ export class Sparky {
         this.currentDom = finalDOM as HTMLElement;
     }
 
-    static diff(oldNode: HTMLElement, newNode: HTMLElement) {
-        return diff(oldNode, newNode)
+    /**
+     * Reconciliate the current DOM with the new Node
+     * @param oldNode Node that need to be reconcile
+     * @param newNode Node that have the new elements
+     */
+    static reconciliate(oldNode: HTMLElement, newNode: HTMLElement) {
+        return reconciliate(oldNode, newNode)
     }
 }
 
@@ -59,6 +69,7 @@ export class Sparky {
 export function render(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn {
     const domNode = document.createElement("div");
     const func: Function[] = [];
+    const children: ISparkyComponent[] = [];
 
     const newHTML = (typeof html == "string") ? html
         : html.map((stringHTML, i) => {
@@ -71,10 +82,11 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
             } else if(computedProps[i].type && computedProps[i].type == "SparkyComponent") {
                 const comp = computedProps[i] as ISparkyComponent;
                 const render =  comp.selfFn.call(window, comp.self) as IRenderReturn;
-                
+
                 const div = document.createElement("div");
                 div.appendChild(render.dom)
 
+                children.push(comp);
                 func.push(...render.func);
                 htmlLine += div.innerHTML;
             } else {
@@ -88,5 +100,5 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
         })
         
     domNode.innerHTML = Array.isArray(newHTML) ? newHTML.join("") : newHTML;
-    return { dom: domNode.firstElementChild as HTMLElement, func };
+    return { dom: domNode.firstElementChild as HTMLElement, func, children };
 }

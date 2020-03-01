@@ -1,4 +1,4 @@
-export function diff(currentDom: HTMLElement, newDom: HTMLElement) {
+export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
     if (!currentDom && !newDom) return null;
     if (currentDom && !newDom) return null;
     if (!currentDom && newDom) return newDom;
@@ -18,6 +18,12 @@ export function diff(currentDom: HTMLElement, newDom: HTMLElement) {
         }
 
         if (!dom && nextDom) {
+            currentDomToAttach.appendChild(nextDom);
+            continue;
+        }
+
+        if(dom.nodeName == "#text" && nextDom.nodeName != "#text") {
+            currentDomToAttach.removeChild(dom);
             currentDomToAttach.appendChild(nextDom);
             continue;
         }
