@@ -22,7 +22,7 @@ function Main(self: SparkyFunction) {
         <div id="uno" class="lol">
             Hola a todos ${ a ? `<b>${a}</b>` : `no hay nada`} 
             <button onclick=${onClick}>Hey!</button>
-            ${self.component(SpanComponent)}
+            ${SpanComponent}
             ${text}
         </div>
     `;    
@@ -36,7 +36,7 @@ function Span(self: SparkyFunction) {
     return render/*html*/`
         <div>
             <span ondblclick=${doIt}>Hazlo</span>
-            <span>${ver}</span>
+            ${ver}
         </div>
     `
 }

@@ -15,6 +15,7 @@ export interface IReconciliateProps {
 export type ISelfFunction = (self: SparkyFunction) => IRenderReturn;
 
 export interface ISparkyComponent {
+    type: string;
     self: SparkyFunction;
     selfFn: ISelfFunction;
 }
@@ -28,11 +29,11 @@ export class Sparky {
      */
     static component(renderFunc: ISelfFunction) {
         const thisFunction = new SparkyFunction(renderFunc);
-        return { self: thisFunction, selfFn: renderFunc } as ISparkyComponent;
+        return { type: "SparkyComponent", self: thisFunction, selfFn: renderFunc } as ISparkyComponent;
     }
 
     /**
-     * Mount a Sparky Component in the DOM Tree and keep it hydrate.
+     * Mount a Sparky Component in the DOM Tree and keep it updated.
      * @param component Sparky Component
      * @param dom The dom element where you want to mount this component
      */
@@ -51,7 +52,7 @@ export class Sparky {
     }
 
     /**
-     * Reconciliate the current DOM with the new Node
+     * Reconciliate the current DOM with the new DOM Node
      * @param oldNode Node that need to be reconcile
      * @param newNode Node that have the new elements
      */
