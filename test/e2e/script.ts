@@ -6,6 +6,8 @@ const SpanComponent = Sparky.component(Span);
 Sparky.mount(Sparky.component(Main), document.getElementById("app"))
 
 function Main(self: SparkyFunction) {
+    self.initialState({boton: "Hugo", texto: "The world"})
+
     const a = (<string>self.getState("boton")); 
     const text = (<string>self.getState("texto")); 
 
@@ -36,7 +38,10 @@ function Span(self: SparkyFunction) {
     return render/*html*/`
         <div>
             <span ondblclick=${doIt}>Hazlo</span>
-            ${ver}
+            <span>
+                <span>Un nuevo Mundo </span>
+                ${ver}
+            </span>
         </div>
     `
 }

@@ -17,6 +17,11 @@ export class SparkyFunction {
         this.__parent = null;
     }
 
+    initialState = <S>(initialState: S) => {
+        if(Object.keys(this.state).length > 0) return;
+        this.state = initialState;
+    }
+
     /**
      * Execute after the render/update of the DOM tree.
      * @param callback - The function that you want to execute

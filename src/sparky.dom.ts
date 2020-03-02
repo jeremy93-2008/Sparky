@@ -41,13 +41,19 @@ export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
 
         if (dom.childNodes.length > 0) {
             currentDomToAttach = dom;
-            Array.from(dom.childNodes).forEach((child: HTMLElement) => currentDomStack.push(child))
+            Array.from(dom.childNodes).forEach((child: HTMLElement) => {
+                if(dom.childNodes.length == 1 && dom.childNodes[0].nodeName == "#text") return;
+                currentDomStack.push(child)
+            })
         }
 
         if (nextDom.childNodes.length > 0) {
             if (dom)
                 currentDomToAttach = dom;
-            Array.from(nextDom.childNodes).forEach((child: HTMLElement) => newDomStack.push(child))
+            Array.from(nextDom.childNodes).forEach((child: HTMLElement) => {
+                if(dom.childNodes.length == 1 && dom.childNodes[0].nodeName == "#text") return;
+                newDomStack.push(child)
+            })
         }
     }
 
