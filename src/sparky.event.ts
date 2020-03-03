@@ -15,13 +15,13 @@ export function setEvents(reconciliate: IReconciliateProps, self: SparkyFunction
 }
 
 export function setAllEvents(reconciliate: IReconciliateProps, self: SparkyFunction) : HTMLElement {
-    EventManager.clearEvents();
+    EventManager.removeUnusedEvents();
     
     const { dom, func } = reconciliate;
     const currentStack = [dom];
     while(currentStack.length > 0) {
         const ele = currentStack.shift();
-        setEvents({dom: ele, func: reconciliate.func}, self);
+        setEvents({dom: ele, func}, self);
         if(ele.children.length > 0) {
             Array.from(ele.children).map((child: HTMLElement) => currentStack.push(child))
         }

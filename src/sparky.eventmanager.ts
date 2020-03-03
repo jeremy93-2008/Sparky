@@ -10,22 +10,13 @@ type eventCallbackFn = (evt: Event) => void;
 
 
 export class EventManager {
-    static isReRendering = false;
     static oldEventType: string[] = [];
-    static eventType: string[] = [];
-    static eventList: eventListSingle[];
+    static eventList: eventListSingle[] = [];
 
-    static listen() {
-        let eventTypeArray = this.eventType;
-        
-        if(this.isReRendering)
-            eventTypeArray = this.eventType.filter((type) => !this.oldEventType.includes(type));
-        
-        eventTypeArray.forEach((type) => {
-            document.body.addEventListener(type,(event) => this.dispatchEvent(event))
+    static listen() {        
+        this.eventList.forEach(({type}) => {
+            document.body.addEventListener(type, (event) => this.dispatchEvent(event))
         });
-        
-        this.isReRendering = true;
     }
 
     static dispatchEvent(event: Event) {
@@ -39,13 +30,11 @@ export class EventManager {
     }
 
     static addEvent(dom: HTMLElement, type: string, callbackFn: eventCallbackFn) {
-        this.eventType.push(type)
         this.eventList.push({ dom, type, callbackFn });
     }
 
-    static clearEvents() {
-        this.oldEventType = this.eventType;
-        this.eventList = [];
-        this.eventType = [];
+    static removeUnusedEvents() {
+        this.eventList = this.eventList
+            .filter((evt) => evt.dom.isConnected);
     }
 }

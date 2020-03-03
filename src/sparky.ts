@@ -41,11 +41,10 @@ export class Sparky {
         const { self, selfFn } = component;
         const render = selfFn.call(window, self) as IRenderReturn;
         render.children.forEach((child) => child.self.__parent = component);
-
-        let finalDOM = reconciliate(this.currentDom, render.dom);
-        finalDOM = setAllEvents({dom: finalDOM, func: render.func}, self);
-        if (!finalDOM) return;
+        render.dom = setAllEvents({dom: render.dom, func: render.func}, self);
         EventManager.listen();
+        let finalDOM = reconciliate(this.currentDom, render.dom);      
+        if (!finalDOM) return;
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
         this.currentDom = finalDOM as HTMLElement;
