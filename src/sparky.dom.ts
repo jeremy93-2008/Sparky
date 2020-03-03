@@ -34,7 +34,8 @@ export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
             dom.parentElement.replaceChild(nextDom, dom);
         }
 
-        if (dom.nodeName == "#text" && nextDom.nodeName == "#text") {
+        if ((dom.nodeName == "#text" && nextDom.nodeName == "#text") 
+        || (nextDom.childNodes.length == 1 && nextDom.childNodes[0].nodeName == "#text")) {
             if (dom.textContent !== nextDom.textContent)
                 dom.textContent = nextDom.textContent
         }
