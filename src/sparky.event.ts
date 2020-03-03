@@ -14,9 +14,7 @@ export function setEvents(reconciliate: IReconciliateProps, self: SparkyFunction
     return dom;
 }
 
-export function setAllEvents(reconciliate: IReconciliateProps, self: SparkyFunction) : HTMLElement {
-    EventManager.removeUnusedEvents();
-    
+export function setAllEvents(reconciliate: IReconciliateProps, self: SparkyFunction) : HTMLElement {   
     const { dom, func } = reconciliate;
     const currentStack = [dom];
     while(currentStack.length > 0) {

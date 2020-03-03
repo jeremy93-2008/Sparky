@@ -12,10 +12,15 @@ type eventCallbackFn = (evt: Event) => void;
 export class EventManager {
     static oldEventType: string[] = [];
     static eventList: eventListSingle[] = [];
+    static eventListType: string[] = [];
 
-    static listen() {        
+    static listen() {
+        EventManager.removeUnusedEvents();
         this.eventList.forEach(({type}) => {
-            document.body.addEventListener(type, (event) => this.dispatchEvent(event))
+            if(!this.eventListType.find(t => t == type)) {
+                document.body.addEventListener(type, (event) => this.dispatchEvent(event))
+                this.eventListType.push(type);
+            }
         });
     }
 
