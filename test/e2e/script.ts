@@ -40,7 +40,7 @@ function Span(self: SparkyFunction) {
             <span ondblclick=${doIt}>Hazlo</span>
             <span>
                 <span>Un nuevo Mundo </span>
-                <span>${ver}</span>
+                ${ver}
             </span>
         </div>
     `

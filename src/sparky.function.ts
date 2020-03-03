@@ -17,6 +17,10 @@ export class SparkyFunction {
         this.__parent = null;
     }
 
+    /**
+     * Define state on component init
+     * @param initialState - The state object
+     */
     initialState = <S>(initialState: S) => {
         if(Object.keys(this.state).length > 0) return;
         this.state = initialState;
