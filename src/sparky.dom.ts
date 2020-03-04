@@ -48,7 +48,9 @@ export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
     return currentDom;
 }
 
-function pushChildNodes(dom: HTMLElement, currentDomToAttach: HTMLElement, currentDomStack: HTMLElement[], nextDom: HTMLElement, newDomStack: HTMLElement[]) {
+function pushChildNodes(dom: HTMLElement, currentDomToAttach: HTMLElement, 
+    currentDomStack: HTMLElement[], nextDom: HTMLElement, newDomStack: HTMLElement[]) {
+
     if (dom.childNodes.length > 0) {
         currentDomToAttach = populateChildren(dom, currentDomToAttach, dom, currentDomStack);
     }
@@ -60,6 +62,7 @@ function pushChildNodes(dom: HTMLElement, currentDomToAttach: HTMLElement, curre
 
 function populateChildren(connectedDom: HTMLElement, currentDomToAttach: HTMLElement, 
     walkDom: HTMLElement, domStack: HTMLElement[]) {
+        
     if (connectedDom)
         currentDomToAttach = connectedDom;
     Array.from(walkDom.childNodes).forEach((child: HTMLElement) => {
