@@ -23,6 +23,7 @@ export interface ISparkyComponent {
 
 export class Sparky {
     private static currentDom: HTMLElement;
+    public static _DEV_: boolean = true;
 
     /**
      * Generate a Sparky Component that can be mount.
@@ -39,26 +40,24 @@ export class Sparky {
      * @param dom The dom element where you want to mount this component
      */
     static mount(component: ISparkyComponent, dom?: HTMLElement) {
-        console.time();
+        if(this._DEV_)
+            console.time();
+        
         const { self, selfFn } = component;
-        console.time("render");
         const render = selfFn.call(window, self) as IRenderReturn;
-        console.timeEnd("render");
-        render.children.forEach((child) => child.self.__parent = component);
-        console.time("event");
+        render.children.forEach((child) => child.self.__parent = component);  
         render.dom = setAllEvents({dom: render.dom, func: render.func}, self);
-        console.timeEnd("event")
-        console.time("reconciliate")
-        let finalDOM = reconciliate(this.currentDom, render.dom);   
-        console.timeEnd("reconciliate")
+              
+        let finalDOM = reconciliate(this.currentDom, render.dom);           
         if (!finalDOM) return;
-        console.time("dom")
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
-        console.timeEnd("dom")
         EventManager.listen();
+        
         this.currentDom = finalDOM as HTMLElement;
-        console.timeEnd();
+        
+        if(this._DEV_)
+            console.timeEnd();
     }
 
     /**
@@ -92,6 +91,11 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
         })
         
     domNode.innerHTML = Array.isArray(newHTML) ? newHTML.join("") : newHTML;
+
+    if(domNode.children.length > 1) {
+        throw new TypeError("The render HTML can only had one root node");
+    }
+
     return { type: "SparkyRender", dom: domNode.firstElementChild as HTMLElement, func, children };
 }
 
