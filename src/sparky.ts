@@ -116,7 +116,7 @@ function getComputedValue(computedProps: any[], i: number, func: Function[], htm
     }
     else if (computedProps[i].type && computedProps[i].type == "SparkyComponent") {
         const comp = computedProps[i] as ISparkyComponent;
-        const render = comp.selfFn.call(window, comp.self) as IRenderReturn;
+        const render = comp.selfFn.call(window, comp.self, comp.self.props) as IRenderReturn;
         htmlLine = renderSparkyObject(render, func, htmlLine);
         children.push(comp);
     }

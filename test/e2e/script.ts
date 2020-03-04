@@ -1,8 +1,6 @@
 import { Sparky, render } from "../../src/sparky";
 import { SparkyFunction } from "../../src/sparky.function";
 
-const SpanComponent = Sparky.component(Span);
-
 Sparky.mount(Sparky.component(Main, { name: "Pablo"}), document.getElementById("app"))
 
 interface IProps {
@@ -28,13 +26,14 @@ function Main(self: SparkyFunction, props: IProps) {
         <div id="uno" class="lol">
             Hola a todos ${ a ? render `<b onclick=${onClick}>${a}</b>` : `no hay nada`} 
             <button onclick=${onClick}>Hey!</button>
-            ${SpanComponent}
+            ${Sparky.component(Span, {name: "Hola"})}
             ${text}
         </div>
     `;    
 }
 
-function Span(self: SparkyFunction) {
+function Span(self: SparkyFunction, props: IProps) {
+    console.log(props)
     const ver = (<string>self.getState("ver"))
     const doIt = () => {
         self.setState({ver: "Hola mundo nested"})
