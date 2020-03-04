@@ -3,10 +3,14 @@ import { SparkyFunction } from "../../src/sparky.function";
 
 const SpanComponent = Sparky.component(Span);
 
-Sparky.mount(Sparky.component(Main), document.getElementById("app"))
+Sparky.mount(Sparky.component(Main, { name: "Pablo"}), document.getElementById("app"))
 
-function Main(self: SparkyFunction) {
-    self.initialState({boton: "Hugo", texto: "The world"})
+interface IProps {
+    name: string;
+}
+
+function Main(self: SparkyFunction, props: IProps) {
+    self.initialState({boton: props.name, texto: "The world"})
 
     const a = (<string>self.getState("boton")); 
     const text = (<string>self.getState("texto")); 

@@ -13,13 +13,19 @@ export interface IReconciliateProps {
     func: Function[],
 }
 
-export type ISelfFunction = (self: SparkyFunction) => IRenderReturn;
+export type ISelfFunction = (self: SparkyFunction, props?: any) => IRenderReturn;
 
 export interface ISparkyComponent {
     type: string;
     self: SparkyFunction;
     selfFn: ISelfFunction;
 }
+
+export interface ISparkyProps {
+    [key: string]: any;
+}
+
+export type ISparkyState = ISparkyProps;
 
 export class Sparky {
     private static currentDom: HTMLElement;
@@ -29,8 +35,8 @@ export class Sparky {
      * Generate a Sparky Component that can be mount.
      * @param renderFunc The function that going to be execute to render html template
      */
-    static component(renderFunc: ISelfFunction) {
-        const thisFunction = new SparkyFunction(renderFunc);
+    static component(renderFunc: ISelfFunction, props?: ISparkyProps) {
+        const thisFunction = new SparkyFunction(renderFunc, props);
         return { type: "SparkyComponent", self: thisFunction, selfFn: renderFunc } as ISparkyComponent;
     }
 
@@ -44,7 +50,7 @@ export class Sparky {
             console.time();
         
         const { self, selfFn } = component;
-        const render = selfFn.call(window, self) as IRenderReturn;
+        const render = selfFn.call(window, self, self.props) as IRenderReturn;
         render.children.forEach((child) => child.self.__parent = component);  
         render.dom = setAllEvents({dom: render.dom, func: render.func}, self);
               

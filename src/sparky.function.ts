@@ -1,4 +1,4 @@
-import { Sparky, IRenderReturn, ISparkyComponent } from "./sparky";
+import { Sparky, IRenderReturn, ISparkyComponent, ISparkyProps, ISparkyState } from "./sparky";
 
 type UpdateCallback = () => void;
 
@@ -6,12 +6,14 @@ type DependenciesList = string[];
 
 export class SparkyFunction {
     public __parent: ISparkyComponent;
-
+    public props: ISparkyProps;
+    
     private newProps: string[] = [];
-    private state: any;
+    private state: ISparkyState;
     private renderFunc: (self: SparkyFunction) => IRenderReturn;
 
-    constructor(renderFunc: (self: SparkyFunction) => IRenderReturn) {
+    constructor(renderFunc: (self: SparkyFunction) => IRenderReturn, props: ISparkyProps) {
+        this.props = props;
         this.state = {};
         this.renderFunc = renderFunc;
         this.__parent = null;
@@ -44,7 +46,7 @@ export class SparkyFunction {
     */
     getState = <S>(props: string): S => {
         if (props) return this.state[props];
-        return this.state;
+        return this.state as S;
     }
 
     /**
