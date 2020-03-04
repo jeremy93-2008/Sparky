@@ -39,16 +39,26 @@ export class Sparky {
      * @param dom The dom element where you want to mount this component
      */
     static mount(component: ISparkyComponent, dom?: HTMLElement) {
+        console.time();
         const { self, selfFn } = component;
+        console.time("render");
         const render = selfFn.call(window, self) as IRenderReturn;
+        console.timeEnd("render");
         render.children.forEach((child) => child.self.__parent = component);
+        console.time("event");
         render.dom = setAllEvents({dom: render.dom, func: render.func}, self);
+        console.timeEnd("event")
+        console.time("reconciliate")
         let finalDOM = reconciliate(this.currentDom, render.dom);   
+        console.timeEnd("reconciliate")
         if (!finalDOM) return;
+        console.time("dom")
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
+        console.timeEnd("dom")
         EventManager.listen();
         this.currentDom = finalDOM as HTMLElement;
+        console.timeEnd();
     }
 
     /**
@@ -77,31 +87,37 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
             let htmlLine = ""
             htmlLine += stringHTML
             if(!computedProps[i]) return htmlLine;
-            if (typeof computedProps[i] == "function") {
-                func.push(computedProps[i])
-                htmlLine += "'functionScoped'";
-            } else if(computedProps[i].type && computedProps[i].type == "SparkyRender") {
-                const render = computedProps[i] as IRenderReturn;
-                htmlLine = renderSparkyObject(render, func, htmlLine);
-
-            } else if(computedProps[i].type && computedProps[i].type == "SparkyComponent") {
-                const comp = computedProps[i] as ISparkyComponent;
-                const render =  comp.selfFn.call(window, comp.self) as IRenderReturn;
-                htmlLine = renderSparkyObject(render, func, htmlLine);
-                children.push(comp);
-                
-            } else {
-                computedProps[i] = new String(computedProps[i]);
-                if ((computedProps[i] as string).startsWith("<"))
-                    htmlLine += computedProps[i]
-                else
-                    htmlLine += `<span class='computed'>${computedProps[i]}</span>`
-            }
+            htmlLine = getComputedValue(computedProps, i, func, htmlLine, children);
             return htmlLine;
         })
         
     domNode.innerHTML = Array.isArray(newHTML) ? newHTML.join("") : newHTML;
     return { type: "SparkyRender", dom: domNode.firstElementChild as HTMLElement, func, children };
+}
+
+function getComputedValue(computedProps: any[], i: number, func: Function[], htmlLine: string, children: ISparkyComponent[]) {
+    if (typeof computedProps[i] == "function") {
+        func.push(computedProps[i]);
+        htmlLine += "'functionScoped'";
+    }
+    else if (computedProps[i].type && computedProps[i].type == "SparkyRender") {
+        const render = computedProps[i] as IRenderReturn;
+        htmlLine = renderSparkyObject(render, func, htmlLine);
+    }
+    else if (computedProps[i].type && computedProps[i].type == "SparkyComponent") {
+        const comp = computedProps[i] as ISparkyComponent;
+        const render = comp.selfFn.call(window, comp.self) as IRenderReturn;
+        htmlLine = renderSparkyObject(render, func, htmlLine);
+        children.push(comp);
+    }
+    else {
+        computedProps[i] = new String(computedProps[i]);
+        if ((computedProps[i] as string).startsWith("<"))
+            htmlLine += computedProps[i];
+        else
+            htmlLine += `<span class='computed'>${computedProps[i]}</span>`;
+    }
+    return htmlLine;
 }
 
 function renderSparkyObject(render: IRenderReturn, func: Function[], htmlLine: string) {

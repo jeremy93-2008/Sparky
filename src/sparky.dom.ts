@@ -42,30 +42,31 @@ export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
 
         setAttributes(dom, nextDom);
 
-        currentDomToAttach = walkChildren(dom, currentDomToAttach, currentDomStack, nextDom, newDomStack);
+        currentDomToAttach = pushChildNodes(dom, currentDomToAttach, currentDomStack, nextDom, newDomStack);
     }
 
     return currentDom;
 }
 
-function walkChildren(dom: HTMLElement, currentDomToAttach: HTMLElement, currentDomStack: HTMLElement[], nextDom: HTMLElement, newDomStack: HTMLElement[]) {
+function pushChildNodes(dom: HTMLElement, currentDomToAttach: HTMLElement, currentDomStack: HTMLElement[], nextDom: HTMLElement, newDomStack: HTMLElement[]) {
     if (dom.childNodes.length > 0) {
-        currentDomToAttach = dom;
-        Array.from(dom.childNodes).forEach((child: HTMLElement) => {
-            if (dom.childNodes.length == 1 && dom.childNodes[0].nodeName == "#text")
-                return;
-            currentDomStack.push(child);
-        });
+        currentDomToAttach = populateChildren(dom, currentDomToAttach, dom, currentDomStack);
     }
     if (nextDom.childNodes.length > 0) {
-        if (dom)
-            currentDomToAttach = dom;
-        Array.from(nextDom.childNodes).forEach((child: HTMLElement) => {
-            if (dom.childNodes.length == 1 && dom.childNodes[0].nodeName == "#text")
-                return;
-            newDomStack.push(child);
-        });
+        currentDomToAttach = populateChildren(dom, currentDomToAttach, nextDom, newDomStack);
     }
+    return currentDomToAttach;
+}
+
+function populateChildren(connectedDom: HTMLElement, currentDomToAttach: HTMLElement, 
+    walkDom: HTMLElement, domStack: HTMLElement[]) {
+    if (connectedDom)
+        currentDomToAttach = connectedDom;
+    Array.from(walkDom.childNodes).forEach((child: HTMLElement) => {
+        if (connectedDom.childNodes.length == 1 && connectedDom.childNodes[0].nodeName == "#text")
+            return;
+        domStack.push(child);
+    });
     return currentDomToAttach;
 }
 
@@ -80,30 +81,39 @@ function setAttributes(currentDom: HTMLElement, nextDom: HTMLElement) {
         const currentAttr = currentAttributesList.shift();
         const nextAttr = nextAttributesList.shift();
 
-        if(currentAttr && !nextAttr) {
-            currentDom.removeAttribute(currentAttr.name);
-            continue;
-        }
+        reconciliateAttributes(currentAttr, nextAttr, currentDom);
 
-        if(!currentAttr && nextAttr) {
-            currentDom.setAttribute(nextAttr.name, nextAttr.value);
-            continue;
-        }
+        if(!currentDom || !nextAttr) continue;
 
-        if(currentAttr.name != nextAttr.name) {
-            currentDom.removeAttribute(currentAttr.name);
-            currentDom.setAttribute(nextAttr.name, nextAttr.value);
-            continue;
-        }
-
-        if(currentAttr.value != nextAttr.value) {
-            currentDom.getAttributeNode(nextAttr.name).value = nextAttr.value;
-        }
+        editAttributes(currentAttr, nextAttr, currentDom);
     }
     
     if(currentAttributesList.length > 0) {
-        currentAttributesList.forEach(attr => currentDom.attributes.removeNamedItem(attr.name))
+        removeUnusedAttribute(currentAttributesList, currentDom);
     }
+}
+
+function editAttributes(currentAttr: Attr, nextAttr: Attr, currentDom: HTMLElement) {
+    if (currentAttr.name != nextAttr.name) {
+        currentDom.removeAttribute(currentAttr.name);
+        currentDom.setAttribute(nextAttr.name, nextAttr.value);
+    }
+    if (currentAttr.value != nextAttr.value) {
+        currentDom.getAttributeNode(nextAttr.name).value = nextAttr.value;
+    }
+}
+
+function reconciliateAttributes(currentAttr: Attr, nextAttr: Attr, currentDom: HTMLElement) {
+    if (currentAttr && !nextAttr) {
+        currentDom.removeAttribute(currentAttr.name);
+    }
+    if (!currentAttr && nextAttr) {
+        currentDom.setAttribute(nextAttr.name, nextAttr.value);
+    }
+}
+
+function removeUnusedAttribute(currentAttributesList: Attr[], currentDom: HTMLElement) {
+    currentAttributesList.forEach(attr => currentDom.attributes.removeNamedItem(attr.name));
 }
 
 function transformAttributesToSortedArray(arrayLike: ArrayLike<Attr>) {
