@@ -4,6 +4,7 @@ import { setAllEvents } from "./sparky.event";
 import { EventManager } from "./sparky.eventmanager";
 
 export interface IRenderReturn extends IReconciliateProps {
+    type: string;
     children: ISparkyComponent[];
 }
 
@@ -79,16 +80,16 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
             if (typeof computedProps[i] == "function") {
                 func.push(computedProps[i])
                 htmlLine += "'functionScoped'";
+            } else if(computedProps[i].type && computedProps[i].type == "SparkyRender") {
+                const render = computedProps[i] as IRenderReturn;
+                htmlLine = renderSparkyObject(render, func, htmlLine);
+
             } else if(computedProps[i].type && computedProps[i].type == "SparkyComponent") {
                 const comp = computedProps[i] as ISparkyComponent;
                 const render =  comp.selfFn.call(window, comp.self) as IRenderReturn;
-
-                const div = document.createElement("div");
-                div.appendChild(render.dom)
-
+                htmlLine = renderSparkyObject(render, func, htmlLine);
                 children.push(comp);
-                func.push(...render.func);
-                htmlLine += div.innerHTML;
+                
             } else {
                 computedProps[i] = new String(computedProps[i]);
                 if ((computedProps[i] as string).startsWith("<"))
@@ -100,5 +101,13 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
         })
         
     domNode.innerHTML = Array.isArray(newHTML) ? newHTML.join("") : newHTML;
-    return { dom: domNode.firstElementChild as HTMLElement, func, children };
+    return { type: "SparkyRender", dom: domNode.firstElementChild as HTMLElement, func, children };
+}
+
+function renderSparkyObject(render: IRenderReturn, func: Function[], htmlLine: string) {
+    const div = document.createElement("div");
+    div.appendChild(render.dom);
+    func.push(...render.func);
+    htmlLine += div.innerHTML;
+    return htmlLine;
 }

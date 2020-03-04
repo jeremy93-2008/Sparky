@@ -22,7 +22,7 @@ function Main(self: SparkyFunction) {
 
     return render /*html*/`
         <div id="uno" class="lol">
-            Hola a todos ${ a ? `<b onclick=${onClick}>${a}</b>` : `no hay nada`} 
+            Hola a todos ${ a ? render `<b onclick=${onClick}>${a}</b>` : `no hay nada`} 
             <button onclick=${onClick}>Hey!</button>
             ${SpanComponent}
             ${text}

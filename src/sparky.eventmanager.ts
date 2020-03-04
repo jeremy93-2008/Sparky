@@ -26,12 +26,16 @@ export class EventManager {
 
     static dispatchEvent(event: Event) {
         this.eventList.forEach((evtList) => {
-            if(evtList.dom === event.target) {
+            if(this.isEventTarget(evtList, event)) {
                 if(evtList.type === event.type) {
                     evtList.callbackFn(event);
                 }
             }
         })
+    }
+
+    private static isEventTarget(evtList: eventListSingle, event: Event) {
+        return (evtList.dom === event.target) || evtList.dom.contains(event.target as HTMLElement);
     }
 
     static addEvent(dom: HTMLElement, type: string, callbackFn: eventCallbackFn) {
