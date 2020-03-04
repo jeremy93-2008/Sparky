@@ -48,29 +48,27 @@ export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
     return currentDom;
 }
 
-function pushChildNodes(dom: HTMLElement, currentDomToAttach: HTMLElement, 
-    currentDomStack: HTMLElement[], nextDom: HTMLElement, newDomStack: HTMLElement[]) {
+function pushChildNodes(dom: HTMLElement, domAttached: HTMLElement, 
+    domStack: HTMLElement[], nextDom: HTMLElement, newDomStack: HTMLElement[]) {
 
     if (dom.childNodes.length > 0) {
-        currentDomToAttach = populateChildren(dom, currentDomToAttach, dom, currentDomStack);
+        domAttached = populateChildren(dom, domAttached, dom, domStack);
     }
     if (nextDom.childNodes.length > 0) {
-        currentDomToAttach = populateChildren(dom, currentDomToAttach, nextDom, newDomStack);
+        domAttached = populateChildren(dom, domAttached, nextDom, newDomStack);
     }
-    return currentDomToAttach;
+    return domAttached;
 }
 
-function populateChildren(connectedDom: HTMLElement, currentDomToAttach: HTMLElement, 
-    walkDom: HTMLElement, domStack: HTMLElement[]) {
-        
-    if (connectedDom)
-        currentDomToAttach = connectedDom;
+function populateChildren(connectDom: HTMLElement, domAttached: HTMLElement, walkDom: HTMLElement, domStack: HTMLElement[]) {
+    if (connectDom)
+        domAttached = connectDom;
     Array.from(walkDom.childNodes).forEach((child: HTMLElement) => {
-        if (connectedDom.childNodes.length == 1 && connectedDom.childNodes[0].nodeName == "#text")
+        if (connectDom.childNodes.length == 1 && connectDom.childNodes[0].nodeName == "#text")
             return;
         domStack.push(child);
     });
-    return currentDomToAttach;
+    return domAttached;
 }
 
 function setAttributes(currentDom: HTMLElement, nextDom: HTMLElement) {
