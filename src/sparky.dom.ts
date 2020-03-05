@@ -3,14 +3,14 @@ export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
     if (currentDom && !newDom) return null;
     if (!currentDom && newDom) return newDom;
 
-    const currentDomStack = [currentDom];
-    let newDomStack = [newDom];
+    const currentDomQueue = [currentDom];
+    let newDomQueue = [newDom];
 
     let currentDomToAttach = currentDom;
 
-    while (currentDomStack.length > 0 || newDomStack.length > 0) {
-        let dom = currentDomStack.shift();
-        let nextDom = newDomStack.shift();
+    while (currentDomQueue.length > 0 || newDomQueue.length > 0) {
+        let dom = currentDomQueue.shift();
+        let nextDom = newDomQueue.shift();
 
         if (dom && !nextDom) {
             dom.parentElement.removeChild(dom);
@@ -42,7 +42,7 @@ export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
 
         setAttributes(dom, nextDom);
 
-        currentDomToAttach = pushChildNodes(dom, currentDomToAttach, currentDomStack, nextDom, newDomStack);
+        currentDomToAttach = pushChildNodes(dom, currentDomToAttach, currentDomQueue, nextDom, newDomQueue);
     }
 
     return currentDom;

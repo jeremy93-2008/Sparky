@@ -5,7 +5,7 @@ type UpdateCallback = () => void;
 type DependenciesList = string[];
 
 export class SparkyFunction {
-    public __parent: ISparkyComponent;
+    public __root: ISparkyComponent;
     public props: ISparkyProps;
     
     private newProps: string[] = [];
@@ -16,7 +16,7 @@ export class SparkyFunction {
         this.props = props;
         this.state = {};
         this.renderFunc = renderFunc;
-        this.__parent = null;
+        this.__root = null;
     }
 
     /**
@@ -56,7 +56,7 @@ export class SparkyFunction {
     setState = <S>(newState: S) => {
         this.newProps = Object.keys(newState);
         this.state = { ...this.state, ...newState };
-        (this.__parent) ? Sparky.mount(this.__parent) :
+        (this.__root) ? Sparky.mount(this.__root) :
             Sparky.mount({ type: "SparkyComponent", self: this, selfFn: this.renderFunc });
     }
 }
