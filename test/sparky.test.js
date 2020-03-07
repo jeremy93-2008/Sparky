@@ -127,18 +127,4 @@ describe("Mount function", () => {
         // console.log(document.body.innerHTML)
         expect(document.body).toMatchSnapshot()
     });
-    test("Computed w/ Events and State function", () => {
-        Sparky.mount(Sparky.component((self) => {
-            const a = self.getState("boton");
-            return lib.render /*html*/`
-            <div onclick=${() => {
-                self.setState({boton: "Sparky Framework"});
-            }}>
-                <p>Hola a todos ${a}</p>
-            </div>
-            `
-        }), document.body);
-        // console.log(document.body.innerHTML)
-        expect(document.body).toMatchSnapshot()
-    });
 })

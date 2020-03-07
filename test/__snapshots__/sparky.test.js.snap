@@ -33,25 +33,6 @@ exports[`Mount function Computed function 1`] = `
 </body>
 `;
 
-exports[`Mount function Computed w/ Events and State function 1`] = `
-<body>
-  <div>
-    
-                
-    <p>
-      Hola a todos 
-      <span
-        class="computed"
-      >
-        undefined
-      </span>
-    </p>
-    
-            
-  </div>
-</body>
-`;
-
 exports[`Mount function Computed w/ State function 1`] = `
 <body>
   <div>
@@ -59,11 +40,6 @@ exports[`Mount function Computed w/ State function 1`] = `
                 
     <p>
       Hola a todos 
-      <span
-        class="computed"
-      >
-        undefined
-      </span>
     </p>
     
             
