@@ -2,22 +2,28 @@ import nanoid from "nanoid";
 
 import { SparkyFunction } from "./sparky.function";
 import { reconciliate } from "./sparky.dom";
-import { setAllEvents } from "./sparky.event";
 import { EventManager } from "./sparky.eventmanager";
 import { SparkyComponent } from "./sparky.component";
 
 export interface IRenderReturn extends IReconciliateProps {
     type: string;
-    children: ISparkyComponent[];
+    nestedComponents: ISparkyComponent[];
+    children: IRenderReturn[];
     renderId: string;
 }
 
 export interface IReconciliateProps {
     dom: HTMLElement,
-    func: Function[],
+    func: ISparkyEventFunc[],
 }
 
 export type ISelfFunction = (self: SparkyFunction, props?: any) => IRenderReturn;
+
+export interface ISparkyEventFunc {
+    renderId: string;
+    index: number;
+    func: Function;
+}
 
 export interface ISparkyComponent {
     type: string;
@@ -55,10 +61,9 @@ export class Sparky {
         
         const { self, selfFn } = component;
         const render = selfFn.call(window, self, self.props) as IRenderReturn;
-        
+
         render.dom = SparkyComponent.populate(render, component);
 
-        render.dom = setAllEvents({dom: render.dom, func: render.func}, self);
         let finalDOM = reconciliate(this.currentDom, render.dom);           
         if (!finalDOM) return;
         if (!finalDOM.isConnected && dom)
@@ -89,8 +94,9 @@ export class Sparky {
  */
 export function render(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn {
     const domNode = document.createElement("div");
-    const func: Function[] = [];
-    const children: ISparkyComponent[] = [];
+    const func: ISparkyEventFunc[] = [];
+    const nestedComponents: ISparkyComponent[] = [];
+    const children: IRenderReturn[] = [];
     const renderId = nanoid(12);
 
     const newHTML = (typeof html == "string") ? html
@@ -98,7 +104,7 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
             let htmlLine = ""
             htmlLine += stringHTML
             if(!computedProps[i]) return htmlLine;
-            htmlLine = getComputedValue(computedProps, i, func, htmlLine, children, renderId);
+            htmlLine = getComputedValue(computedProps, i, func, htmlLine, nestedComponents, children, renderId);
             return htmlLine;
         })
         
@@ -108,22 +114,23 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
         throw new TypeError("The render HTML can only had one root node");
     }
 
-    return { type: "SparkyRender", dom: domNode.firstElementChild as HTMLElement, func, children, renderId };
+    return { type: "SparkyRender", dom: domNode.firstElementChild as HTMLElement, func, nestedComponents, children, renderId };
 }
 
-function getComputedValue(computedProps: any[], i: number, func: Function[], htmlLine: string, children: ISparkyComponent[], renderId: string) {
+function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFunc[], htmlLine: string, nestedComponents: ISparkyComponent[], children: IRenderReturn[], renderId: string) {
     if (typeof computedProps[i] == "function") {
-        func.push(computedProps[i]);
-        htmlLine += "'functionScoped'";
+        func.push({index: func.length - 1, renderId, func: computedProps[i]});
+        htmlLine += `'SparkyFunction#${renderId}#${func.length - 1}'`;
     }
     else if (computedProps[i].type == "SparkyRender") {
         const render = computedProps[i] as IRenderReturn;
-        htmlLine = renderSparkyObject(render, func, htmlLine);
+        htmlLine = renderSparkyObject(render, htmlLine);
+        children.push(render)
     }
     else if (computedProps[i].type == "SparkyComponent") {
         const comp = computedProps[i] as ISparkyComponent;
-        htmlLine += `<!-- SparkyComponent#${comp.selfFn.name}#${children.length}#${renderId} -->`;
-        children.push(comp);
+        htmlLine += `<!-- SparkyComponent#${comp.selfFn.name}#${nestedComponents.length}#${renderId} -->`;
+        nestedComponents.push(comp);
     }
     else {
         computedProps[i] = new String(computedProps[i]);
@@ -135,10 +142,9 @@ function getComputedValue(computedProps: any[], i: number, func: Function[], htm
     return htmlLine;
 }
 
-function renderSparkyObject(render: IRenderReturn, func: Function[], htmlLine: string) {
+function renderSparkyObject(render: IRenderReturn, htmlLine: string) {
     const div = document.createElement("div");
     div.appendChild(render.dom);
-    func.push(...render.func);
     htmlLine += div.innerHTML;
     return htmlLine;
 }

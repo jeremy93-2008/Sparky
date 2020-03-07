@@ -32,7 +32,8 @@ export class EventManager {
         })
     }
 
-    static addEvent(dom: HTMLElement, type: string, callbackFn: eventCallbackFn) {
+    static addEvent(eventSingle: eventListSingle) {
+        const {dom, type, callbackFn} = eventSingle;
         this.eventList.push({ dom, type, callbackFn });
     }
 

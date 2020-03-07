@@ -1,4 +1,6 @@
 import { IRenderReturn, ISparkyComponent } from "./sparky";
+import { findEvent } from "./sparky.event";
+import { EventManager } from "./sparky.eventmanager";
 
 interface ICachedComponent {
     component: ISparkyComponent,
@@ -6,7 +8,7 @@ interface ICachedComponent {
 }
 
 export class SparkyComponent {
-    static cachedComponent: ICachedComponent[][] = [];
+    private static cachedComponent: ICachedComponent[][] = [];
     static populate(render: IRenderReturn, rootComponent: ISparkyComponent) {
         
         const renderQueue = [render];
@@ -16,21 +18,38 @@ export class SparkyComponent {
         while (renderQueue.length > 0) {
             const currentRender = renderQueue.shift();
             if(!this.cachedComponent[depthHorizontal]) this.cachedComponent[depthHorizontal] = [];
-            currentRender.children.forEach((currentChild, index) => {
+
+            currentRender.func.forEach((currentFunc, index) => {
+                const currentEvent = findEvent(render.dom, currentRender.renderId, index);
+                const eventName = currentEvent.attr.name.replace("on", "");
+                EventManager.addEvent({
+                    dom: currentEvent.dom,
+                    type: eventName,
+                    callbackFn: currentFunc.func.bind(window, event)
+                })
+                currentEvent.dom.removeAttribute(currentEvent.attr.name)
+            })
+
+            currentRender.children.forEach((currentChild) => {
+                renderQueue.push(currentChild)
+            })
+
+            currentRender.nestedComponents.forEach((currentComp, index) => {
+                if(currentComp.type !== "SparkyComponent") return;
                 const cached = this.cachedComponent[depthHorizontal][index];
-                const commentDom = this.findComment(render.dom, currentRender.renderId, index, currentChild.selfFn.name);
+                const commentDom = this.findComment(render.dom, currentRender.renderId, index, currentComp.selfFn.name);
                 if(cached) {
-                    currentChild = cached.component;
+                    currentComp = cached.component;
                 }
-                const renderChild = currentChild.selfFn(currentChild.self, currentChild.self.props);
+                const renderChild = currentComp.selfFn(currentComp.self, currentComp.self.props);
                 if(!commentDom) return;
                 commentDom.parentNode.replaceChild(renderChild.dom, commentDom);
-                currentChild.self.__root = rootComponent;
+                currentComp.self.__root = rootComponent;
                 render.func.push(...renderChild.func);
                 renderQueue.push(renderChild);
 
                 this.cachedComponent[depthHorizontal].push({
-                    component: currentChild,
+                    component: currentComp,
                     dom: renderChild.dom
                 })
             });
@@ -48,7 +67,9 @@ export class SparkyComponent {
                 return elem;
             }
 
-            domQueue.push(...Array.from(elem.childNodes as NodeListOf<HTMLElement>));
+            Array.from(elem.childNodes as NodeListOf<HTMLElement>).forEach((child) => {
+                domQueue.push(child)
+            })
         }
     }
 }

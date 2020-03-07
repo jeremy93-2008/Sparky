@@ -39,11 +39,11 @@ function SpanNest(self: SparkyFunction, props: IProps) {
     console.log(props)
     const ver = (<string>self.getState("ver"))
     const doIt = () => {
-        self.setState({ver: "Hola mundo nested"})
+        self.setState({ver: "Uno para ti"})
     }
     return render/*html*/`
         <div>
-            <span ondblclick=${doIt}>Hazlo</span>
+            <span ondblclick=${doIt}>Hazlo 2</span>
             <span>
                 <span>${ver}</span>    
             </span>
@@ -55,12 +55,12 @@ function SpanNest(self: SparkyFunction, props: IProps) {
 function Span(self: SparkyFunction, props: IProps) {
     console.log(props)
     const ver = (<string>self.getState("ver"))
-    const doIt = () => {
-        self.setState({ver: "Hola mundo nested"})
+    const click = () => {
+        self.setState({ver: "Otro para mi"})
     }
     return render/*html*/`
         <div>
-            <span ondblclick=${doIt}>Hazlo</span>
+            <span ondblclick=${click}>Hazlo</span>
             <span>
                 <span>Un nuevo Mundo </span>
                 ${ver}
