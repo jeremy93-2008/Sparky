@@ -1,5 +1,5 @@
-import { Sparky, render } from "../../src/sparky";
-import { SparkyFunction } from "../../src/sparky.function";
+import { Sparky, render } from "../../dist/sparky";
+import { SparkyFunction } from "../../dist/sparky.function";
 
 Sparky.mount(Sparky.component(Main, { name: "Pablo"}), document.getElementById("app"))
 

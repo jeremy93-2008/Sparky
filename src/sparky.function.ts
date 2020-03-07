@@ -38,6 +38,7 @@ export class SparkyFunction {
         if (!dependenciesChanged && this.newProps.length == 0 ||
             dependenciesChanged && dependenciesChanged.length == 0 ||
             this.newProps.some((props) => dependenciesChanged && dependenciesChanged.includes(props)))
+            //@ts-ignore
             window.requestIdleCallback(() => callback.call(this))
     }
 
