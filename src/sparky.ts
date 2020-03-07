@@ -1,9 +1,14 @@
-import nanoid from "nanoid";
+import nanoid from "nanoid/non-secure";
+import "core-js/stable";
 
 import { SparkyFunction } from "./sparky.function";
 import { reconciliate } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
 import { SparkyComponent } from "./sparky.component";
+
+import { isConnectedPolyfill } from "./polyfill/isConnected"
+
+isConnectedPolyfill();
 
 export interface IRenderReturn extends IReconciliateProps {
     type: string;

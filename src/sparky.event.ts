@@ -1,3 +1,5 @@
+import "string.prototype.startswith";
+
 interface IEventReturn {
     dom: HTMLElement;
     attr: Attr;

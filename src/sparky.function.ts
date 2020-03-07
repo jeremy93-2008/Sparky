@@ -1,4 +1,5 @@
 import { Sparky, IRenderReturn, ISparkyComponent, ISparkyProps, ISparkyState } from "./sparky";
+import 'requestidlecallback-polyfill';
 
 type UpdateCallback = () => void;
 

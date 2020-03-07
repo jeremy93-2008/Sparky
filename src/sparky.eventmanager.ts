@@ -1,3 +1,7 @@
+import { isConnectedPolyfill } from "./polyfill/isConnected"
+
+isConnectedPolyfill();
+
 interface eventListSingle {
     dom: HTMLElement;
     type: string;
@@ -6,7 +10,6 @@ interface eventListSingle {
 
 type eventCallbackFn = (evt: Event) => void;
 
-
 export class EventManager {
     static oldEventType: string[] = [];
     static eventList: eventListSingle[] = [];
@@ -14,9 +17,10 @@ export class EventManager {
 
     static listen() {
         EventManager.removeUnusedEvents();
-        this.eventList.forEach(({type}) => {
+        this.eventList.forEach((event) => {
+            const { type } = event;
             if(!this.isEventTypeListening(type)) {
-                document.body.addEventListener(type, (event) => this.dispatchEvent(event))
+                document.addEventListener(type, (event) => this.dispatchEvent(event))
                 this.eventListType.push(type);
             }
         });

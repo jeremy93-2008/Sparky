@@ -36,7 +36,6 @@ function Main(self: SparkyFunction, props: IProps) {
 }
 
 function SpanNest(self: SparkyFunction, props: IProps) {
-    console.log(props)
     const ver = (<string>self.getState("ver"))
     const doIt = () => {
         self.setState({ver: "Uno para ti"})
@@ -53,10 +52,9 @@ function SpanNest(self: SparkyFunction, props: IProps) {
 }
 
 function Span(self: SparkyFunction, props: IProps) {
-    console.log(props)
     const ver = (<string>self.getState("ver"))
     const click = () => {
-        self.setState({ver: "Otro para mi"})
+        self.setState({ver: new Date().toISOString()})
     }
     return render/*html*/`
         <div>
