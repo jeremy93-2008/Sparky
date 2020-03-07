@@ -2,7 +2,7 @@ import nanoid from "nanoid/non-secure";
 import "core-js/stable";
 
 import { SparkyFunction } from "./sparky.function";
-import { reconciliate } from "./sparky.dom";
+import { reconciliate, getCurrentDom, setCurrentDom } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
 import { SparkyComponent } from "./sparky.component";
 
@@ -43,7 +43,6 @@ export interface ISparkyProps {
 export type ISparkyState = ISparkyProps;
 
 export class Sparky {
-    private static currentDom: HTMLElement;
     public static _DEV_: boolean = true;
 
     /**
@@ -69,13 +68,13 @@ export class Sparky {
 
         render.dom = SparkyComponent.populate(render, component);
 
-        let finalDOM = reconciliate(this.currentDom, render.dom);           
+        let finalDOM = reconciliate(getCurrentDom(), render.dom);           
         if (!finalDOM) return;
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
         EventManager.listen();
         
-        this.currentDom = finalDOM as HTMLElement;
+        setCurrentDom(finalDOM as HTMLElement);
         
         if(this._DEV_)
             console.timeEnd();

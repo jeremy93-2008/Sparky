@@ -1,3 +1,13 @@
+let currentDom: HTMLElement = null;
+
+export function getCurrentDom() {
+    return currentDom;
+}
+
+export function setCurrentDom(dom: HTMLElement) {
+    currentDom = dom;
+}
+
 export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
     if (!currentDom && !newDom) return null;
     if (currentDom && !newDom) return null;

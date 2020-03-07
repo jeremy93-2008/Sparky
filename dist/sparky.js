@@ -36,7 +36,7 @@ while (i-- - 10) {
  * @name nonSecure
  * @function
  */
-var C__Users_jerem_OneDrive_Documentos_Creaciones_Sparky_node_modules_nanoid_nonSecure = function (size) {
+var C__Users_jerem_Documents_Creaciones_Sparky_node_modules_nanoid_nonSecure = function (size) {
   var id = '';
   i = size || 21;
   // Compact alternative for `for (var i = 0; i < size; i++)`
@@ -9252,6 +9252,13 @@ var __assign = function() {
     return __assign.apply(this, arguments);
 };
 
+var currentDom = null;
+function getCurrentDom() {
+    return currentDom;
+}
+function setCurrentDom(dom) {
+    currentDom = dom;
+}
 function reconciliate(currentDom, newDom) {
     if (!currentDom && !newDom)
         return null;
@@ -9567,13 +9574,13 @@ var Sparky = (function () {
         var self = component.self, selfFn = component.selfFn;
         var render = selfFn.call(window, self, self.props);
         render.dom = SparkyComponent.populate(render, component);
-        var finalDOM = reconciliate(this.currentDom, render.dom);
+        var finalDOM = reconciliate(getCurrentDom(), render.dom);
         if (!finalDOM)
             return;
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
         EventManager.listen();
-        this.currentDom = finalDOM;
+        setCurrentDom(finalDOM);
         if (this._DEV_)
             console.timeEnd();
     };
@@ -9632,13 +9639,13 @@ var Sparky$1 = (function () {
         var self = component.self, selfFn = component.selfFn;
         var render = selfFn.call(window, self, self.props);
         render.dom = SparkyComponent.populate(render, component);
-        var finalDOM = reconciliate(this.currentDom, render.dom);
+        var finalDOM = reconciliate(getCurrentDom(), render.dom);
         if (!finalDOM)
             return;
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
         EventManager.listen();
-        this.currentDom = finalDOM;
+        setCurrentDom(finalDOM);
         if (this._DEV_)
             console.timeEnd();
     };
@@ -9657,7 +9664,7 @@ function render(html) {
     var func = [];
     var nestedComponents = [];
     var children = [];
-    var renderId = C__Users_jerem_OneDrive_Documentos_Creaciones_Sparky_node_modules_nanoid_nonSecure(12);
+    var renderId = C__Users_jerem_Documents_Creaciones_Sparky_node_modules_nanoid_nonSecure(12);
     var newHTML = (typeof html == "string") ? html
         : html.map(function (stringHTML, i) {
             var htmlLine = "";

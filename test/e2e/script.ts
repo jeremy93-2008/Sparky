@@ -1,7 +1,7 @@
 import { Sparky, render } from "../../dist/sparky";
 import { SparkyFunction } from "../../dist/sparky.function";
 
-Sparky.mount(Sparky.component(Main, { name: "Pablo"}), document.getElementById("app"))
+Sparky.mount(Sparky.component(Main, { name: "Hugo"}), document.getElementById("app"))
 
 interface IProps {
     name: string;

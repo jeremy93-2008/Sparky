@@ -26,7 +26,6 @@ export interface ISparkyProps {
 }
 export declare type ISparkyState = ISparkyProps;
 export declare class Sparky {
-    private static currentDom;
     static _DEV_: boolean;
     static component(renderFunc: ISelfFunction, props?: ISparkyProps): ISparkyComponent;
     static mount(component: ISparkyComponent, dom?: HTMLElement): void;
