@@ -9362,6 +9362,14 @@ function transformAttributesToSortedArray(arrayLike) {
     });
 }
 
+/*
+ * Node.isConnected polyfill for IE and EdgeHTML
+ * 2020-02-04
+ *
+ * By Eli Grey, https://eligrey.com
+ * Public domain.
+ * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+ */
 function isConnectedPolyfill() {
     if (!('isConnected' in Node.prototype)) {
         Object.defineProperty(Node.prototype, 'isConnected', {
@@ -9375,7 +9383,7 @@ function isConnectedPolyfill() {
 }
 
 isConnectedPolyfill();
-var EventManager = (function () {
+var EventManager = /** @class */ (function () {
     function EventManager() {
     }
     EventManager.listen = function () {
@@ -9491,7 +9499,7 @@ function findEvent(element, renderId, index) {
     }
 }
 
-var SparkyComponent = (function () {
+var SparkyComponent = /** @class */ (function () {
     function SparkyComponent() {
     }
     SparkyComponent.populate = function (render, rootComponent) {
@@ -9561,13 +9569,22 @@ var SparkyComponent = (function () {
 }());
 
 isConnectedPolyfill();
-var Sparky = (function () {
+var Sparky = /** @class */ (function () {
     function Sparky() {
     }
+    /**
+     * Generate a Sparky Component that can be mount.
+     * @param renderFunc The function that going to be execute to render html template
+     */
     Sparky.component = function (renderFunc, props) {
         var thisFunction = new SparkyFunction(renderFunc, props);
         return { type: "SparkyComponent", self: thisFunction, selfFn: renderFunc };
     };
+    /**
+     * Mount a Sparky Component in the DOM Tree and keep it updated.
+     * @param component Sparky Component
+     * @param dom The dom element where you want to mount this component
+     */
     Sparky.mount = function (component, dom) {
         if (this._DEV_)
             console.time();
@@ -9584,6 +9601,11 @@ var Sparky = (function () {
         if (this._DEV_)
             console.timeEnd();
     };
+    /**
+     * Reconciliate the current DOM with the new DOM Node
+     * @param oldNode Node that need to be reconcile
+     * @param newNode Node that have the new elements
+     */
     Sparky.reconciliate = function (oldNode, newNode) {
         return reconciliate(oldNode, newNode);
     };
@@ -9591,26 +9613,44 @@ var Sparky = (function () {
     return Sparky;
 }());
 
-var SparkyFunction = (function () {
+var SparkyFunction = /** @class */ (function () {
     function SparkyFunction(renderFunc, props) {
         var _this = this;
         this.newProps = [];
+        /**
+         * Execute on Initial Phase to set up the compnent's state object
+         * @param initialState - The initial state object
+         */
         this.initialState = function (initialState) {
             if (Object.keys(_this.state).length > 0)
                 return;
             _this.state = initialState;
         };
+        /**
+         * Execute after the render/update of the DOM tree.
+         * @param callback - The function that you want to execute
+         * @param dependenciesChanged - An array of keys to know when the onUpdate need to be executed
+         */
         this.onUpdate = function (callback, dependenciesChanged) {
             if (!dependenciesChanged && _this.newProps.length == 0 ||
                 dependenciesChanged && dependenciesChanged.length == 0 ||
                 _this.newProps.some(function (props) { return dependenciesChanged && dependenciesChanged.includes(props); }))
+                //@ts-ignore
                 window.requestIdleCallback(function () { return callback.call(_this); });
         };
+        /**
+        * Get State object value of this context
+        * @param props - the specific key of the value that you want to retrieve
+        */
         this.getState = function (props) {
             if (props)
                 return _this.state[props];
             return _this.state;
         };
+        /**
+         * Add/Set a new value into the State object of the context
+         * @param newState - new Value
+         */
         this.setState = function (newState) {
             _this.newProps = Object.keys(newState);
             _this.state = __assign(__assign({}, _this.state), newState);
@@ -9626,13 +9666,22 @@ var SparkyFunction = (function () {
 }());
 
 isConnectedPolyfill();
-var Sparky$1 = (function () {
+var Sparky$1 = /** @class */ (function () {
     function Sparky() {
     }
+    /**
+     * Generate a Sparky Component that can be mount.
+     * @param renderFunc The function that going to be execute to render html template
+     */
     Sparky.component = function (renderFunc, props) {
         var thisFunction = new SparkyFunction(renderFunc, props);
         return { type: "SparkyComponent", self: thisFunction, selfFn: renderFunc };
     };
+    /**
+     * Mount a Sparky Component in the DOM Tree and keep it updated.
+     * @param component Sparky Component
+     * @param dom The dom element where you want to mount this component
+     */
     Sparky.mount = function (component, dom) {
         if (this._DEV_)
             console.time();
@@ -9649,12 +9698,23 @@ var Sparky$1 = (function () {
         if (this._DEV_)
             console.timeEnd();
     };
+    /**
+     * Reconciliate the current DOM with the new DOM Node
+     * @param oldNode Node that need to be reconcile
+     * @param newNode Node that have the new elements
+     */
     Sparky.reconciliate = function (oldNode, newNode) {
         return reconciliate(oldNode, newNode);
     };
     Sparky._DEV_ = true;
     return Sparky;
 }());
+/**
+ * Render the html string template to HTML elements
+ * @param html Array of HTML String
+ * @param computedProps Computed Props used to pass Javascript into template
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
+ */
 function render(html) {
     var computedProps = [];
     for (var _i = 1; _i < arguments.length; _i++) {
