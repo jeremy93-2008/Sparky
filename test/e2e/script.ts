@@ -28,7 +28,7 @@ function Main(self: SparkyFunction, props: IProps) {
             <div>
                 <div>${Sparky.component(Span, {name: a})}</div>
             </div>
-            ${Sparky.component(SpanNest, {name: "Hola"})}
+            ${Sparky.component(SpanNest)}
             ${text}
         </div>
     `;    

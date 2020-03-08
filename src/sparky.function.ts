@@ -14,7 +14,7 @@ export class SparkyFunction {
     private renderFunc: (self: SparkyFunction) => IRenderReturn;
 
     constructor(renderFunc: (self: SparkyFunction) => IRenderReturn, props: ISparkyProps) {
-        this.props = Object.freeze(props);
+        this.props = Object.freeze(props || {});
         this.state = {};
         this.renderFunc = renderFunc;
         this.__root = null;

@@ -82,7 +82,7 @@ this.getState=function(e){return e?n.state[e]:n.state},
            * Add/Set a new value into the State object of the context
            * @param newState - new Value
            */
-this.setState=function(e){n.newProps=Object.keys(e),n.state=o(o({},n.state),e),n.__root?N.mount(n.__root):N.mount({type:"SparkyComponent",self:n,selfFn:n.renderFunc})},this.props=Object.freeze(t),this.state={},this.renderFunc=e,this.__root=null};C();var T=(
+this.setState=function(e){n.newProps=Object.keys(e),n.state=o(o({},n.state),e),n.__root?N.mount(n.__root):N.mount({type:"SparkyComponent",self:n,selfFn:n.renderFunc})},this.props=Object.freeze(t||{}),this.state={},this.renderFunc=e,this.__root=null};C();var T=(
 /**
        * Generate a Sparky Component that can be mount.
        * @param renderFunc The function that going to be execute to render html template
