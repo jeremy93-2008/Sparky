@@ -1,6 +1,6 @@
 {
-  "name": "sparky",
-  "version": "1.0.0",
+  "name": "sparky-js",
+  "version": "1.0.2",
   "description": "New framework to develop web application quicker",
   "main": "sparky.js",
   "repository": {
@@ -13,6 +13,12 @@
     "url": "https://github.com/jeremy93-2008/Sparky/issues"
   },
   "homepage": "https://github.com/jeremy93-2008/Sparky#readme",
+  "keywords": [
+    "client",
+    "frontend",
+    "framework",
+    "javascript"
+  ],
   "dependencies": {
     "core-js": "^3.6.4",
     "nanoid": "^2.1.11",
