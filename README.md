@@ -16,6 +16,6 @@ The idea behind this library was to create something like React but without the 
     Sparky.mount(Sparky.component(Main), document.getElementById("app"));
 
     function Main() {
-        return render `<span>Hola mundo</span>`;
+        return render `<span>Hello World</span>`;
     }
 ```
