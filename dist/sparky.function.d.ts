@@ -10,11 +10,6 @@ export declare class SparkyFunction {
     private renderFunc;
     constructor(renderFunc: (self: SparkyFunction) => IRenderReturn, props: ISparkyProps);
     /**
-     * Execute on Initial Phase to set up the compnent's state object
-     * @param initialState - The initial state object
-     */
-    initialState: <S>(initialState: S) => void;
-    /**
      * Execute after the render/update of the DOM tree.
      * @param callback - The function that you want to execute
      * @param dependenciesChanged - An array of keys to know when the onUpdate need to be executed

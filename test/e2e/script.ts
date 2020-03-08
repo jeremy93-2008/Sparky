@@ -8,10 +8,9 @@ interface IProps {
 }
 
 function Main(self: SparkyFunction, props: IProps) {
-    self.initialState({boton: props.name, texto: "The world"})
 
-    const a = (<string>self.getState("boton")); 
-    const text = (<string>self.getState("texto")); 
+    const a = (<string>self.getState("boton")) || props.name; 
+    const text = (<string>self.getState("texto")) || "The world"; 
 
     self.onUpdate(() => {
         console.log("after dom render");
@@ -27,7 +26,7 @@ function Main(self: SparkyFunction, props: IProps) {
             Hola a todos ${ a ? render `<b onclick=${onClick}>${a}</b>` : `no hay nada`}
             <button onclick=${onClick}>Hey!</button>
             <div>
-                <div>${Sparky.component(Span, {name: "Hola"})}</div>
+                <div>${Sparky.component(Span, {name: a})}</div>
             </div>
             ${Sparky.component(SpanNest, {name: "Hola"})}
             ${text}
@@ -52,6 +51,7 @@ function SpanNest(self: SparkyFunction, props: IProps) {
 }
 
 function Span(self: SparkyFunction, props: IProps) {
+    const name = props ? props.name : "Esto no es una prop";
     const ver = (<string>self.getState("ver"))
     const click = () => {
         self.setState({ver: new Date().toISOString()})
@@ -60,7 +60,7 @@ function Span(self: SparkyFunction, props: IProps) {
         <div>
             <span ondblclick=${click}>Hazlo</span>
             <span>
-                <span>Un nuevo Mundo </span>
+                <span>Un nuevo Mundo ${name}</span>
                 ${ver}
             </span>
         </div>

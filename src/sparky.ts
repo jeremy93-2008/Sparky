@@ -64,7 +64,7 @@ export class Sparky {
             console.time();
         
         const { self, selfFn } = component;
-        const render = selfFn.call(window, self, self.props) as IRenderReturn;
+        const render = selfFn.call(window, self, Object.freeze(self.props)) as IRenderReturn;
 
         render.dom = SparkyComponent.populate(render, component);
 

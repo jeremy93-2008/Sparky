@@ -14,21 +14,12 @@ export class SparkyFunction {
     private renderFunc: (self: SparkyFunction) => IRenderReturn;
 
     constructor(renderFunc: (self: SparkyFunction) => IRenderReturn, props: ISparkyProps) {
-        this.props = props;
+        this.props = Object.freeze(props);
         this.state = {};
         this.renderFunc = renderFunc;
         this.__root = null;
     }
-
-    /**
-     * Execute on Initial Phase to set up the compnent's state object
-     * @param initialState - The initial state object
-     */
-    initialState = <S>(initialState: S) => {
-        if(Object.keys(this.state).length > 0) return;
-        this.state = initialState;
-    }
-
+    
     /**
      * Execute after the render/update of the DOM tree.
      * @param callback - The function that you want to execute
