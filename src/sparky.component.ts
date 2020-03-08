@@ -39,9 +39,10 @@ export class SparkyComponent {
                 const cached = this.cachedComponent[depthHorizontal][index];
                 const commentDom = this.findComment(render.dom, currentRender.renderId, index, currentComp.selfFn.name);
                 if(cached) {
+                    cached.component.self.props = currentComp.self.props;
                     currentComp = cached.component;
                 }
-                const renderChild = currentComp.selfFn(currentComp.self, currentComp.self.props);
+                const renderChild = currentComp.selfFn(currentComp.self, Object.freeze(currentComp.self.props));
                 if(!commentDom) return;
                 commentDom.parentNode.replaceChild(renderChild.dom, commentDom);
                 currentComp.self.__root = rootComponent;
