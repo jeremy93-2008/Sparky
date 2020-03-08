@@ -25,10 +25,9 @@
   },
   "homepage": "https://github.com/jeremy93-2008/Sparky#readme",
   "dependencies": {
-    "core-js": "^3.6.4",
+    "mdn-polyfills": "^5.20.0",
     "nanoid": "^2.1.11",
-    "requestidlecallback-polyfill": "^1.0.2",
-    "string.prototype.startswith": "^0.2.0"
+    "requestidlecallback-polyfill": "^1.0.2"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.2",

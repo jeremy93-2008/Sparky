@@ -1,4 +1,4 @@
-import "string.prototype.startswith";
+import 'mdn-polyfills/String.prototype.startsWith';
 interface IEventReturn {
     dom: HTMLElement;
     attr: Attr;

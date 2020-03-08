@@ -1,4 +1,5 @@
-import "core-js/stable";
+import 'mdn-polyfills/Array.from';
+import 'mdn-polyfills/Array.prototype.find';
 import { SparkyFunction } from "./sparky.function";
 export interface IRenderReturn extends IReconciliateProps {
     type: string;

@@ -1,5 +1,7 @@
 import nanoid from "nanoid/non-secure";
-import "core-js/stable";
+
+import 'mdn-polyfills/Array.from';
+import 'mdn-polyfills/Array.prototype.find';
 
 import { SparkyFunction } from "./sparky.function";
 import { reconciliate, getCurrentDom, setCurrentDom } from "./sparky.dom";

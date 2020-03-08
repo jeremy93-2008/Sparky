@@ -1,6 +1,6 @@
 {
   "name": "sparky-js",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "New framework to develop web application quicker",
   "main": "sparky.js",
   "repository": {
