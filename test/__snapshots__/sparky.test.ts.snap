@@ -20,7 +20,12 @@ exports[`Mount function Computed function 1`] = `
     
                 
     <p>
-      Hola a todos
+      Hola a todos 
+      <span
+        class="computed"
+      >
+        24
+      </span>
     </p>
     
             
@@ -35,6 +40,11 @@ exports[`Mount function Computed w/ State function 1`] = `
                 
     <p>
       Hola a todos 
+      <span
+        class="computed"
+      >
+        uno
+      </span>
     </p>
     
             

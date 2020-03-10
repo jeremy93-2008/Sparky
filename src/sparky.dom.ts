@@ -33,7 +33,12 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
             if(node.isEqualNode(nextNode)) return;
 
             if(node.nodeName !== nextNode.nodeName) {
-                currentElem.replaceChild(nextNode, node);
+                currentElem.replaceChild(nextNode.cloneNode(true), node);
+                return;
+            }
+
+            if(node.nodeName == "#text" && node.textContent !== nextNode.textContent) {
+                node.textContent = nextNode.textContent;
                 return;
             }
 
@@ -41,8 +46,8 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
         });
 
         for(let i = currentElem.childNodes.length; i < nextElem.childNodes.length; i++) {
-            const nextDom = nextElemChildren.item(i);
-            currentElem.appendChild(nextDom)
+            const childNode = nextElem.childNodes.item(i);
+            currentElem.appendChild(childNode.cloneNode(true))
         }
 
         removedList.forEach((rmElem) => {
@@ -57,7 +62,38 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
 function reconciliateAttribute(currentElem: HTMLElement, nextElem: HTMLElement) {
     if(!currentElem.attributes || !nextElem.attributes) return;
 
-    Array.from(currentElem.attributes).forEach(att => {
+    const sortedCurrentAttributes = Array.from(currentElem.attributes).sort((attr, attr2) => attributeSort(attr, attr2))
+    const sortedNextAttributes = Array.from(nextElem.attributes).sort((attr, attr2) => attributeSort(attr, attr2))
+
+    const removedAttr: Attr[] = [];
+
+    sortedCurrentAttributes.forEach((attr, i) => {
+        const nextAttr = sortedNextAttributes[i];
+
+        if(!nextAttr) {
+            removedAttr.push(attr);
+            return;
+        }
         
+        if(attr.name !== nextAttr.name) {
+            removedAttr.push(attr);
+            currentElem.setAttribute(nextAttr.name, nextAttr.value);
+            return;
+        }
+
+        if(attr.value !== nextAttr.value) {
+            attr.value = nextAttr.value;
+        }
     })
+
+    for(let i = sortedCurrentAttributes.length; i < sortedNextAttributes.length; i++) {
+        const nextAttr = sortedNextAttributes[i];
+        currentElem.setAttribute(nextAttr.name, nextAttr.value);
+    }
+
+    removedAttr.forEach(attr => currentElem.removeAttribute(attr.name))
+}
+
+function attributeSort(a: Attr, b: Attr) {
+    return (a.name < b.name ? -1 : (a.name > b.name ? 1 : 0));
 }
