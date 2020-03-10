@@ -1,4 +1,4 @@
-const lib = require("../.dist/sparky");
+const lib = require("../src/sparky");
 const Sparky = lib.Sparky;
 
 describe("Diff method", () => {

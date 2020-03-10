@@ -36,6 +36,7 @@ export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
 
         if (dom.nodeName !== nextDom.nodeName) {
             dom.parentElement.replaceChild(nextDom, dom);
+            continue;
         }
 
         if(dom.nodeName == "#text" && nextDom.nodeName != "#text") {
@@ -62,6 +63,7 @@ function pushChildNodes(dom: HTMLElement, domAttached: HTMLElement,
     domStack: HTMLElement[], nextDom: HTMLElement, newDomStack: HTMLElement[]) {
 
     if (dom.childNodes.length > 0) {
+        domAttached = dom;
         domAttached = populateChildren(dom, domAttached, dom, domStack);
     }
     if (nextDom.childNodes.length > 0) {
@@ -71,10 +73,8 @@ function pushChildNodes(dom: HTMLElement, domAttached: HTMLElement,
 }
 
 function populateChildren(connectDom: HTMLElement, domAttached: HTMLElement, walkDom: HTMLElement, domStack: HTMLElement[]) {
-    if (connectDom)
-        domAttached = connectDom;
     Array.from(walkDom.childNodes).forEach((child: HTMLElement) => {
-        if (connectDom.childNodes.length == 1 && connectDom.childNodes[0].nodeName == "#text")
+        if (walkDom.childNodes.length == 1 && walkDom.childNodes[0].nodeName == "#text")
             return;
         domStack.push(child);
     });

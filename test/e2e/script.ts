@@ -10,7 +10,11 @@ interface IProps {
 function Main(self: SparkyFunction, props: IProps) {
 
     const a = (<string>self.getState("boton")) || props.name; 
-    const text = (<string>self.getState("texto")) || "The world"; 
+    const text = (<string[]>self.getState("texto")) || ["The world"]; 
+
+    self.memo((du) => {
+        console.log("Memo :) " + du);
+    }, [a]);
 
     self.onUpdate(() => {
         console.log("after dom render");
@@ -18,18 +22,20 @@ function Main(self: SparkyFunction, props: IProps) {
     }, [])
 
     const onClick = () => {
-        self.setState({ boton: "Jeremy" });
+        self.setState({ boton: "Jeremy", texto: ["Hola","Buenas","Adios"] });
     }
 
     return render /*html*/`
         <div id="uno" class="lol">
-            Hola a todos ${ a ? render `<b onclick=${onClick}>${a}</b>` : `no hay nada`}
+            Hola a todos ${ a !== "Hugo" ? render `<b onclick=${onClick}>${a}</b>` : `no hay nada`}
             <button onclick=${onClick}>Hey!</button>
             <div>
                 <div>${Sparky.component(Span, {name: a})}</div>
             </div>
             ${Sparky.component(SpanNest)}
-            ${text}
+            <ul>
+                ${text.map(t => `<li>${t}</li>`)}
+            </ul>
         </div>
     `;    
 }

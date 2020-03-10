@@ -1,15 +1,24 @@
 import { Sparky, IRenderReturn, ISparkyComponent, ISparkyProps, ISparkyState } from "./sparky";
 import 'requestidlecallback-polyfill';
+import { arrayAreSame } from "./sparky.helper";
 
 type UpdateCallback = () => void;
 
 type DependenciesList = string[];
+type ArgumentsList = any[];
+
+interface IMemoCached {
+    fn: Function;
+    dependencies: string[];
+    result: any;
+}
 
 export class SparkyFunction {
     public __root: ISparkyComponent;
     public props: ISparkyProps;
     
     private newProps: string[] = [];
+    private cachedMemo: IMemoCached[] = [];
     private state: ISparkyState;
     private renderFunc: (self: SparkyFunction) => IRenderReturn;
 
@@ -51,5 +60,32 @@ export class SparkyFunction {
         this.state = { ...this.state, ...newState };
         (this.__root) ? Sparky.mount(this.__root) :
             Sparky.mount({ type: "SparkyComponent", self: this, selfFn: this.renderFunc });
+    }
+
+    /**
+     * Call the function callback only when dependencies has changed
+     * @param callbackFn - Callback to be called when needed
+     * @param argumentsChanged - list of value that are used to know if the callback needed to be recalled
+     */
+    memo = (callbackFn: Function, argumentsChanged?: ArgumentsList) => {
+        const memoCached = this.cachedMemo.find((memo) => callbackFn.toString() == memo.fn.toString());
+        const newMemo = {
+            fn: callbackFn,
+            result: null,
+            dependencies: argumentsChanged
+        };
+
+        if(!memoCached) {
+            newMemo.result = callbackFn.call(window, ...argumentsChanged);
+            this.cachedMemo.push(newMemo)
+            return newMemo.result;
+        }
+        
+        if(!arrayAreSame(memoCached.dependencies, argumentsChanged)) {
+            memoCached.dependencies = argumentsChanged;
+            return callbackFn.call(window, ...argumentsChanged)
+        }
+        
+        return memoCached.result;
     }
 }
