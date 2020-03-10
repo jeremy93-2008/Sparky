@@ -2,10 +2,12 @@ import { IRenderReturn, ISparkyComponent, ISparkyProps } from "./sparky";
 import 'requestidlecallback-polyfill';
 declare type UpdateCallback = () => void;
 declare type DependenciesList = string[];
+declare type ArgumentsList = any[];
 export declare class SparkyFunction {
     __root: ISparkyComponent;
     props: ISparkyProps;
     private newProps;
+    private cachedMemo;
     private state;
     private renderFunc;
     constructor(renderFunc: (self: SparkyFunction) => IRenderReturn, props: ISparkyProps);
@@ -25,5 +27,11 @@ export declare class SparkyFunction {
      * @param newState - new Value
      */
     setState: <S>(newState: S) => void;
+    /**
+     * Call the function callback only when dependencies has changed
+     * @param callbackFn - Callback to be called when needed
+     * @param argumentsChanged - list of value that are used to know if the callback needed to be recalled
+     */
+    memo: (callbackFn: Function, argumentsChanged?: ArgumentsList) => any;
 }
 export {};

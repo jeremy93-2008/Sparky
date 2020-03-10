@@ -1,4 +1,4 @@
-const lib = require("../.dist/sparky");
+const lib = require("../src/sparky");
 const Sparky = lib.Sparky;
 
 describe("Diff method", () => {
@@ -117,7 +117,7 @@ describe("Mount function", () => {
     });
     test("Computed w/ State function", () => {
         Sparky.mount(Sparky.component((self) => {
-            const a = self.getState("boton");
+            const a = self.getState("boton") || "uno";
             return lib.render /*html*/`
             <div>
                 <p>Hola a todos ${a}</p>

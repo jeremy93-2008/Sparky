@@ -8,127 +8,92 @@ export function setCurrentDom(dom: HTMLElement) {
     currentDom = dom;
 }
 
-export function reconciliate(currentDom: HTMLElement, newDom: HTMLElement) {
-    if (!currentDom && !newDom) return null;
-    if (currentDom && !newDom) return null;
-    if (!currentDom && newDom) return newDom;
+export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
+    if (!nextDom) return null;
+    if (!currentDom && nextDom) return nextDom;
+    if (currentDom.isEqualNode(nextDom)) return currentDom;
+    if (currentDom.nodeName !== nextDom.nodeName) return nextDom;
 
-    const currentDomQueue = [currentDom];
-    let newDomQueue = [newDom];
+    const domQueue: [Node, Node][] = [[currentDom, nextDom]];
 
-    let currentDomToAttach = currentDom;
+    while(domQueue.length > 0) {
+        const [currentElem, nextElem] = domQueue.shift();
+        const removedList: Node[] = [];
+        reconciliateAttribute(currentElem as HTMLElement, nextElem as HTMLElement);
 
-    while (currentDomQueue.length > 0 || newDomQueue.length > 0) {
-        let dom = currentDomQueue.shift();
-        let nextDom = newDomQueue.shift();
+        const nextElemChildren = nextElem.childNodes;
+        currentElem.childNodes.forEach((node, i) => {
+            const nextNode = nextElemChildren.item(i);
 
-        if (dom && !nextDom) {
-            dom.parentElement.removeChild(dom);
-            continue;
+            if(!nextNode) {
+                removedList.push(node)
+                return;
+            }
+
+            if(node.isEqualNode(nextNode)) return;
+
+            if(node.nodeName !== nextNode.nodeName) {
+                currentElem.replaceChild(nextNode.cloneNode(true), node);
+                return;
+            }
+
+            if(node.nodeName == "#text" && node.textContent !== nextNode.textContent) {
+                node.textContent = nextNode.textContent;
+                return;
+            }
+
+            domQueue.push([node, nextNode])
+        });
+
+        for(let i = currentElem.childNodes.length; i < nextElem.childNodes.length; i++) {
+            const childNode = nextElem.childNodes.item(i);
+            currentElem.appendChild(childNode.cloneNode(true))
         }
 
-        if (!dom && nextDom) {
-            currentDomToAttach.appendChild(nextDom);
-            continue;
-        }
+        removedList.forEach((rmElem) => {
+            currentElem.removeChild(rmElem)
+        })
 
-        if(dom.isEqualNode(nextDom)) continue;
-
-        if (dom.nodeName !== nextDom.nodeName) {
-            dom.parentElement.replaceChild(nextDom, dom);
-        }
-
-        if(dom.nodeName == "#text" && nextDom.nodeName != "#text") {
-            currentDomToAttach.removeChild(dom);
-            currentDomToAttach.appendChild(nextDom);
-            continue;
-        }
-
-        if ((dom.nodeName == "#text" && nextDom.nodeName == "#text") 
-        || (nextDom.childNodes.length == 1 && nextDom.childNodes[0].nodeName == "#text")) {
-            if (dom.textContent !== nextDom.textContent)
-                dom.textContent = nextDom.textContent
-        }   
-
-        setAttributes(dom, nextDom);
-
-        currentDomToAttach = pushChildNodes(dom, currentDomToAttach, currentDomQueue, nextDom, newDomQueue);
     }
 
     return currentDom;
 }
 
-function pushChildNodes(dom: HTMLElement, domAttached: HTMLElement, 
-    domStack: HTMLElement[], nextDom: HTMLElement, newDomStack: HTMLElement[]) {
+function reconciliateAttribute(currentElem: HTMLElement, nextElem: HTMLElement) {
+    if(!currentElem.attributes || !nextElem.attributes) return;
 
-    if (dom.childNodes.length > 0) {
-        domAttached = populateChildren(dom, domAttached, dom, domStack);
-    }
-    if (nextDom.childNodes.length > 0) {
-        domAttached = populateChildren(dom, domAttached, nextDom, newDomStack);
-    }
-    return domAttached;
-}
+    const sortedCurrentAttributes = Array.from(currentElem.attributes).sort((attr, attr2) => attributeSort(attr, attr2))
+    const sortedNextAttributes = Array.from(nextElem.attributes).sort((attr, attr2) => attributeSort(attr, attr2))
 
-function populateChildren(connectDom: HTMLElement, domAttached: HTMLElement, walkDom: HTMLElement, domStack: HTMLElement[]) {
-    if (connectDom)
-        domAttached = connectDom;
-    Array.from(walkDom.childNodes).forEach((child: HTMLElement) => {
-        if (connectDom.childNodes.length == 1 && connectDom.childNodes[0].nodeName == "#text")
+    const removedAttr: Attr[] = [];
+
+    sortedCurrentAttributes.forEach((attr, i) => {
+        const nextAttr = sortedNextAttributes[i];
+
+        if(!nextAttr) {
+            removedAttr.push(attr);
             return;
-        domStack.push(child);
-    });
-    return domAttached;
-}
+        }
+        
+        if(attr.name !== nextAttr.name) {
+            removedAttr.push(attr);
+            currentElem.setAttribute(nextAttr.name, nextAttr.value);
+            return;
+        }
 
-function setAttributes(currentDom: HTMLElement, nextDom: HTMLElement) {
-    const currentAttributesList = currentDom && currentDom.attributes
-        ? transformAttributesToSortedArray(currentDom.attributes) : [];
-
-    const nextAttributesList = nextDom && nextDom.attributes
-        ? transformAttributesToSortedArray(nextDom.attributes) : [];
-
-    while(nextAttributesList.length > 0) {
-        const currentAttr = currentAttributesList.shift();
-        const nextAttr = nextAttributesList.shift();
-
-        reconciliateAttributes(currentAttr, nextAttr, currentDom);
-
-        if(!currentDom || !nextAttr) continue;
-
-        editAttributes(currentAttr, nextAttr, currentDom);
-    }
-    
-    if(currentAttributesList.length > 0) {
-        removeUnusedAttribute(currentAttributesList, currentDom);
-    }
-}
-
-function editAttributes(currentAttr: Attr, nextAttr: Attr, currentDom: HTMLElement) {
-    if (currentAttr.name != nextAttr.name) {
-        currentDom.removeAttribute(currentAttr.name);
-        currentDom.setAttribute(nextAttr.name, nextAttr.value);
-    }
-    if (currentAttr.value != nextAttr.value) {
-        currentDom.getAttributeNode(nextAttr.name).value = nextAttr.value;
-    }
-}
-
-function reconciliateAttributes(currentAttr: Attr, nextAttr: Attr, currentDom: HTMLElement) {
-    if (currentAttr && !nextAttr) {
-        currentDom.removeAttribute(currentAttr.name);
-    }
-    if (!currentAttr && nextAttr) {
-        currentDom.setAttribute(nextAttr.name, nextAttr.value);
-    }
-}
-
-function removeUnusedAttribute(currentAttributesList: Attr[], currentDom: HTMLElement) {
-    currentAttributesList.forEach(attr => currentDom.attributes.removeNamedItem(attr.name));
-}
-
-function transformAttributesToSortedArray(arrayLike: ArrayLike<Attr>) {
-    return Array.from(arrayLike).sort((a: Attr, b: Attr) => {
-        return a.name.localeCompare(b.name);
+        if(attr.value !== nextAttr.value) {
+            attr.value = nextAttr.value;
+        }
     })
+
+    for(let i = sortedCurrentAttributes.length; i < sortedNextAttributes.length; i++) {
+        const nextAttr = sortedNextAttributes[i];
+        currentElem.setAttribute(nextAttr.name, nextAttr.value);
+    }
+
+    removedAttr.forEach(attr => currentElem.removeAttribute(attr.name))
+}
+
+function attributeSort(a: Attr, b: Attr) {
+    return (a.name < b.name ? -1 : (a.name > b.name ? 1 : 0));
 }

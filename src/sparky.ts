@@ -62,7 +62,7 @@ export class Sparky {
      * @param dom The dom element where you want to mount this component
      */
     static mount(component: ISparkyComponent, dom?: HTMLElement) {
-        if(this._DEV_)
+        if(Sparky._DEV_)
             console.time();
         
         const { self, selfFn } = component;
@@ -78,7 +78,7 @@ export class Sparky {
         
         setCurrentDom(finalDOM as HTMLElement);
         
-        if(this._DEV_)
+        if(Sparky._DEV_)
             console.timeEnd();
     }
 
@@ -139,7 +139,9 @@ function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFun
         nestedComponents.push(comp);
     }
     else {
-        computedProps[i] = new String(computedProps[i]);
+
+        computedProps[i] = Array.isArray(computedProps[i]) ? 
+            computedProps[i].join("") : new String(computedProps[i]);
         if ((computedProps[i] as string).startsWith("<"))
             htmlLine += computedProps[i];
         else

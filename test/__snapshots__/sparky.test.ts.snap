@@ -40,6 +40,11 @@ exports[`Mount function Computed w/ State function 1`] = `
                 
     <p>
       Hola a todos 
+      <span
+        class="computed"
+      >
+        uno
+      </span>
     </p>
     
             
