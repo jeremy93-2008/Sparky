@@ -1,6 +1,7 @@
 import { IRenderReturn, ISparkyComponent } from "./sparky";
 import { findEvent } from "./sparky.event";
 import { EventManager } from "./sparky.eventmanager";
+import { defaultSparkySelf } from "./sparky.helper";
 
 interface ICachedComponent {
     component: ISparkyComponent,
@@ -40,6 +41,7 @@ export class SparkyComponent {
                 const commentDom = this.findComment(render.dom, currentRender.renderId, index, currentComp.selfFn.name);
                 if(cached) {
                     cached.component.self.props = currentComp.self.props;
+                    cached.component.self.__sparkySelf = {...defaultSparkySelf}
                     currentComp = cached.component;
                 }
                 const renderChild = currentComp.selfFn(currentComp.self, Object.freeze(currentComp.self.props));

@@ -1,13 +1,12 @@
 import { Sparky, IRenderReturn, ISparkyComponent, ISparkyProps, ISparkyState } from "./sparky";
 import 'requestidlecallback-polyfill';
-import { arrayAreSame } from "./sparky.helper";
+import { arrayAreSame, ISparkySelf } from "./sparky.helper";
 
+type CachedType = "memoize" | "update";
 type UpdateCallback = () => void;
-
-type DependenciesList = string[];
 type ArgumentsList = any[];
 
-interface IMemoCached {
+interface IFnCached {
     fn: Function;
     dependencies: string[];
     result: any;
@@ -15,10 +14,11 @@ interface IMemoCached {
 
 export class SparkyFunction {
     public __root: ISparkyComponent;
+    public __sparkySelf: ISparkySelf;
     public props: ISparkyProps;
     
-    private newProps: string[] = [];
-    private cachedMemo: IMemoCached[] = [];
+    private cachedUpdate: IFnCached[] = [];
+    private cachedMemo: IFnCached[] = [];
     private state: ISparkyState;
     private renderFunc: (self: SparkyFunction) => IRenderReturn;
 
@@ -34,12 +34,10 @@ export class SparkyFunction {
      * @param callback - The function that you want to execute
      * @param dependenciesChanged - An array of keys to know when the onUpdate need to be executed
      */
-    onUpdate = (callback: UpdateCallback, dependenciesChanged?: DependenciesList) => {
-        if (!dependenciesChanged && this.newProps.length == 0 ||
-            dependenciesChanged && dependenciesChanged.length == 0 ||
-            this.newProps.some((props) => dependenciesChanged && dependenciesChanged.includes(props)))
-            //@ts-ignore
-            window.requestIdleCallback(() => callback.call(this))
+    onUpdate = (callback: UpdateCallback, dependenciesChanged?: ArgumentsList) => {
+        window.requestIdleCallback(() => {
+            callCachedFn(this, "update", this.cachedUpdate, callback, dependenciesChanged)
+        }, { timeout: 250 });
     }
 
     /**
@@ -56,7 +54,6 @@ export class SparkyFunction {
      * @param newState - new Value
      */
     setState = <S>(newState: S) => {
-        this.newProps = Object.keys(newState);
         this.state = { ...this.state, ...newState };
         (this.__root) ? Sparky.mount(this.__root) :
             Sparky.mount({ type: "SparkyComponent", self: this, selfFn: this.renderFunc });
@@ -67,25 +64,43 @@ export class SparkyFunction {
      * @param callbackFn - Callback to be called when needed
      * @param argumentsChanged - list of value that are used to know if the callback needed to be recalled
      */
-    memo = (callbackFn: Function, argumentsChanged?: ArgumentsList) => {
-        const memoCached = this.cachedMemo.find((memo) => callbackFn.toString() == memo.fn.toString());
-        const newMemo = {
-            fn: callbackFn,
-            result: null,
-            dependencies: argumentsChanged
-        };
-
-        if(!memoCached) {
-            newMemo.result = callbackFn.call(window, ...argumentsChanged);
-            this.cachedMemo.push(newMemo)
-            return newMemo.result;
-        }
-        
-        if(!arrayAreSame(memoCached.dependencies, argumentsChanged)) {
-            memoCached.dependencies = argumentsChanged;
-            return callbackFn.call(window, ...argumentsChanged)
-        }
-        
-        return memoCached.result;
+    memoize = (callbackFn: Function, argumentsChanged?: ArgumentsList) => {
+        callCachedFn(this, "memoize", this.cachedMemo, callbackFn, argumentsChanged)
     }
+}
+
+function callCachedFn(self: SparkyFunction, type: CachedType,cachedArray: IFnCached[], callbackFn: Function, argumentsChanged?: ArgumentsList) {
+    const fnCached = cachedArray[getIndexByType(self, type)];
+    incrementIndexByType(self, type)
+
+    const newMemo = {
+        fn: callbackFn,
+        result: null,
+        dependencies: argumentsChanged
+    };
+
+    if(!fnCached || !argumentsChanged) {
+        newMemo.result = callbackFn.call(window, argumentsChanged ? [ ...argumentsChanged ] : null);
+        cachedArray.push(newMemo)
+        return newMemo.result;
+    }
+    
+    if(!arrayAreSame(fnCached.dependencies, argumentsChanged)) {
+        fnCached.dependencies = argumentsChanged;
+        fnCached.result = callbackFn.call(window, ...argumentsChanged);
+        return fnCached.result;
+    }
+    
+    return fnCached.result;
+}
+
+function getIndexByType(self: SparkyFunction, type: CachedType) {
+    if(type == "memoize")
+        return self.__sparkySelf.indexMemo;
+    return self.__sparkySelf.indexUpdate;
+}
+function incrementIndexByType(self: SparkyFunction, type: CachedType) {
+    if(type == "memoize")
+        return ++self.__sparkySelf.indexMemo;
+    return ++self.__sparkySelf.indexUpdate;    
 }

@@ -7,8 +7,10 @@ import { SparkyFunction } from "./sparky.function";
 import { reconciliate, getCurrentDom, setCurrentDom } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
 import { SparkyComponent } from "./sparky.component";
+import { defaultSparkySelf } from "./sparky.helper";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected"
+
 
 isConnectedPolyfill();
 
@@ -53,6 +55,7 @@ export class Sparky {
      */
     static component(renderFunc: ISelfFunction, props?: ISparkyProps) {
         const thisFunction = new SparkyFunction(renderFunc, props);
+        thisFunction.__sparkySelf = { ...defaultSparkySelf };
         return { type: "SparkyComponent", self: thisFunction, selfFn: renderFunc } as ISparkyComponent;
     }
 
@@ -62,23 +65,24 @@ export class Sparky {
      * @param dom The dom element where you want to mount this component
      */
     static mount(component: ISparkyComponent, dom?: HTMLElement) {
-        if(Sparky._DEV_)
+        if (Sparky._DEV_)
             console.time();
-        
+
         const { self, selfFn } = component;
-        const render = selfFn.call(window, self, Object.freeze(self.props)) as IRenderReturn;
+        self.__sparkySelf = { ...defaultSparkySelf };
+        const render = selfFn(self, Object.freeze(self.props)) as IRenderReturn;
 
         render.dom = SparkyComponent.populate(render, component);
 
-        let finalDOM = reconciliate(getCurrentDom(), render.dom);           
+        let finalDOM = reconciliate(getCurrentDom(), render.dom);
         if (!finalDOM) return;
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
         EventManager.listen();
-        
+
         setCurrentDom(finalDOM as HTMLElement);
-        
-        if(Sparky._DEV_)
+
+        if (Sparky._DEV_)
             console.timeEnd();
     }
 
@@ -109,14 +113,14 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
         : html.map((stringHTML, i) => {
             let htmlLine = ""
             htmlLine += stringHTML
-            if(!computedProps[i]) return htmlLine;
+            if (!computedProps[i]) return htmlLine;
             htmlLine = getComputedValue(computedProps, i, func, htmlLine, nestedComponents, children, renderId);
             return htmlLine;
         })
-        
+
     domNode.innerHTML = Array.isArray(newHTML) ? newHTML.join("") : newHTML;
 
-    if(domNode.children.length > 1) {
+    if (domNode.children.length > 1) {
         throw new TypeError("The render HTML can only had one root node");
     }
 
@@ -125,7 +129,7 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
 
 function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFunc[], htmlLine: string, nestedComponents: ISparkyComponent[], children: IRenderReturn[], renderId: string) {
     if (typeof computedProps[i] == "function") {
-        func.push({index: func.length - 1, renderId, func: computedProps[i]});
+        func.push({ index: func.length - 1, renderId, func: computedProps[i] });
         htmlLine += `'SparkyFunction#${renderId}#${func.length - 1}'`;
     }
     else if (computedProps[i].type == "SparkyRender") {
@@ -140,7 +144,7 @@ function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFun
     }
     else {
 
-        computedProps[i] = Array.isArray(computedProps[i]) ? 
+        computedProps[i] = Array.isArray(computedProps[i]) ?
             computedProps[i].join("") : new String(computedProps[i]);
         if ((computedProps[i] as string).startsWith("<"))
             htmlLine += computedProps[i];

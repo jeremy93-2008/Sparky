@@ -12,9 +12,13 @@ function Main(self: SparkyFunction, props: IProps) {
     const a = (<string>self.getState("boton")) || props.name; 
     const text = (<string[]>self.getState("texto")) || ["The world"]; 
 
-    self.memo((du) => {
+    self.memoize((du) => {
         console.log("Memo :) " + du);
     }, [a]);
+
+    self.memoize((du) => {
+        console.log("Memo 2 :) " + du);
+    }, [text]);
 
     self.onUpdate(() => {
         console.log("after dom render");

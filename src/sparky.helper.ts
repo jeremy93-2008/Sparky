@@ -19,3 +19,13 @@ function sortArrayInObject(array1: any[], array2: any[]): ISortArray {
 
     return { bigArray: array2, smallArray: array1 }
 }
+
+export interface ISparkySelf {
+    indexMemo: number;
+    indexUpdate: number;
+}
+
+export const defaultSparkySelf = {
+    indexMemo: 0,
+    indexUpdate: 0
+}
