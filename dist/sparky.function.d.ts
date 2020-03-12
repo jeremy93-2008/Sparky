@@ -1,12 +1,13 @@
 import { IRenderReturn, ISparkyComponent, ISparkyProps } from "./sparky";
 import 'requestidlecallback-polyfill';
+import { ISparkySelf } from "./sparky.helper";
 declare type UpdateCallback = () => void;
-declare type DependenciesList = string[];
 declare type ArgumentsList = any[];
 export declare class SparkyFunction {
     __root: ISparkyComponent;
+    __sparkySelf: ISparkySelf;
     props: ISparkyProps;
-    private newProps;
+    private cachedUpdate;
     private cachedMemo;
     private state;
     private renderFunc;
@@ -16,7 +17,7 @@ export declare class SparkyFunction {
      * @param callback - The function that you want to execute
      * @param dependenciesChanged - An array of keys to know when the onUpdate need to be executed
      */
-    onUpdate: (callback: UpdateCallback, dependenciesChanged?: DependenciesList) => void;
+    onUpdate: (callback: UpdateCallback, dependenciesChanged?: ArgumentsList) => void;
     /**
     * Get State object value of this context
     * @param props - the specific key of the value that you want to retrieve
@@ -32,6 +33,6 @@ export declare class SparkyFunction {
      * @param callbackFn - Callback to be called when needed
      * @param argumentsChanged - list of value that are used to know if the callback needed to be recalled
      */
-    memo: (callbackFn: Function, argumentsChanged?: ArgumentsList) => any;
+    memoize: (callbackFn: Function, argumentsChanged?: ArgumentsList) => void;
 }
 export {};
