@@ -2,13 +2,13 @@ import { isConnectedPolyfill } from "./polyfill/isConnected"
 
 isConnectedPolyfill();
 
-interface eventListSingle {
+export interface eventListSingle {
     dom: HTMLElement;
     type: string;
     callbackFn: eventCallbackFn;
 }
 
-type eventCallbackFn = (evt: Event) => void;
+export type eventCallbackFn = (evt: Event) => void;
 
 export class EventManager {
     static oldEventType: string[] = [];

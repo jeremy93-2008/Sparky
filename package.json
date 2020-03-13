@@ -11,8 +11,8 @@
     "start:test": "node ./scripts/start.js",
     "start:web": "node ./scripts/start-web.js",
     "build": "rollup -c",
-    "jest": "jest ./test",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "jest": "jest ./test --coverage",
+    "test": "npm run jest"
   },
   "repository": {
     "type": "git",
