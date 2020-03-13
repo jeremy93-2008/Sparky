@@ -1,5 +1,5 @@
 import { Sparky, render } from "../../src/sparky";
-import { SparkyFunction } from "../../src/sparky.function";
+import { getState, memoize, onUpdate, setState } from "../../src/sparky.function";
 
 Sparky.mount(Sparky.component(Main, { name: "Hugo"}), document.getElementById("app"))
 
@@ -7,26 +7,26 @@ interface IProps {
     name: string;
 }
 
-function Main(self: SparkyFunction, props: IProps) {
+function Main(props: IProps) {
 
-    const a = (<string>self.getState("boton")) || props.name; 
-    const text = (<string[]>self.getState("texto")) || ["The world"]; 
+    const a = (<string>getState("boton")) || props.name; 
+    const text = (<string[]>getState("texto")) || ["The world"]; 
 
-    self.memoize((du) => {
+    memoize((du) => {
         console.log("Memo :) " + du);
     }, [a]);
 
-    self.memoize((du) => {
+    memoize((du) => {
         console.log("Memo 2 :) " + du);
     }, [text]);
 
-    self.onUpdate(() => {
+    onUpdate(() => {
         console.log("after dom render");
         console.log(document.getElementById("uno").innerHTML);
     }, [])
 
     const onClick = (event) => {
-        self.setState({ boton: "Jeremy", texto: ["Hola","Buenas","Adios"] });
+        setState({ boton: "Jeremy", texto: ["Hola","Buenas","Adios"] });
     }
 
     return render /*html*/`
@@ -44,10 +44,10 @@ function Main(self: SparkyFunction, props: IProps) {
     `;    
 }
 
-function SpanNest(self: SparkyFunction, props: IProps) {
-    const ver = (<string>self.getState("ver"))
+function SpanNest(props: IProps) {
+    const ver = (<string>getState("ver"))
     const doIt = () => {
-        self.setState({ver: "Uno para ti"})
+        setState({ver: "Uno para ti"})
     }
     return render/*html*/`
         <div>
@@ -60,11 +60,11 @@ function SpanNest(self: SparkyFunction, props: IProps) {
     `
 }
 
-function Span(self: SparkyFunction, props: IProps) {
+function Span(props: IProps) {
     const name = props ? props.name : "Esto no es una prop";
-    const ver = (<string>self.getState("ver"))
+    const ver = (<string>getState("ver"))
     const click = () => {
-        self.setState({ver: new Date().toISOString()})
+        setState({ver: new Date().toISOString()})
     }
     return render/*html*/`
         <div>

@@ -1,7 +1,7 @@
-import { IRenderReturn, ISparkyComponent } from "./sparky";
+import { IRenderReturn, ISparkyComponent, Sparky } from "./sparky";
 import { findEvent } from "./sparky.event";
 import { EventManager, eventCallbackFn } from "./sparky.eventmanager";
-import { defaultSparkySelf } from "./sparky.helper";
+import { SparkyContext } from "./sparky.context";
 
 interface ICachedComponent {
     component: ISparkyComponent,
@@ -38,16 +38,20 @@ export class SparkyComponent {
             currentRender.nestedComponents.forEach((currentComp, index) => {
                 if(currentComp.type !== "SparkyComponent") return;
                 const cached = this.cachedComponent[depthHorizontal][index];
-                const commentDom = this.findComment(render.dom, currentRender.renderId, index, currentComp.selfFn.name);
+                const commentDom = this.findComment(render.dom, currentRender.renderId, index, currentComp.renderFn.name);
                 if(cached) {
-                    cached.component.self.props = currentComp.self.props;
-                    cached.component.self.__sparkySelf = {...defaultSparkySelf}
-                    currentComp = cached.component;
+                    if(cached.component.renderFn.name == "") {
+                        if(cached.component.renderFn.toString() == currentComp.renderFn.toString()) {
+                            currentComp = getCachedComponent(cached, currentComp);
+                        }
+                    } else if(cached.component.renderFn.name == currentComp.renderFn.name){
+                        currentComp = getCachedComponent(cached, currentComp);
+                    }
                 }
-                const renderChild = currentComp.selfFn(currentComp.self, Object.freeze(currentComp.self.props));
+                const renderChild = currentComp.renderFn(Object.freeze(currentComp.context.props));
                 if(!commentDom) return;
                 commentDom.parentNode.replaceChild(renderChild.dom, commentDom);
-                currentComp.self.__root = rootComponent;
+                currentComp.context.__root = rootComponent;
                 render.func.push(...renderChild.func);
                 renderQueue.push(renderChild);
 
@@ -75,4 +79,11 @@ export class SparkyComponent {
             })
         }
     }
+}
+
+function getCachedComponent(cached: ICachedComponent, currentComp: ISparkyComponent) {
+    SparkyContext.setCurrentContext(cached.component.context);
+    cached.component.context.props = currentComp.context.props;
+    currentComp = cached.component;
+    return currentComp;
 }

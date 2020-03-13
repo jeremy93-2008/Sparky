@@ -3,13 +3,13 @@ import nanoid from "nanoid/non-secure";
 import 'mdn-polyfills/Array.from';
 import 'mdn-polyfills/Array.prototype.find';
 
-import { SparkyFunction } from "./sparky.function";
 import { reconciliate, getCurrentDom, setCurrentDom } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
 import { SparkyComponent } from "./sparky.component";
-import { defaultSparkySelf } from "./sparky.helper";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected"
+import { ISparkySelf } from "./sparky.function.helper";
+import { SparkyContext } from "./sparky.context";
 
 
 isConnectedPolyfill();
@@ -26,7 +26,7 @@ export interface IReconciliateProps {
     func: ISparkyEventFunc[],
 }
 
-export type ISelfFunction = (self: SparkyFunction, props?: any) => IRenderReturn;
+export type ISelfFunction = (props?: any) => IRenderReturn;
 
 export interface ISparkyEventFunc {
     renderId: string;
@@ -36,8 +36,8 @@ export interface ISparkyEventFunc {
 
 export interface ISparkyComponent {
     type: string;
-    self: SparkyFunction;
-    selfFn: ISelfFunction;
+    context: ISparkySelf;
+    renderFn: ISelfFunction;
 }
 
 export interface ISparkyProps {
@@ -54,9 +54,8 @@ export class Sparky {
      * @param renderFunc The function that going to be execute to render html template
      */
     static component(renderFunc: ISelfFunction, props?: ISparkyProps) {
-        const thisFunction = new SparkyFunction(renderFunc, props);
-        thisFunction.__sparkySelf = { ...defaultSparkySelf };
-        return { type: "SparkyComponent", self: thisFunction, selfFn: renderFunc } as ISparkyComponent;
+        const sparkyContext = SparkyContext.newContext({props, renderFunc});
+        return { type: "SparkyComponent", context: sparkyContext, renderFn: renderFunc } as ISparkyComponent;
     }
 
     /**
@@ -68,9 +67,10 @@ export class Sparky {
         if (Sparky._DEV_)
             console.time();
 
-        const { self, selfFn } = component;
-        self.__sparkySelf = { ...defaultSparkySelf };
-        const render = selfFn(self, Object.freeze(self.props)) as IRenderReturn;
+        const { context, renderFn } = component;
+        SparkyContext.setCurrentContext(context);
+        SparkyContext.resetIndexes();
+        const render = renderFn(Object.freeze(context.props)) as IRenderReturn;
 
         render.dom = SparkyComponent.populate(render, component);
 
@@ -139,7 +139,7 @@ function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFun
     }
     else if (computedProps[i].type == "SparkyComponent") {
         const comp = computedProps[i] as ISparkyComponent;
-        htmlLine += `<!-- SparkyComponent#${comp.selfFn.name}#${nestedComponents.length}#${renderId} -->`;
+        htmlLine += `<!-- SparkyComponent#${comp.renderFn.name}#${nestedComponents.length}#${renderId} -->`;
         nestedComponents.push(comp);
     }
     else {
