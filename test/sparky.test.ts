@@ -127,4 +127,56 @@ describe("Mount function", () => {
         // console.log(document.body.innerHTML)
         expect(document.body).toMatchSnapshot()
     });
+    test("Computed, State w/ Event function", () => {
+        Sparky.mount(Sparky.component((self) => {
+            const a = self.getState("boton") || "uno";
+            const onClick = () => {
+                self.setState({"boton" : 10})
+            }
+            return lib.render /*html*/`
+            <div>
+                <p onclick=${onClick}>Hola a todos ${a}</p>
+            </div>
+            `
+        }), document.body);
+        // console.log(document.body.innerHTML)
+        expect(document.body).toMatchSnapshot()
+    });
+    test("Computed, State, Memo w/ Event and Click function", () => {
+
+        const Span = (self) => {
+            const a = self.getState("boton") || "uno";
+            return lib.render /*html*/`
+            <div>
+                <p>Hola a todos ${a}</p>
+            </div>
+            `
+        };
+
+        Sparky.mount(Sparky.component((self) => {
+            if(!self.getState("boton")) self.setState({boton: "hola mundo"})
+            const a = self.getState("boton") || "uno";
+            
+            self.memoize(() => {
+                console.log("Memo!")
+            }, [a]);
+
+            self.onUpdate(() => {
+                console.log("Update!")
+            }, [a])
+
+            const onClick = () => {
+                self.setState({"boton" : 10})
+            }
+            
+            return lib.render /*html*/`
+            <div>
+                <p id="paragraph" onclick=${onClick}>Hola a todos ${a}</p>
+                <div>${Sparky.component(Span)}</div>
+            </div>
+            `
+        }), document.body);
+        // console.log(document.body.innerHTML)
+        expect(document.body).toMatchSnapshot()
+    });
 })

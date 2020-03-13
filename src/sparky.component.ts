@@ -1,6 +1,6 @@
 import { IRenderReturn, ISparkyComponent } from "./sparky";
 import { findEvent } from "./sparky.event";
-import { EventManager } from "./sparky.eventmanager";
+import { EventManager, eventCallbackFn } from "./sparky.eventmanager";
 import { defaultSparkySelf } from "./sparky.helper";
 
 interface ICachedComponent {
@@ -26,7 +26,7 @@ export class SparkyComponent {
                 EventManager.addEvent({
                     dom: currentEvent.dom,
                     type: eventName,
-                    callbackFn: currentFunc.func.bind(window, event)
+                    callbackFn: currentFunc.func as eventCallbackFn
                 })
                 currentEvent.dom.removeAttribute(currentEvent.attr.name)
             })

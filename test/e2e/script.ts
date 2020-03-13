@@ -25,7 +25,7 @@ function Main(self: SparkyFunction, props: IProps) {
         console.log(document.getElementById("uno").innerHTML);
     }, [])
 
-    const onClick = () => {
+    const onClick = (event) => {
         self.setState({ boton: "Jeremy", texto: ["Hola","Buenas","Adios"] });
     }
 

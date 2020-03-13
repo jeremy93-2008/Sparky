@@ -51,3 +51,61 @@ exports[`Mount function Computed w/ State function 1`] = `
   </div>
 </body>
 `;
+
+exports[`Mount function Computed, State w/ Event function 1`] = `
+<body>
+  <div>
+    
+                
+    <p>
+      Hola a todos 
+      <span
+        class="computed"
+      >
+        uno
+      </span>
+    </p>
+    
+            
+  </div>
+</body>
+`;
+
+exports[`Mount function Computed, State, Memo w/ Event and Click function 1`] = `
+<body>
+  <div>
+    
+                
+    <p
+      id="paragraph"
+    >
+      Hola a todos 
+      <span
+        class="computed"
+      >
+        hola mundo
+      </span>
+    </p>
+    
+                
+    <div>
+      <div>
+        
+                
+        <p>
+          Hola a todos 
+          <span
+            class="computed"
+          >
+            uno
+          </span>
+        </p>
+        
+            
+      </div>
+    </div>
+    
+            
+  </div>
+</body>
+`;
