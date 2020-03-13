@@ -12,12 +12,12 @@ export class SparkyComponent {
     private static cachedComponent: ICachedComponent[][] = [];
     static populate(render: IRenderReturn, rootComponent: ISparkyComponent) {
         
-        const renderQueue = [render];
+        const renderQueue: [IRenderReturn, ISparkyComponent][] = [[render, rootComponent]];
 
         let depthHorizontal = 0;
 
         while (renderQueue.length > 0) {
-            const currentRender = renderQueue.shift();
+            const [currentRender, currentComponent] = renderQueue.shift();
             if(!this.cachedComponent[depthHorizontal]) this.cachedComponent[depthHorizontal] = [];
 
             currentRender.func.forEach((currentFunc, index) => {
@@ -26,13 +26,14 @@ export class SparkyComponent {
                 EventManager.addEvent({
                     dom: currentEvent.dom,
                     type: eventName,
+                    context: currentComponent.context,
                     callbackFn: currentFunc.func as eventCallbackFn
                 })
                 currentEvent.dom.removeAttribute(currentEvent.attr.name)
             })
 
             currentRender.children.forEach((currentChild) => {
-                renderQueue.push(currentChild)
+                renderQueue.push([currentChild, currentComponent])
             })
 
             currentRender.nestedComponents.forEach((currentComp, index) => {
@@ -53,7 +54,7 @@ export class SparkyComponent {
                 commentDom.parentNode.replaceChild(renderChild.dom, commentDom);
                 currentComp.context.__root = rootComponent;
                 render.func.push(...renderChild.func);
-                renderQueue.push(renderChild);
+                renderQueue.push([renderChild, currentComp]);
 
                 this.cachedComponent[depthHorizontal].push({
                     component: currentComp,

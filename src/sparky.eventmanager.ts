@@ -1,10 +1,13 @@
 import { isConnectedPolyfill } from "./polyfill/isConnected"
+import { ISparkySelf } from "./sparky.function.helper";
+import { SparkyContext } from "./sparky.context";
 
 isConnectedPolyfill();
 
 export interface eventListSingle {
     dom: HTMLElement;
     type: string;
+    context: ISparkySelf;
     callbackFn: eventCallbackFn;
 }
 
@@ -30,6 +33,7 @@ export class EventManager {
         this.eventList.find((evtList) => {
             if(this.isEventTarget(evtList, event)) {
                 if(evtList.type === event.type) {
+                    SparkyContext.setCurrentContext(evtList.context);
                     evtList.callbackFn(event);
                 }
             }
@@ -37,8 +41,8 @@ export class EventManager {
     }
 
     static addEvent(eventSingle: eventListSingle) {
-        const {dom, type, callbackFn} = eventSingle;
-        this.eventList.push({ dom, type, callbackFn });
+        const {dom, type, context, callbackFn} = eventSingle;
+        this.eventList.push({ dom, type, context, callbackFn });
     }
 
     private static removeUnusedEvents() {
