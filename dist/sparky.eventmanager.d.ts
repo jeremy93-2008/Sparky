@@ -1,9 +1,9 @@
-interface eventListSingle {
+export interface eventListSingle {
     dom: HTMLElement;
     type: string;
     callbackFn: eventCallbackFn;
 }
-declare type eventCallbackFn = (evt: Event) => void;
+export declare type eventCallbackFn = (evt: Event) => void;
 export declare class EventManager {
     static oldEventType: string[];
     static eventList: eventListSingle[];
@@ -15,4 +15,3 @@ export declare class EventManager {
     private static isEventTypeListening;
     private static isEventTarget;
 }
-export {};

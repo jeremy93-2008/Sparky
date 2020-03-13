@@ -1,6 +1,6 @@
 import 'mdn-polyfills/Array.from';
 import 'mdn-polyfills/Array.prototype.find';
-import { SparkyFunction } from "./sparky.function";
+import { ISparkySelf } from "./sparky.function.helper";
 export interface IRenderReturn extends IReconciliateProps {
     type: string;
     nestedComponents: ISparkyComponent[];
@@ -11,7 +11,7 @@ export interface IReconciliateProps {
     dom: HTMLElement;
     func: ISparkyEventFunc[];
 }
-export declare type ISelfFunction = (self: SparkyFunction, props?: any) => IRenderReturn;
+export declare type ISelfFunction = (props?: any) => IRenderReturn;
 export interface ISparkyEventFunc {
     renderId: string;
     index: number;
@@ -19,8 +19,8 @@ export interface ISparkyEventFunc {
 }
 export interface ISparkyComponent {
     type: string;
-    self: SparkyFunction;
-    selfFn: ISelfFunction;
+    context: ISparkySelf;
+    renderFn: ISelfFunction;
 }
 export interface ISparkyProps {
     [key: string]: any;
