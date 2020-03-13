@@ -1,3 +1,5 @@
+import { setState, memoize, onUpdate, getState } from "../src/sparky.function";
+
 const lib = require("../src/sparky");
 const Sparky = lib.Sparky;
 
@@ -116,8 +118,8 @@ describe("Mount function", () => {
         expect(document.body).toMatchSnapshot()
     });
     test("Computed w/ State function", () => {
-        Sparky.mount(Sparky.component((self) => {
-            const a = self.getState("boton") || "uno";
+        Sparky.mount(Sparky.component(() => {
+            const a = getState("boton") || "uno";
             return lib.render /*html*/`
             <div>
                 <p>Hola a todos ${a}</p>
@@ -128,10 +130,10 @@ describe("Mount function", () => {
         expect(document.body).toMatchSnapshot()
     });
     test("Computed, State w/ Event function", () => {
-        Sparky.mount(Sparky.component((self) => {
-            const a = self.getState("boton") || "uno";
+        Sparky.mount(Sparky.component(() => {
+            const a = getState("boton") || "uno";
             const onClick = () => {
-                self.setState({"boton" : 10})
+                setState({"boton" : 10})
             }
             return lib.render /*html*/`
             <div>
@@ -144,8 +146,8 @@ describe("Mount function", () => {
     });
     test("Computed, State, Memo w/ Event and Click function", () => {
 
-        const Span = (self) => {
-            const a = self.getState("boton") || "uno";
+        const Span = () => {
+            const a = getState("boton") || "uno";
             return lib.render /*html*/`
             <div>
                 <p>Hola a todos ${a}</p>
@@ -153,20 +155,20 @@ describe("Mount function", () => {
             `
         };
 
-        Sparky.mount(Sparky.component((self) => {
-            if(!self.getState("boton")) self.setState({boton: "hola mundo"})
-            const a = self.getState("boton") || "uno";
+        Sparky.mount(Sparky.component(() => {
+            if(!getState("boton")) setState({boton: "hola mundo"})
+            const a = getState("boton") || "uno";
             
-            self.memoize(() => {
+            memoize(() => {
                 console.log("Memo!")
             }, [a]);
 
-            self.onUpdate(() => {
+            onUpdate(() => {
                 console.log("Update!")
             }, [a])
 
             const onClick = () => {
-                self.setState({"boton" : 10})
+                setState({"boton" : 10})
             }
             
             return lib.render /*html*/`
