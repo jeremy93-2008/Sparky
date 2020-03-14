@@ -9,9 +9,11 @@ export interface ISparkySelf {
     state?: ISparkyState;
     cachedMemo?: IFnCached[],
     cachedUpdate?: IFnCached[],
+    cachedState?: any[]
     indexes?: {
         memo: number;
         update: number;
+        state: number;
         [x: string] : number;
     },
     __root?: ISparkyComponent

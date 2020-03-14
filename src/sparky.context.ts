@@ -6,9 +6,11 @@ const emptyContext = {
     state: {},
     cachedMemo: [],
     cachedUpdate: [],
+    cachedState: [],
     indexes: {
         memo: 0,
-        update: 0
+        update: 0,
+        state: 0
     },
     renderFunc: null
 };
@@ -29,6 +31,7 @@ export class SparkyContext {
         if(!this.__context) throw new ReferenceError("Try to reset index on a undefined context");
         this.__context.indexes.memo = 0;
         this.__context.indexes.update = 0;
+        this.__context.indexes.state = 0;
     }
 
     public static newContext(newContext: ISparkySelf) : ISparkySelf {

@@ -12,6 +12,8 @@ export interface IFnCached {
     result: any;
 }
 
+export type ISetState<S> = (newState: S) => ISetState<S>;
+
 /**
  * Execute after the render/update of the DOM tree.
  * @param callback - The function that you want to execute
@@ -28,7 +30,7 @@ export const onUpdate = (callback: UpdateCallback, dependenciesChanged?: Argumen
 * Get State object value of this context
 * @param props - the specific key of the value that you want to retrieve
 */
-export const getState = <S>(props: string): S => {
+const getState = <S>(props: string): S => {
     const currentContext = getContext();
     if (props) return currentContext.state[props];
     return currentContext.state as S;
@@ -38,11 +40,25 @@ export const getState = <S>(props: string): S => {
  * Add/Set a new value into the State object of the context
  * @param newState - new Value
  */
-export const setState = <S>(newState: S) => {
+const setCurrentState = <S>(newState: S): ISetState<S> => {
     const currentContext = getContext();
-    currentContext.state = { ...currentContext.state, ...newState };
-    (currentContext.__root) ? Sparky.mount(currentContext.__root) :
+    currentContext.cachedState[currentContext.indexes.state] = newState;
+    (currentContext.__root) ? Sparky.mount({...currentContext.__root, context: currentContext}) :
         Sparky.mount({ type: "SparkyComponent", context: currentContext, renderFn: currentContext.renderFunc });
+    return setCurrentState;
+}
+
+export const state = <S>(newState: S): [S, ISetState<S>] => {
+    const currentContext = getContext();
+    const currentState = currentContext.cachedState[currentContext.indexes.state];
+    if(currentState) {
+        currentContext.indexes.state++;
+        const setState = setCurrentState;
+        return [currentState as S, setState];
+    }
+
+    const setState = setCurrentState(newState);
+    return [currentState as S, setState];
 }
 
 /**
