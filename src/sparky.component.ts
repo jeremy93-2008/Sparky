@@ -49,6 +49,7 @@ export class SparkyComponent {
                         currentComp = getCachedComponent(cached, currentComp);
                     }
                 }
+                SparkyContext.setCurrentContext(currentComp.context);
                 const renderChild = currentComp.renderFn(Object.freeze(currentComp.context.props));
                 if(!commentDom) return;
                 commentDom.parentNode.replaceChild(renderChild.dom, commentDom);
@@ -83,7 +84,6 @@ export class SparkyComponent {
 }
 
 function getCachedComponent(cached: ICachedComponent, currentComp: ISparkyComponent) {
-    SparkyContext.setCurrentContext(cached.component.context);
     cached.component.context.props = currentComp.context.props;
     currentComp = cached.component;
     return currentComp;

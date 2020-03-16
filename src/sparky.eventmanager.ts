@@ -34,6 +34,7 @@ export class EventManager {
             if(this.isEventTarget(evtList, event)) {
                 if(evtList.type === event.type) {
                     SparkyContext.setCurrentContext(evtList.context);
+                    SparkyContext.resetIndexes();
                     evtList.callbackFn(event);
                 }
             }

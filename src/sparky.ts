@@ -3,6 +3,8 @@ import nanoid from "nanoid/non-secure";
 import 'mdn-polyfills/Array.from';
 import 'mdn-polyfills/Array.prototype.find';
 
+import cloneDeep from "lodash.clonedeep";
+
 import { reconciliate, getCurrentDom, setCurrentDom } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
 import { SparkyComponent } from "./sparky.component";
@@ -37,6 +39,7 @@ export interface ISparkyEventFunc {
 export interface ISparkyComponent {
     type: string;
     context: ISparkySelf;
+    currentContext: ISparkySelf;
     renderFn: ISelfFunction;
 }
 
@@ -54,8 +57,8 @@ export class Sparky {
      * @param renderFunc The function that going to be execute to render html template
      */
     static component(renderFunc: ISelfFunction, props?: ISparkyProps) {
-        const sparkyContext = SparkyContext.newContext({props, renderFunc});
-        return { type: "SparkyComponent", context: sparkyContext, renderFn: renderFunc } as ISparkyComponent;
+        const sparkyContext = SparkyContext.newContext({ props, renderFunc });
+        return { type: "SparkyComponent", context: sparkyContext, currentContext: sparkyContext, renderFn: renderFunc } as ISparkyComponent;
     }
 
     /**
@@ -68,8 +71,12 @@ export class Sparky {
             console.time();
 
         const { context, renderFn } = component;
+
+        const oldContext = cloneDeep(component.currentContext);
+
         SparkyContext.setCurrentContext(context);
         SparkyContext.resetIndexes();
+
         const render = renderFn(Object.freeze(context.props)) as IRenderReturn;
 
         render.dom = SparkyComponent.populate(render, component);
@@ -84,6 +91,8 @@ export class Sparky {
 
         if (Sparky._DEV_)
             console.timeEnd();
+        
+        return oldContext;
     }
 
     /**

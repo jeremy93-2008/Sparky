@@ -1,5 +1,5 @@
 import { Sparky, render } from "../../src/sparky";
-import { memoize, onUpdate, state } from "../../src/sparky.function";
+import { memoize, update, state } from "../../src/sparky.function";
 
 Sparky.mount(Sparky.component(Main, { name: "Hugo"}), document.getElementById("app"))
 
@@ -19,7 +19,7 @@ function Main(props: IProps) {
         console.log("Memo 2 :) " + du);
     }, [text]);
 
-    onUpdate(() => {
+    update(() => {
         console.log("after dom render");
         console.log(document.getElementById("uno").innerHTML);
     }, [])

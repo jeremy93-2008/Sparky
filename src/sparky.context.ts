@@ -1,4 +1,5 @@
 import { ISparkySelf } from "./sparky.function.helper";
+import cloneDeep from "lodash.clonedeep";
 
 const emptyContext = {
     __root: null,
@@ -35,6 +36,6 @@ export class SparkyContext {
     }
 
     public static newContext(newContext: ISparkySelf) : ISparkySelf {
-        return {...this.__defaultContext, ...newContext};
+        return cloneDeep({...this.__defaultContext, ...newContext});
     }
 }

@@ -1,4 +1,4 @@
-import { setState, memoize, onUpdate, getState } from "../src/sparky.function";
+import { memoize, update, state } from "../src/sparky.function";
 
 const lib = require("../src/sparky");
 const Sparky = lib.Sparky;
@@ -119,7 +119,7 @@ describe("Mount function", () => {
     });
     test("Computed w/ State function", () => {
         Sparky.mount(Sparky.component(() => {
-            const a = getState("boton") || "uno";
+            const [a, setA] = state("uno");
             return lib.render /*html*/`
             <div>
                 <p>Hola a todos ${a}</p>
@@ -131,9 +131,9 @@ describe("Mount function", () => {
     });
     test("Computed, State w/ Event function", () => {
         Sparky.mount(Sparky.component(() => {
-            const a = getState("boton") || "uno";
+            const [a, setA] = state("uno");
             const onClick = () => {
-                setState({"boton" : 10})
+                setA("10");
             }
             return lib.render /*html*/`
             <div>
@@ -147,7 +147,7 @@ describe("Mount function", () => {
     test("Computed, State, Memo w/ Event and Click function", () => {
 
         const Span = () => {
-            const a = getState("boton") || "uno";
+            const [a, setA] = state("uno");
             return lib.render /*html*/`
             <div>
                 <p>Hola a todos ${a}</p>
@@ -156,19 +156,18 @@ describe("Mount function", () => {
         };
 
         Sparky.mount(Sparky.component(() => {
-            if(!getState("boton")) setState({boton: "hola mundo"})
-            const a = getState("boton") || "uno";
+            const [a, setA] = state("hola mundo");
             
             memoize(() => {
                 console.log("Memo!")
             }, [a]);
 
-            onUpdate(() => {
+            update(() => {
                 console.log("Update!")
             }, [a])
 
             const onClick = () => {
-                setState({"boton" : 10})
+                setA("10")
             }
             
             return lib.render /*html*/`

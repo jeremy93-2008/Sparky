@@ -14,41 +14,51 @@ export interface IFnCached {
 
 export type ISetState<S> = (newState: S) => ISetState<S>;
 
+const getContext = () => {
+    const currentContext = SparkyContext.getCurrentContext();
+    if (!currentContext)
+        throw new ReferenceError("Sparky Function only can be used in the lifecycle of a Sparky application");
+    return currentContext;
+}
+
+const setCurrentState = <S>(newState: S): ISetState<S> => {
+    const currentContext = getContext();
+    currentContext.cachedState[currentContext.indexes.state] = newState;
+    currentContext.indexes.state++;
+    if (currentContext.__root) {
+        SparkyContext.setCurrentContext(Sparky.mount({ 
+            ...currentContext.__root, currentContext }));
+    } else {
+        SparkyContext.setCurrentContext(
+            Sparky.mount({ type: "SparkyComponent", 
+            context: currentContext, currentContext, renderFn: currentContext.renderFunc }));
+    }
+    return setCurrentState;
+}
+
+const setInitialState = <S>(newState: S): ISetState<S> => {
+    const currentContext = getContext();
+    currentContext.cachedState[currentContext.indexes.state] = newState;
+    return setCurrentState;
+}
+
 /**
- * Execute after the render/update of the DOM tree.
- * @param callback - The function that you want to execute
- * @param dependenciesChanged - An array of keys to know when the onUpdate need to be executed
+ * Function will be run after the render is commited to the screen.
+ * @param callbackFn - The function to run
+ * @param dependenciesChanged - Array of values that the function depends on
  */
-export const onUpdate = (callback: UpdateCallback, dependenciesChanged?: ArgumentsList) => {
+export const update = (callbackFn: UpdateCallback, dependenciesChanged?: ArgumentsList) => {
     const currentContext = getContext();
     window.requestIdleCallback(() => {
-        callCachedFn(currentContext, "update", currentContext.cachedUpdate, callback, dependenciesChanged)
+        callCachedFn(currentContext, "update", currentContext.cachedUpdate, callbackFn, dependenciesChanged)
     }, { timeout: 250 });
 }
 
 /**
-* Get State object value of this context
-* @param props - the specific key of the value that you want to retrieve
-*/
-const getState = <S>(props: string): S => {
-    const currentContext = getContext();
-    if (props) return currentContext.state[props];
-    return currentContext.state as S;
-}
-
-/**
- * Add/Set a new value into the State object of the context
- * @param newState - new Value
+ * Returns a stateful value, and a function to update it.
+ * @param initialState The value during the first render
  */
-const setCurrentState = <S>(newState: S): ISetState<S> => {
-    const currentContext = getContext();
-    currentContext.cachedState[currentContext.indexes.state] = newState;
-    (currentContext.__root) ? Sparky.mount({...currentContext.__root, context: currentContext}) :
-        Sparky.mount({ type: "SparkyComponent", context: currentContext, renderFn: currentContext.renderFunc });
-    return setCurrentState;
-}
-
-export const state = <S>(newState: S): [S, ISetState<S>] => {
+export const state = <S>(initialState: S): [S, ISetState<S>] => {
     const currentContext = getContext();
     const currentState = currentContext.cachedState[currentContext.indexes.state];
     if(currentState) {
@@ -56,24 +66,18 @@ export const state = <S>(newState: S): [S, ISetState<S>] => {
         const setState = setCurrentState;
         return [currentState as S, setState];
     }
-
-    const setState = setCurrentState(newState);
-    return [currentState as S, setState];
+    const setState = setInitialState(initialState);
+    currentContext.indexes.state++;
+    const lastIndex = currentContext.indexes.state - 1;
+    return [currentContext.cachedState[lastIndex] as S, setState];
 }
 
 /**
- * Call the function callback only when dependencies has changed
- * @param callbackFn - Callback to be called when needed
- * @param argumentsChanged - list of value that are used to know if the callback needed to be recalled
+ * Run and returns a memoized value
+ * @param callbackFn - Function will be run on rendering phase
+ * @param argumentsChanged - Array of values that the function depends on
  */
 export const memoize = (callbackFn: Function, argumentsChanged?: ArgumentsList) => {
     const currentContext = getContext();
     callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged)
-}
-
-function getContext() {
-    const currentContext = SparkyContext.getCurrentContext();
-    if (!currentContext)
-        throw new ReferenceError("Sparky Function only can be used in the lifecycle of a Sparky application");
-    return currentContext;
 }
