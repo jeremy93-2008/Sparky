@@ -1,4 +1,4 @@
-import { IRenderReturn, ISparkyComponent, Sparky } from "./sparky";
+import { IRenderReturn, ISparkyComponent } from "./sparky";
 import { findEvent } from "./sparky.event";
 import { EventManager, eventCallbackFn } from "./sparky.eventmanager";
 import { SparkyContext } from "./sparky.context";
@@ -50,6 +50,7 @@ export class SparkyComponent {
                     }
                 }
                 SparkyContext.setCurrentContext(currentComp.context);
+                SparkyContext.resetIndexes();
                 const renderChild = currentComp.renderFn(Object.freeze(currentComp.context.props));
                 if(!commentDom) return;
                 commentDom.parentNode.replaceChild(renderChild.dom, commentDom);

@@ -3,11 +3,11 @@ import nanoid from "nanoid/non-secure";
 import 'mdn-polyfills/Array.from';
 import 'mdn-polyfills/Array.prototype.find';
 
-import cloneDeep from "lodash.clonedeep";
-
 import { reconciliate, getCurrentDom, setCurrentDom } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
 import { SparkyComponent } from "./sparky.component";
+
+import cloneDeep from "lodash.clonedeep";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected"
 import { ISparkySelf } from "./sparky.function.helper";
@@ -66,13 +66,13 @@ export class Sparky {
      * @param component Sparky Component
      * @param dom The dom element where you want to mount this component
      */
-    static mount(component: ISparkyComponent, dom?: HTMLElement) {
+    static mount(component: ISparkyComponent, dom?: HTMLElement): ISparkySelf {
         if (Sparky._DEV_)
             console.time();
 
         const { context, renderFn } = component;
 
-        const oldContext = cloneDeep(component.currentContext);
+        const keepIndexes = cloneDeep(component.currentContext.indexes);
 
         SparkyContext.setCurrentContext(context);
         SparkyContext.resetIndexes();
@@ -92,7 +92,7 @@ export class Sparky {
         if (Sparky._DEV_)
             console.timeEnd();
         
-        return oldContext;
+        return {...component.currentContext, indexes: keepIndexes};
     }
 
     /**
