@@ -1,24 +1,8 @@
 import { arrayAreSame } from "./sparky.helper";
 import { IFnCached, ArgumentsList } from "./sparky.function";
-import { ISparkyProps, ISparkyState, IRenderReturn, ISparkyComponent } from "./sparky";
+import { ISparkySelf } from "./sparky.context";
 
 type CachedType = "memoize" | "update";
-
-export interface ISparkySelf {
-    props: ISparkyProps;
-    state?: ISparkyState;
-    cachedMemo?: IFnCached[],
-    cachedUpdate?: IFnCached[],
-    cachedState?: any[]
-    indexes?: {
-        memo: number;
-        update: number;
-        state: number;
-        [x: string] : number;
-    },
-    __root?: ISparkyComponent
-    renderFunc: (props?: any) => IRenderReturn;
-}
 
 export function callCachedFn(context: ISparkySelf, type: CachedType, cachedArray: IFnCached[], callbackFn: Function, argumentsChanged?: ArgumentsList) {
     const fnCached = cachedArray[getIndexByType(context, type)];

@@ -1,16 +1,21 @@
 import { Sparky } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { callCachedFn } from "./sparky.function.helper";
-import { SparkyContext } from "./sparky.context";
+import { SparkyContext, ISparkySelf } from "./sparky.context";
 
 export type ArgumentsList = any[];
 type UpdateCallback = () => void;
+type IBoundSetCurrentState = {
+    context: ISparkySelf;
+    state: number;
+};
 
 export interface IFnCached {
     fn: Function;
     dependencies: string[];
     result: any;
 }
+
 
 export type ISetState<S> = (newState: S) => ISetState<S>;
 
@@ -21,8 +26,15 @@ const getContext = () => {
     return currentContext;
 }
 
-const setCurrentState = <S>(newState: S): ISetState<S> => {
+const setContext = (newContext: ISparkySelf) => {
+    SparkyContext.setCurrentContext(newContext);
+    SparkyContext.resetIndexes();
+}
+
+const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S): ISetState<S> {
+    setContext(this.context);
     const currentContext = getContext();
+    currentContext.indexes.state = this.state;
     currentContext.cachedState[currentContext.indexes.state] = newState;
     currentContext.indexes.state++;
     if (currentContext.__root) {
@@ -42,42 +54,29 @@ const setInitialState = <S>(newState: S): ISetState<S> => {
     return setCurrentState;
 }
 
-/**
- * Function will be run after the render is commited to the screen.
- * @param callbackFn - The function to run
- * @param dependenciesChanged - Array of values that the function depends on
- */
-export const update = (callbackFn: UpdateCallback, dependenciesChanged?: ArgumentsList) => {
+export const Sparky__update = (callbackFn: UpdateCallback, dependenciesChanged?: ArgumentsList) => {
     const currentContext = getContext();
     window.requestIdleCallback(() => {
         callCachedFn(currentContext, "update", currentContext.cachedUpdate, callbackFn, dependenciesChanged)
     }, { timeout: 250 });
 }
 
-/**
- * Returns a stateful value, and a function to update it.
- * @param initialState The value during the first render
- */
-export const state = <S>(initialState: S): [S, ISetState<S>] => {
+export const Sparky__state = <S>(initialState: S): [S, ISetState<S>] => {
     const currentContext = getContext();
+    const bound = { context: currentContext, state: currentContext.indexes.state }
     const currentState = currentContext.cachedState[currentContext.indexes.state];
     if(currentState) {
         currentContext.indexes.state++;
         const setState = setCurrentState;
-        return [currentState as S, setState];
+        return [currentState as S, setState.bind(bound)];
     }
     const setState = setInitialState(initialState);
     currentContext.indexes.state++;
     const lastIndex = currentContext.indexes.state - 1;
-    return [currentContext.cachedState[lastIndex] as S, setState];
+    return [currentContext.cachedState[lastIndex] as S, setState.bind(bound)];
 }
 
-/**
- * Run and returns a memoized value
- * @param callbackFn - Function will be run on rendering phase
- * @param argumentsChanged - Array of values that the function depends on
- */
-export const memoize = (callbackFn: Function, argumentsChanged?: ArgumentsList) => {
+export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: ArgumentsList) => {
     const currentContext = getContext();
     callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged)
 }

@@ -1,5 +1,4 @@
-import { Sparky, render } from "../../src/sparky";
-import { memoize, update, state } from "../../src/sparky.function";
+import { Sparky, render, memoize, state, update } from "../../src/sparky";
 
 Sparky.mount(Sparky.component(Main, { name: "Hugo"}), document.getElementById("app"))
 
@@ -31,7 +30,7 @@ function Main(props: IProps) {
 
     return render /*html*/`
         <div id="uno" class="lol">
-            Hola a todos ${ name !== "Hugo" ? render `<b onclick=${onClick}>${name}</b>` : `no hay nada`}
+            Hola a todos ${ name !== "Hugo" ? render /*html*/`<b onclick=${onClick}>${name}</b>` : `no hay nada`}
             <button onclick=${onClick}>Hey!</button>
             <div>
                 <div>${Sparky.component(Span, {name})}</div>
@@ -56,6 +55,9 @@ function SpanNest(props: IProps) {
                 <span>${ver}</span>    
             </span>
             ${Sparky.component(Span)}
+            <div style="border: solid 1px blue">
+                ${Sparky.component(Span)}
+            </div>
         </div>
     `
 }

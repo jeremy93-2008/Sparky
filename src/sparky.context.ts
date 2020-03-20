@@ -1,8 +1,28 @@
-import { ISparkySelf } from "./sparky.function.helper";
-import cloneDeep from "lodash.clonedeep";
+import nanoid from "nanoid/non-secure";
+import cloneDeep from "clone-deep";
+import { ISparkyProps, ISparkyState, ISparkyComponent, IRenderReturn } from "./sparky";
+import { IFnCached } from "./sparky.function";
 
-const emptyContext = {
+export interface ISparkySelf {
+    props: ISparkyProps;
+    state?: ISparkyState;
+    cachedMemo?: IFnCached[],
+    cachedUpdate?: IFnCached[],
+    cachedState?: any[]
+    indexes?: {
+        memo: number;
+        update: number;
+        state: number;
+        [x: string] : number;
+    },
+    __id?: string,
+    __root?: ISparkyComponent,
+    renderFunc: (props?: any) => IRenderReturn;
+}
+
+const emptyContext: ISparkySelf = {
     __root: null,
+    __id: "",
     props: {},
     state: {},
     cachedMemo: [],
@@ -36,6 +56,6 @@ export class SparkyContext {
     }
 
     public static newContext(newContext: ISparkySelf) : ISparkySelf {
-        return cloneDeep({...this.__defaultContext, ...newContext});
+        return cloneDeep({...this.__defaultContext, ...newContext, __id: nanoid(12)});
     }
 }
