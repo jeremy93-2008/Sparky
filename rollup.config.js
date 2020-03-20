@@ -1,4 +1,4 @@
-import { uglify } from "rollup-plugin-uglify";
+import { terser } from "rollup-plugin-terser";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from "rollup-plugin-typescript2";
@@ -15,11 +15,11 @@ export default [
 			typescript(),
 			resolve(),
 			commonjs(),
-			uglify({
+			terser({
 				output: {
 				  comments: "all"
 				}
-			})
+			  })
         ]
 	}
 ];

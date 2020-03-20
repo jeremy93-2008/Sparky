@@ -6,16 +6,19 @@ import 'mdn-polyfills/Array.prototype.find';
 import { reconciliate, getCurrentDom, setCurrentDom } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
 import { SparkyComponent } from "./sparky.component";
+import { SparkyContext, ISparkySelf } from "./sparky.context";
 
-import { isConnectedPolyfill } from "./polyfill/isConnected"
-import { ISparkySelf } from "./sparky.function.helper";
-import { SparkyContext } from "./sparky.context";
+import cloneDeep from "clone-deep";
 
+import { isConnectedPolyfill } from "./polyfill/isConnected";
+import { Sparky__state, Sparky__update, Sparky__memoize } from "./sparky.function";
 
 isConnectedPolyfill();
 
-export interface IRenderReturn extends IReconciliateProps {
+export interface IRenderReturn {
     type: string;
+    html: string;
+    func: ISparkyEventFunc[],
     nestedComponents: ISparkyComponent[];
     children: IRenderReturn[];
     renderId: string;
@@ -37,6 +40,7 @@ export interface ISparkyEventFunc {
 export interface ISparkyComponent {
     type: string;
     context: ISparkySelf;
+    currentContext: ISparkySelf;
     renderFn: ISelfFunction;
 }
 
@@ -54,8 +58,8 @@ export class Sparky {
      * @param renderFunc The function that going to be execute to render html template
      */
     static component(renderFunc: ISelfFunction, props?: ISparkyProps) {
-        const sparkyContext = SparkyContext.newContext({props, renderFunc});
-        return { type: "SparkyComponent", context: sparkyContext, renderFn: renderFunc } as ISparkyComponent;
+        const sparkyContext = SparkyContext.newContext({ props, renderFunc });
+        return { type: "SparkyComponent", context: sparkyContext, currentContext: sparkyContext, renderFn: renderFunc } as ISparkyComponent;
     }
 
     /**
@@ -63,18 +67,24 @@ export class Sparky {
      * @param component Sparky Component
      * @param dom The dom element where you want to mount this component
      */
-    static mount(component: ISparkyComponent, dom?: HTMLElement) {
+    static mount(component: ISparkyComponent, dom?: HTMLElement): ISparkySelf {
         if (Sparky._DEV_)
             console.time();
 
         const { context, renderFn } = component;
+
+        const keepIndexes = cloneDeep(component.currentContext.indexes);
+
         SparkyContext.setCurrentContext(context);
         SparkyContext.resetIndexes();
+
         const render = renderFn(Object.freeze(context.props)) as IRenderReturn;
 
-        render.dom = SparkyComponent.populate(render, component);
+        let nextDOM = renderToDOMNode(render.html);
 
-        let finalDOM = reconciliate(getCurrentDom(), render.dom);
+        nextDOM = SparkyComponent.populate(nextDOM, render, component);
+
+        let finalDOM = reconciliate(getCurrentDom(), nextDOM);
         if (!finalDOM) return;
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
@@ -84,6 +94,8 @@ export class Sparky {
 
         if (Sparky._DEV_)
             console.timeEnd();
+        
+        return {...component.currentContext, indexes: keepIndexes};
     }
 
     /**
@@ -97,13 +109,32 @@ export class Sparky {
 }
 
 /**
+ * Function will be run after the render is commited to the screen.
+ * @param callbackFn - The function to run
+ * @param dependenciesChanged - Array of values that the function depends on
+ */
+export const update = Sparky__update;
+
+/**
+ * Returns a stateful value, and a function to update it.
+ * @param initialState The value during the first render
+ */
+export const state = Sparky__state;
+
+/**
+ * Run and returns a memoized value
+ * @param callbackFn - Function will be run on rendering phase
+ * @param argumentsChanged - Array of values that the function depends on
+ */
+export const memoize = Sparky__memoize;
+
+/**
  * Render the html string template to HTML elements
  * @param html Array of HTML String 
  * @param computedProps Computed Props used to pass Javascript into template
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
  */
 export function render(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn {
-    const domNode = document.createElement("div");
     const func: ISparkyEventFunc[] = [];
     const nestedComponents: ISparkyComponent[] = [];
     const children: IRenderReturn[] = [];
@@ -118,13 +149,9 @@ export function render(html: TemplateStringsArray | string, ...computedProps: an
             return htmlLine;
         })
 
-    domNode.innerHTML = Array.isArray(newHTML) ? newHTML.join("") : newHTML;
+    const innerHTML = Array.isArray(newHTML) ? newHTML.join("") : newHTML;
 
-    if (domNode.children.length > 1) {
-        throw new TypeError("The render HTML can only had one root node");
-    }
-
-    return { type: "SparkyRender", dom: domNode.firstElementChild as HTMLElement, func, nestedComponents, children, renderId };
+    return { type: "SparkyRender", html: innerHTML, func, nestedComponents, children, renderId };
 }
 
 function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFunc[], htmlLine: string, nestedComponents: ISparkyComponent[], children: IRenderReturn[], renderId: string) {
@@ -134,7 +161,7 @@ function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFun
     }
     else if (computedProps[i].type == "SparkyRender") {
         const render = computedProps[i] as IRenderReturn;
-        htmlLine = renderSparkyObject(render, htmlLine);
+        htmlLine += render.html;
         children.push(render)
     }
     else if (computedProps[i].type == "SparkyComponent") {
@@ -154,9 +181,11 @@ function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFun
     return htmlLine;
 }
 
-function renderSparkyObject(render: IRenderReturn, htmlLine: string) {
+export function renderToDOMNode(html: string) {
     const div = document.createElement("div");
-    div.appendChild(render.dom);
-    htmlLine += div.innerHTML;
-    return htmlLine;
+    div.innerHTML = html;
+    if (div.children.length > 1) {
+        throw new TypeError("Adjacent elements on the root level are forbidden.");
+    }
+    return div.firstElementChild as HTMLElement;
 }

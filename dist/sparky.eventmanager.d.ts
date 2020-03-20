@@ -1,6 +1,8 @@
+import { ISparkySelf } from "./sparky.context";
 export interface eventListSingle {
     dom: HTMLElement;
     type: string;
+    context: ISparkySelf;
     callbackFn: eventCallbackFn;
 }
 export declare type eventCallbackFn = (evt: Event) => void;

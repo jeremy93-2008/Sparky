@@ -1,5 +1,4 @@
-import { Sparky, render } from "../../src/sparky";
-import { getState, memoize, onUpdate, setState } from "../../src/sparky.function";
+import { Sparky, render, memoize, state, update } from "../../src/sparky";
 
 Sparky.mount(Sparky.component(Main, { name: "Hugo"}), document.getElementById("app"))
 
@@ -8,33 +7,33 @@ interface IProps {
 }
 
 function Main(props: IProps) {
-
-    const a = (<string>getState("boton")) || props.name; 
-    const text = (<string[]>getState("texto")) || ["The world"]; 
+    const [name, setName] = state("Hugo");
+    const [text, setText] = state(["The world"]); 
 
     memoize((du) => {
         console.log("Memo :) " + du);
-    }, [a]);
+    }, [name]);
 
     memoize((du) => {
         console.log("Memo 2 :) " + du);
     }, [text]);
 
-    onUpdate(() => {
+    update(() => {
         console.log("after dom render");
         console.log(document.getElementById("uno").innerHTML);
     }, [])
 
     const onClick = (event) => {
-        setState({ boton: "Jeremy", texto: ["Hola","Buenas","Adios"] });
+        setName("Jeremy");
+        setText(["Hola","Buenas","Adios"]);
     }
 
     return render /*html*/`
         <div id="uno" class="lol">
-            Hola a todos ${ a !== "Hugo" ? render `<b onclick=${onClick}>${a}</b>` : `no hay nada`}
+            Hola a todos ${ name !== "Hugo" ? render /*html*/`<b onclick=${onClick}>${name}</b>` : `no hay nada`}
             <button onclick=${onClick}>Hey!</button>
             <div>
-                <div>${Sparky.component(Span, {name: a})}</div>
+                <div>${Sparky.component(Span, {name})}</div>
             </div>
             ${Sparky.component(SpanNest)}
             <ul>
@@ -45,9 +44,9 @@ function Main(props: IProps) {
 }
 
 function SpanNest(props: IProps) {
-    const ver = (<string>getState("ver"))
+    const [ver, setVer] = state("Esto son state nuevos")
     const doIt = () => {
-        setState({ver: "Uno para ti"})
+        setVer("Uno para ti");
     }
     return render/*html*/`
         <div>
@@ -56,15 +55,18 @@ function SpanNest(props: IProps) {
                 <span>${ver}</span>    
             </span>
             ${Sparky.component(Span)}
+            <div style="border: solid 1px blue">
+                ${Sparky.component(Span)}
+            </div>
         </div>
     `
 }
 
 function Span(props: IProps) {
     const name = props ? props.name : "Esto no es una prop";
-    const ver = (<string>getState("ver"))
+    const [ver, setVer] = state(new Date().toLocaleString());
     const click = () => {
-        setState({ver: new Date().toISOString()})
+        setVer(new Date().toLocaleString())
     }
     return render/*html*/`
         <div>

@@ -1,6 +1,5 @@
 import { isConnectedPolyfill } from "./polyfill/isConnected"
-import { ISparkySelf } from "./sparky.function.helper";
-import { SparkyContext } from "./sparky.context";
+import { ISparkySelf } from "./sparky.context";
 
 isConnectedPolyfill();
 
@@ -33,7 +32,6 @@ export class EventManager {
         this.eventList.find((evtList) => {
             if(this.isEventTarget(evtList, event)) {
                 if(evtList.type === event.type) {
-                    SparkyContext.setCurrentContext(evtList.context);
                     evtList.callbackFn(event);
                 }
             }

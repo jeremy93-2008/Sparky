@@ -28,6 +28,7 @@
     "preset": "ts-jest"
   },
   "dependencies": {
+    "clone-deep": "^4.0.1",
     "mdn-polyfills": "^5.20.0",
     "nanoid": "^2.1.11",
     "requestidlecallback-polyfill": "^1.0.2"
@@ -40,8 +41,9 @@
     "jest": "^25.1.0",
     "parcel-bundler": "^1.12.4",
     "rollup": "^2.0.2",
+    "rollup-plugin-terser": "^5.3.0",
     "rollup-plugin-typescript2": "^0.26.0",
-    "rollup-plugin-uglify": "^6.0.4",
+    "terser": "^4.6.7",
     "ts-jest": "^25.2.1",
     "tslib": "^1.11.1",
     "typescript": "^3.8.2"

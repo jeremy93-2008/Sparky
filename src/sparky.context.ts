@@ -1,14 +1,37 @@
-import { ISparkySelf } from "./sparky.function.helper";
+import nanoid from "nanoid/non-secure";
+import cloneDeep from "clone-deep";
+import { ISparkyProps, ISparkyState, ISparkyComponent, IRenderReturn } from "./sparky";
+import { IFnCached } from "./sparky.function";
 
-const emptyContext = {
+export interface ISparkySelf {
+    props: ISparkyProps;
+    state?: ISparkyState;
+    cachedMemo?: IFnCached[],
+    cachedUpdate?: IFnCached[],
+    cachedState?: any[]
+    indexes?: {
+        memo: number;
+        update: number;
+        state: number;
+        [x: string] : number;
+    },
+    __id?: string,
+    __root?: ISparkyComponent,
+    renderFunc: (props?: any) => IRenderReturn;
+}
+
+const emptyContext: ISparkySelf = {
     __root: null,
+    __id: "",
     props: {},
     state: {},
     cachedMemo: [],
     cachedUpdate: [],
+    cachedState: [],
     indexes: {
         memo: 0,
-        update: 0
+        update: 0,
+        state: 0
     },
     renderFunc: null
 };
@@ -29,9 +52,10 @@ export class SparkyContext {
         if(!this.__context) throw new ReferenceError("Try to reset index on a undefined context");
         this.__context.indexes.memo = 0;
         this.__context.indexes.update = 0;
+        this.__context.indexes.state = 0;
     }
 
     public static newContext(newContext: ISparkySelf) : ISparkySelf {
-        return {...this.__defaultContext, ...newContext};
+        return cloneDeep({...this.__defaultContext, ...newContext, __id: nanoid(12)});
     }
 }

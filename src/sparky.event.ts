@@ -16,9 +16,9 @@ export function findEvent(element: HTMLElement, renderId: string, index: number)
         })
 
         if(eventAttr) return {dom: elem, attr: eventAttr};
-        
-        Array.from(elem.children as HTMLCollectionOf<HTMLElement>).forEach((child) => {
-            domQueue.push(child)
-        })
+
+        for(let index = 0; index < elem.children.length; index++) {
+            domQueue.push(elem.children[index] as HTMLElement)
+        }
     }
 }
