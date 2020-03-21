@@ -1,4 +1,6 @@
 # `Sparky`
+![Travis CI](https://travis-ci.org/jeremy93-2008/Sparky.svg?branch=master)
+[![codecov](https://codecov.io/gh/jeremy93-2008/Sparky/branch/master/graph/badge.svg)](https://codecov.io/gh/jeremy93-2008/Sparky)
 
 Sparky is a library that help you to create dynamic UI using Javascript.
 
