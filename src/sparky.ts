@@ -15,6 +15,9 @@ import { Sparky__state, Sparky__update, Sparky__memoize } from "./sparky.functio
 
 isConnectedPolyfill();
 
+declare var thisTest;
+declare var thisTestEvent;
+
 export interface IRenderReturn {
     type: string;
     html: string;
@@ -88,12 +91,21 @@ export class Sparky {
         if (!finalDOM) return;
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
-        EventManager.listen();
+
+        EventManager.listen(thisTestEvent);
 
         setCurrentDom(finalDOM as HTMLElement);
 
         if (Sparky._DEV_)
             console.timeEnd();
+
+        if(typeof thisTest != "undefined" && thisTest.testing) {
+            thisTest.__testUtilData = {
+                root: getCurrentDom(),
+                component,
+                eventList: thisTestEvent
+            };
+        }
         
         return {...component.currentContext, indexes: keepIndexes};
     }

@@ -1,7 +1,11 @@
 import { IRenderReturn, ISparkyComponent, renderToDOMNode } from "./sparky";
 import { findEvent } from "./sparky.event";
-import { EventManager, eventCallbackFn } from "./sparky.eventmanager";
+import { EventManager, eventCallbackFn, eventListSingle } from "./sparky.eventmanager";
 import { SparkyContext } from "./sparky.context";
+
+interface windowTesting extends Window {
+    thisTestEvent: eventListSingle[]
+}
 
 interface ICachedComponent {
     component: ISparkyComponent,
@@ -66,6 +70,8 @@ export class SparkyComponent {
             if(currentRender.nestedComponents.length > 0)
                 depthHorizontal++;
         }
+
+        (window as unknown as windowTesting).thisTestEvent = EventManager.eventList;
 
         return nextDOM;
     }

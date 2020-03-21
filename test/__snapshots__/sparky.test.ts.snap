@@ -56,17 +56,54 @@ exports[`Mount function Computed, State w/ Event function 1`] = `
 <body>
   <div>
     
-                
-    <p>
+                    
+    <p
+      id="unique"
+    >
       Hola a todos 
       <span
         class="computed"
       >
-        uno
+        10
       </span>
     </p>
     
-            
+                
+  </div>
+</body>
+`;
+
+exports[`Mount function Computed, State w/ Event function with Render inside 1`] = `
+<body>
+  <div>
+    
+                    
+    <p
+      id="unique"
+    >
+      Hola a todos 
+      <span
+        class="computed"
+      >
+        10
+      </span>
+    </p>
+    
+                    
+    <div>
+      <div>
+        Hola
+      </div>
+    </div>
+    
+                    
+    <div>
+      <div>
+        Esto es un componente
+      </div>
+    </div>
+    
+                
   </div>
 </body>
 `;
@@ -83,7 +120,7 @@ exports[`Mount function Computed, State, Memo w/ Event and Click function 1`] = 
       <span
         class="computed"
       >
-        hola mundo
+        10
       </span>
     </p>
     
@@ -92,12 +129,14 @@ exports[`Mount function Computed, State, Memo w/ Event and Click function 1`] = 
       <div>
         
                 
-        <p>
+        <p
+          id="paragraph-1"
+        >
           Hola a todos 
           <span
             class="computed"
           >
-            uno
+            100
           </span>
         </p>
         

@@ -17,19 +17,20 @@ export class EventManager {
     static eventList: eventListSingle[] = [];
     static eventListType: string[] = [];
 
-    static listen() {
+    static listen(eventList?: eventListSingle[]) {
         EventManager.removeUnusedEvents();
-        this.eventList.forEach((event) => {
+        const evtList = eventList || this.eventList
+        evtList.forEach((event) => {
             const { type } = event;
             if(!this.isEventTypeListening(type)) {
-                document.addEventListener(type, (event) => this.dispatchEvent(event))
+                document.addEventListener(type, (event) => this.dispatchEvent(event, evtList))
                 this.eventListType.push(type);
             }
         });
     }
 
-    static dispatchEvent(event: Event) {
-        this.eventList.find((evtList) => {
+    static dispatchEvent(event: Event, eventList: eventListSingle[]) {
+        eventList.find((evtList) => {
             if(this.isEventTarget(evtList, event)) {
                 if(evtList.type === event.type) {
                     evtList.callbackFn(event);

@@ -10,8 +10,8 @@ export declare class EventManager {
     static oldEventType: string[];
     static eventList: eventListSingle[];
     static eventListType: string[];
-    static listen(): void;
-    static dispatchEvent(event: Event): void;
+    static listen(eventList?: eventListSingle[]): void;
+    static dispatchEvent(event: Event, eventList: eventListSingle[]): void;
     static addEvent(eventSingle: eventListSingle): void;
     private static removeUnusedEvents;
     private static isEventTypeListening;
