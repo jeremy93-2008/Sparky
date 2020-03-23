@@ -12,6 +12,7 @@ import cloneDeep from "clone-deep";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected";
 import { Sparky__state, Sparky__update, Sparky__memoize } from "./sparky.function";
+import { listeningHashChange, getStateByHash } from "./sparky.router";
 
 isConnectedPolyfill();
 
@@ -25,6 +26,12 @@ export interface IRenderReturn {
     nestedComponents: ISparkyComponent[];
     children: IRenderReturn[];
     renderId: string;
+}
+
+export interface IStateRoute {
+    key: string;
+    path: RegExp | string;
+    component: ISparkyComponent;
 }
 
 export interface IReconciliateProps {
@@ -63,6 +70,20 @@ export class Sparky {
     static component(renderFunc: ISelfFunction, props?: ISparkyProps) {
         const sparkyContext = SparkyContext.newContext({ props, renderFunc });
         return { type: "SparkyComponent", context: sparkyContext, currentContext: sparkyContext, renderFn: renderFunc } as ISparkyComponent;
+    }
+
+    /**
+     * Create a routing component that manage history
+     * @param stateRoute 
+     */
+    static router(stateRoute: IStateRoute[], dom?: HTMLElement) {
+        listeningHashChange(stateRoute, (component) => {
+            Sparky.mount(component);
+        })
+
+        const newState = getStateByHash(stateRoute);
+
+        return newState.component;
     }
 
     /**

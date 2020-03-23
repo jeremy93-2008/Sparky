@@ -1,6 +1,17 @@
 import { Sparky, render, memoize, state, update } from "../../src/sparky";
 
-Sparky.mount(Sparky.component(Main, { name: "Hugo"}), document.getElementById("app"))
+Sparky.mount(Sparky.router([
+    {
+        key: "main",
+        path: "#lol",
+        component: Sparky.component(Main, { name: "Hugo"})
+    },
+    {
+        key: "child",
+        path: "#dos",
+        component: Sparky.component(Span, { name: "Hugo"})
+    }
+]), document.getElementById("app"))
 
 interface IProps {
     name: string;
@@ -9,6 +20,7 @@ interface IProps {
 function Main(props: IProps) {
     const [name, setName] = state("Hugo");
     const [text, setText] = state(["The world"]); 
+    const [input, setInput] = state("");
 
     memoize((du) => {
         console.log("Memo :) " + du);
@@ -28,6 +40,10 @@ function Main(props: IProps) {
         setText(["Hola","Buenas","Adios"]);
     }
 
+    const onInput = (event: Event) => {
+        setInput((event.target as HTMLInputElement).value)
+    }
+
     return render /*html*/`
         <div id="uno" class="lol">
             Hola a todos ${ name !== "Hugo" ? render /*html*/`<b onclick=${onClick}>${name}</b>` : `no hay nada`}
@@ -36,6 +52,9 @@ function Main(props: IProps) {
                 <div>${Sparky.component(Span, {name})}</div>
             </div>
             ${Sparky.component(SpanNest)}
+            <input id="text" type="text" oninput=${onInput} />
+            <a href="#dos">A Dos</a>
+            <span>${input}</span>
             <ul>
                 ${text.map(t => `<li>${t}</li>`)}
             </ul>
@@ -71,6 +90,7 @@ function Span(props: IProps) {
     return render/*html*/`
         <div>
             <span ondblclick=${click}>Hazlo</span>
+            <a href="#">A Main</a>
             <span>
                 <span>Un nuevo Mundo ${name}</span>
                 ${ver}
