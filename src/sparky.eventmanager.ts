@@ -28,21 +28,21 @@ export class EventManager {
     static eventListType: string[] = [];
 
     static listen(finalDOM: HTMLElement) {
-        (window as unknown as windowTesting).thisTestEvent = EventManager.eventList;
+        this.eventList = [];
         EventManager.populateEvents(finalDOM);
         EventManager.removeUnusedEvents();
-        const evtList = this.eventList;
-        evtList.forEach((event) => {
+        (window as unknown as windowTesting).thisTestEvent = EventManager.eventList;
+        this.eventList.forEach((event) => {
             const { type } = event;
             if(!this.isEventTypeListening(type)) {
-                document.addEventListener(type, (event) => this.dispatchEvent(event, evtList))
+                document.addEventListener(type, (event) => this.dispatchEvent(event))
                 this.eventListType.push(type);
             }
         });
     }
 
-    static dispatchEvent(event: Event, eventList: eventListSingle[]) {
-        eventList.find((evtList) => {
+    static dispatchEvent(event: Event) {
+        this.eventList.find((evtList) => {
             if(this.isEventTarget(evtList, event)) {
                 if(evtList.type === event.type) {
                     evtList.callbackFn(event);
@@ -63,8 +63,7 @@ export class EventManager {
             
             if(elem.__sparkyEvent) {
                 const { callbackFn, type, context } = elem.__sparkyEvent;
-                this.addEvent({dom: elem, type, context, callbackFn})
-                continue;
+                this.addEvent({dom: elem, type, context, callbackFn});
             }
     
             for(let index = 0; index < elem.children.length; index++) {

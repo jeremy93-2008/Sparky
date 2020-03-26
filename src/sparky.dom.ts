@@ -23,6 +23,11 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
         const [currentElem, nextElem] = domQueue.shift();
         const removedList: Node[] = [];
         reconciliateAttribute(currentElem as HTMLElement, nextElem as HTMLElement);
+        
+        if(nextElem.nodeName != "#text" && (nextElem as HTMLElementSparkyEnhanced).__sparkyEvent) {
+            (currentElem as HTMLElementSparkyEnhanced).__sparkyEvent = 
+                (nextElem as HTMLElementSparkyEnhanced).__sparkyEvent;
+        }
 
         const nextElemChildren = nextElem.childNodes;
         currentElem.childNodes.forEach((node, i) => {
@@ -36,7 +41,9 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
             if(node.isEqualNode(nextNode)) return;
 
             if(node.nodeName !== nextNode.nodeName) {
-                currentElem.replaceChild(cloneDeep(nextNode), node);
+                const newNextNode = nextNode.cloneNode(true);
+                const oldNextNode = nextNode.parentElement.replaceChild(newNextNode, nextNode);
+                currentElem.replaceChild(oldNextNode, node);
                 return;
             }
 
@@ -45,16 +52,14 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
                 return;
             }
 
-            if(nextNode.__sparkyEvent) {
-                (node as HTMLElementSparkyEnhanced).__sparkyEvent = nextNode.__sparkyEvent;
-            }
-
             domQueue.push([node, nextNode])
         });
 
         for(let i = currentElem.childNodes.length; i < nextElem.childNodes.length; i++) {
             const childNode = nextElem.childNodes.item(i);
-            currentElem.appendChild(cloneDeep(childNode))
+            const newNextNode = childNode.cloneNode(true);
+            const oldNextNode = childNode.parentElement.replaceChild(newNextNode, childNode);
+            currentElem.appendChild(oldNextNode)
         }
 
         removedList.forEach((rmElem) => {
