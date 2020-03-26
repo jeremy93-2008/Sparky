@@ -28,7 +28,7 @@ export class EventManager {
     static eventListType: string[] = [];
 
     static listen(finalDOM: HTMLElement) {
-        this.eventList = [];
+        EventManager.removeAllEvents();
         EventManager.populateEvents(finalDOM);
         EventManager.removeUnusedEvents();
         (window as unknown as windowTesting).thisTestEvent = EventManager.eventList;
@@ -70,6 +70,10 @@ export class EventManager {
                 domQueue.push(elem.children[index] as HTMLElement)
             }
         }
+    }
+
+    private static removeAllEvents() {
+        this.eventList = [];
     }
 
     private static removeUnusedEvents() {

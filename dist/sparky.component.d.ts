@@ -1,6 +1,7 @@
 import { IRenderReturn, ISparkyComponent } from "./sparky";
+import { IEventSingle } from "./sparky.eventmanager";
 export interface HTMLElementSparkyEnhanced extends HTMLElement {
-    __sparkyEventIndex?: number;
+    __sparkyEvent?: IEventSingle;
 }
 export declare class SparkyComponent {
     private static cachedComponent;

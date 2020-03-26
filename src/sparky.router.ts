@@ -8,7 +8,10 @@ let abstractHistory: IStateRoute[] = [];
 export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Function) {
     window.requestIdleCallback(() => {
         window.addEventListener("hashchange", (evt) => {
-            if(evt.oldURL == evt.newURL || stateChanging) return;
+            if(evt.oldURL == evt.newURL || stateChanging) {
+                stateChanging = false;
+                return
+            };
             const newState = getStateByHash(stateRoute, location.hash);
             pushToAbstractHistory(newState);
             if(newState) {
@@ -45,6 +48,8 @@ export function pushToAbstractHistory(stateRoute: IStateRoute) {
 
 export function Sparky__goToState(path: string) {
     const routeState = getStateByHash(statesRouter, path);
+    stateChanging = true;
+    location.hash = path;
     pushToAbstractHistory(routeState);
     Sparky.mount(routeState.component);
 }
@@ -52,12 +57,16 @@ export function Sparky__goToState(path: string) {
 export function Sparky__back() {
     if(currentIndex - 1 < 0) return;
     const state = abstractHistory[--currentIndex];
+    stateChanging = true;
+    location.hash = state.path.toString();
     Sparky.mount(state.component);
 }
 
 export function Sparky__forward() {
     if(currentIndex + 1 > abstractHistory.length - 1) return; 
     const state = abstractHistory[++currentIndex];
+    stateChanging = true;
+    location.hash = state.path.toString();
     Sparky.mount(state.component)
 }
 
