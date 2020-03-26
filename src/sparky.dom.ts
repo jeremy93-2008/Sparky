@@ -1,3 +1,6 @@
+import { HTMLElementSparkyEnhanced } from "./sparky.component";
+import cloneDeep from "clone-deep";
+
 let currentDom: HTMLElement = null;
 
 export function getCurrentDom() {
@@ -23,7 +26,7 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
 
         const nextElemChildren = nextElem.childNodes;
         currentElem.childNodes.forEach((node, i) => {
-            const nextNode = nextElemChildren.item(i);
+            const nextNode = nextElemChildren.item(i) as HTMLElementSparkyEnhanced;
 
             if(!nextNode) {
                 removedList.push(node)
@@ -33,7 +36,7 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
             if(node.isEqualNode(nextNode)) return;
 
             if(node.nodeName !== nextNode.nodeName) {
-                currentElem.replaceChild(nextNode.cloneNode(true), node);
+                currentElem.replaceChild(cloneDeep(nextNode), node);
                 return;
             }
 
@@ -42,12 +45,16 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
                 return;
             }
 
+            if(nextNode.__sparkyEvent) {
+                (node as HTMLElementSparkyEnhanced).__sparkyEvent = nextNode.__sparkyEvent;
+            }
+
             domQueue.push([node, nextNode])
         });
 
         for(let i = currentElem.childNodes.length; i < nextElem.childNodes.length; i++) {
             const childNode = nextElem.childNodes.item(i);
-            currentElem.appendChild(childNode.cloneNode(true))
+            currentElem.appendChild(cloneDeep(childNode))
         }
 
         removedList.forEach((rmElem) => {

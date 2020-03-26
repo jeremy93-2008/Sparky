@@ -12,7 +12,7 @@ import cloneDeep from "clone-deep";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected";
 import { Sparky__state, Sparky__update, Sparky__memoize } from "./sparky.function";
-import { listeningHashChange, getStateByHash } from "./sparky.router";
+import { listeningHashChange, getStateByHash, pushToAbstractHistory, Sparky__goToState, Sparky__back, Sparky__forward, setStateRoute } from "./sparky.router";
 
 isConnectedPolyfill();
 
@@ -29,7 +29,6 @@ export interface IRenderReturn {
 }
 
 export interface IStateRoute {
-    key: string;
     path: RegExp | string;
     component: ISparkyComponent;
 }
@@ -81,9 +80,10 @@ export class Sparky {
             Sparky.mount(component);
         })
 
-        const newState = getStateByHash(stateRoute);
-
-        return newState.component;
+        const routeState = getStateByHash(stateRoute, location.hash);
+        setStateRoute(stateRoute);
+        pushToAbstractHistory(routeState)
+        return routeState.component;
     }
 
     /**
@@ -113,7 +113,7 @@ export class Sparky {
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
 
-        EventManager.listen(thisTestEvent);
+        EventManager.listen(finalDOM);
 
         setCurrentDom(finalDOM as HTMLElement);
 
@@ -160,6 +160,10 @@ export const state = Sparky__state;
  * @param argumentsChanged - Array of values that the function depends on
  */
 export const memoize = Sparky__memoize;
+
+export const goToState = Sparky__goToState;
+export const goBack = Sparky__back;
+export const goForward = Sparky__forward;
 
 /**
  * Render the html string template to HTML elements

@@ -1,6 +1,7 @@
 import 'mdn-polyfills/Array.from';
 import 'mdn-polyfills/Array.prototype.find';
 import { ISparkySelf } from "./sparky.context";
+import { Sparky__goToState, Sparky__back, Sparky__forward } from "./sparky.router";
 export interface IRenderReturn {
     type: string;
     html: string;
@@ -8,6 +9,10 @@ export interface IRenderReturn {
     nestedComponents: ISparkyComponent[];
     children: IRenderReturn[];
     renderId: string;
+}
+export interface IStateRoute {
+    path: RegExp | string;
+    component: ISparkyComponent;
 }
 export interface IReconciliateProps {
     dom: HTMLElement;
@@ -36,6 +41,11 @@ export declare class Sparky {
      * @param renderFunc The function that going to be execute to render html template
      */
     static component(renderFunc: ISelfFunction, props?: ISparkyProps): ISparkyComponent;
+    /**
+     * Create a routing component that manage history
+     * @param stateRoute
+     */
+    static router(stateRoute: IStateRoute[], dom?: HTMLElement): ISparkyComponent;
     /**
      * Mount a Sparky Component in the DOM Tree and keep it updated.
      * @param component Sparky Component
@@ -66,6 +76,9 @@ export declare const state: <S>(initialState: S) => [S, import("./sparky.functio
  * @param argumentsChanged - Array of values that the function depends on
  */
 export declare const memoize: (callbackFn: Function, argumentsChanged?: import("./sparky.function").ArgumentsList) => void;
+export declare const goToState: typeof Sparky__goToState;
+export declare const goBack: typeof Sparky__back;
+export declare const goForward: typeof Sparky__forward;
 /**
  * Render the html string template to HTML elements
  * @param html Array of HTML String

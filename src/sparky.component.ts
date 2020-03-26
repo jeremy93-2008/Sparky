@@ -1,10 +1,10 @@
 import { IRenderReturn, ISparkyComponent, renderToDOMNode } from "./sparky";
 import { findEvent } from "./sparky.event";
-import { EventManager, eventCallbackFn, eventListSingle } from "./sparky.eventmanager";
+import { EventManager, eventCallbackFn, eventListSingle, IEventSingle } from "./sparky.eventmanager";
 import { SparkyContext } from "./sparky.context";
 
-interface windowTesting extends Window {
-    thisTestEvent: eventListSingle[]
+export interface HTMLElementSparkyEnhanced extends HTMLElement {
+    __sparkyEvent?: IEventSingle;
 }
 
 interface ICachedComponent {
@@ -27,12 +27,11 @@ export class SparkyComponent {
             currentRender.func.forEach((currentFunc, index) => {
                 const currentEvent = findEvent(currentDOM, currentRender.renderId, index);
                 const eventName = currentEvent.attr.name.replace("on", "");
-                EventManager.addEvent({
-                    dom: currentEvent.dom,
+                currentEvent.dom.__sparkyEvent = {
                     type: eventName,
                     context: currentComponent.context,
                     callbackFn: currentFunc.func as eventCallbackFn
-                })
+                };
                 currentEvent.dom.removeAttribute(currentEvent.attr.name)
             })
 
@@ -70,9 +69,7 @@ export class SparkyComponent {
             if(currentRender.nestedComponents.length > 0)
                 depthHorizontal++;
         }
-
-        (window as unknown as windowTesting).thisTestEvent = EventManager.eventList;
-
+        
         return nextDOM;
     }
 

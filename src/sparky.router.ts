@@ -1,10 +1,16 @@
-import { IStateRoute } from "./sparky"
+import { IStateRoute, Sparky } from "./sparky"
+
+let currentIndex = 0;
+let stateChanging = false;
+let statesRouter = [];
+let abstractHistory: IStateRoute[] = [];
 
 export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Function) {
     window.requestIdleCallback(() => {
         window.addEventListener("hashchange", (evt) => {
-            if(evt.oldURL == evt.newURL) return;
-            const newState = getStateByHash(stateRoute);
+            if(evt.oldURL == evt.newURL || stateChanging) return;
+            const newState = getStateByHash(stateRoute, location.hash);
+            pushToAbstractHistory(newState);
             if(newState) {
                 callbackFn(newState.component);
             }
@@ -12,16 +18,53 @@ export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Funct
     })
 }
 
-export function getStateByHash(stateRoute: IStateRoute[]) {
-    return stateRoute.find((state) => {
+export function getStateByHash(stateRoute: IStateRoute[], path: string) {
+    return stateRoute.find((state, i) => {
         if (state.path instanceof RegExp) {
-            return location.hash.search(state.path);
+            currentIndex = i;
+            return path.search(state.path);
         }
         else if (typeof state.path == "string") {
-            return location.hash.includes(state.path);
+            currentIndex = i;
+            return path.includes(state.path);
         }
         else {
             return false;
         }
     }) || stateRoute[0];
+}
+
+
+export function pushToAbstractHistory(stateRoute: IStateRoute) {
+    if(currentIndex < (abstractHistory.length - 1)) {
+        abstractHistory = abstractHistory.slice(0, currentIndex + 1)
+    }
+    abstractHistory.push(stateRoute);
+    currentIndex = abstractHistory.length - 1;
+}
+
+export function Sparky__goToState(path: string) {
+    const routeState = getStateByHash(statesRouter, path);
+    pushToAbstractHistory(routeState);
+    Sparky.mount(routeState.component);
+}
+
+export function Sparky__back() {
+    if(currentIndex - 1 < 0) return;
+    const state = abstractHistory[--currentIndex];
+    Sparky.mount(state.component);
+}
+
+export function Sparky__forward() {
+    if(currentIndex + 1 > abstractHistory.length - 1) return; 
+    const state = abstractHistory[++currentIndex];
+    Sparky.mount(state.component)
+}
+
+export function setStateRoute(stateRoute: IStateRoute[]) {
+    statesRouter = stateRoute;
+}
+
+export function getStateRoute() {
+    return statesRouter;
 }
