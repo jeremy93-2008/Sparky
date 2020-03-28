@@ -24,11 +24,9 @@ export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Funct
 export function getStateByHash(stateRoute: IStateRoute[], path: string) {
     return stateRoute.find((state, i) => {
         if (state.path instanceof RegExp) {
-            currentIndex = i;
             return path.search(state.path);
         }
         else if (typeof state.path == "string") {
-            currentIndex = i;
             return path.includes(state.path);
         }
         else {
@@ -45,6 +43,12 @@ export function pushToAbstractHistory(stateRoute: IStateRoute) {
     abstractHistory.push(stateRoute);
     currentIndex = abstractHistory.length - 1;
 }
+
+export function Sparky_cleanHistory() {
+    abstractHistory = [];
+    stateChanging = true;
+    location.hash = "";
+} 
 
 export function Sparky__goToState(path: string) {
     const routeState = getStateByHash(statesRouter, path);

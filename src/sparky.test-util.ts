@@ -45,17 +45,12 @@ export class SparkyTest {
     }
 
     private static simulate(this: ISimulateEvent, eventType: string) {
-        const currentEvt = SparkyTest.getCurrentEvent(this.testData, this.dom, eventType);
-
-        if(this.testData.eventList.length > 0) {
-            const testEvent = this.testData.eventList[0];
-            const evt = new Event(testEvent.type);
-            Object.defineProperty(evt, 'target', {writable: false, value: testEvent.dom});
-            EventManager.dispatchEvent(evt);
-        }
-
-        if(currentEvt)
-            currentEvt.callbackFn(new Event(eventType));
+        const currentSyntheticEvt = SparkyTest.getCurrentEvent(this.testData, this.dom, eventType);
+        if(!currentSyntheticEvt) return;
+        const testEvent = currentSyntheticEvt;
+        const evt = new Event(testEvent.type);
+        Object.defineProperty(evt, 'target', {writable: false, value: testEvent.dom});
+        EventManager.dispatchEvent(evt);
     }
 
     private static getCurrentEvent(testData: ITestData, dom: HTMLElement, eventType: string) {

@@ -1,7 +1,7 @@
 import 'mdn-polyfills/Array.from';
 import 'mdn-polyfills/Array.prototype.find';
 import { ISparkySelf } from "./sparky.context";
-import { Sparky__goToState, Sparky__back, Sparky__forward } from "./sparky.router";
+import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory } from "./sparky.router";
 export interface IRenderReturn {
     type: string;
     html: string;
@@ -79,11 +79,12 @@ export declare const memoize: (callbackFn: Function, argumentsChanged?: import("
 export declare const goToState: typeof Sparky__goToState;
 export declare const goBack: typeof Sparky__back;
 export declare const goForward: typeof Sparky__forward;
+export declare const dangerouslyCleanHistory: typeof Sparky_cleanHistory;
 /**
  * Render the html string template to HTML elements
  * @param html Array of HTML String
  * @param computedProps Computed Props used to pass Javascript into template
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
  */
-export declare function render(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn;
+export declare function html(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn;
 export declare function renderToDOMNode(html: string): HTMLElement;

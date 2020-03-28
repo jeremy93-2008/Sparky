@@ -12,7 +12,7 @@ import cloneDeep from "clone-deep";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected";
 import { Sparky__state, Sparky__update, Sparky__memoize } from "./sparky.function";
-import { listeningHashChange, getStateByHash, pushToAbstractHistory, Sparky__goToState, Sparky__back, Sparky__forward, setStateRoute } from "./sparky.router";
+import { listeningHashChange, getStateByHash, pushToAbstractHistory, Sparky__goToState, Sparky__back, Sparky__forward, setStateRoute, Sparky_cleanHistory } from "./sparky.router";
 
 isConnectedPolyfill();
 
@@ -164,6 +164,7 @@ export const memoize = Sparky__memoize;
 export const goToState = Sparky__goToState;
 export const goBack = Sparky__back;
 export const goForward = Sparky__forward;
+export const dangerouslyCleanHistory = Sparky_cleanHistory;
 
 /**
  * Render the html string template to HTML elements
@@ -171,7 +172,7 @@ export const goForward = Sparky__forward;
  * @param computedProps Computed Props used to pass Javascript into template
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
  */
-export function render(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn {
+export function html(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn {
     const func: ISparkyEventFunc[] = [];
     const nestedComponents: ISparkyComponent[] = [];
     const children: IRenderReturn[] = [];

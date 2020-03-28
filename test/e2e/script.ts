@@ -1,4 +1,4 @@
-import { Sparky, render, memoize, state, update, goToState } from "../../src/sparky";
+import { Sparky, html, memoize, state, update, goToState, goBack, goForward } from "../../src/sparky";
 
 const routingState = [
     {
@@ -39,6 +39,14 @@ function Main(props: IProps) {
         goToState("#dos")
     }
 
+    const back = () => {
+        goBack()
+    }
+
+    const after = () => {
+        goForward()
+    }
+
     const onClick = (event) => {
         setName("Jeremy");
         setText(["Hola","Buenas","Adios"]);
@@ -48,9 +56,9 @@ function Main(props: IProps) {
         setInput((event.target as HTMLInputElement).value)
     }
 
-    return render /*html*/`
+    return html`
         <div id="uno" class="lol">
-            Hola a todos ${ name !== "Hugo" ? render /*html*/`<b onclick=${onClick}>${name}</b>` : `no hay nada`}
+            Hola a todos ${ name !== "Hugo" ? html`<b onclick=${onClick}>${name}</b>` : `no hay nada`}
             <button onclick=${onClick}>Hey!</button>
             <div>
                 <div>${Sparky.component(Span, {name})}</div>
@@ -58,6 +66,8 @@ function Main(props: IProps) {
             ${Sparky.component(SpanNest)}
             <input id="text" type="text" oninput=${onInput} />
             <a onclick=${route}>A Dos</a>
+            <a onclick=${back}>A Back</a>
+            <a onclick=${after}>A After</a>
             <span>${input}</span>
             <ul>
                 ${text.map(t => `<li>${t}</li>`)}
@@ -71,7 +81,7 @@ function SpanNest(props: IProps) {
     const doIt = () => {
         setVer("Uno para ti");
     }
-    return render/*html*/`
+    return html`
         <div>
             <span ondblclick=${doIt}>Hazlo 2</span>
             <span>
@@ -94,10 +104,14 @@ function Span(props: IProps) {
     const route = () => {
         goToState("#lol");
     }
-    return render/*html*/`
+    const back = () => {
+        goBack()
+    }
+    return html`
         <div>
             <span ondblclick=${click}>Hazlo</span>
             <a onclick=${route}>A Main</a>
+            <a onclick=${back}>A Back</a>
             <span>
                 <span>Un nuevo Mundo ${name}</span>
                 ${ver}

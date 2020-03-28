@@ -1,5 +1,4 @@
 import { HTMLElementSparkyEnhanced } from "./sparky.component";
-import cloneDeep from "clone-deep";
 
 let currentDom: HTMLElement = null;
 
