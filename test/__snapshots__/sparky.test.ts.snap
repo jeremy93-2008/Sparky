@@ -149,44 +149,21 @@ exports[`Mount function Computed, State, Memo w/ Event and Click function 1`] = 
 </body>
 `;
 
-exports[`Routing function Basic Routing 1`] = `
-<body>
-  <div>
-    Hola mundo
-  </div>
-</body>
-`;
-
-exports[`Routing function Basic goTo Routing 1`] = `
-<body>
-  <div
-    id="unique"
-  >
-    Hola mundo
-  </div>
-</body>
-`;
-
-exports[`Routing function goBack Basic goTo Routing 1`] = `
-<body>
-  <div
-    id="unique"
-  >
-    Hola mundo
-  </div>
-</body>
-`;
-
-exports[`Routing function goForward Basic goTo Routing 1`] = `
+exports[`Mount function Routing Functionality 1`] = `
 <body>
   <div>
      
     <span
-      id="unique-backen"
+      id="unique1"
     >
       GoTo
     </span>
-     Mundo
+     
+    <span
+      id="unique-back"
+    >
+      Everyone
+    </span>
   </div>
 </body>
 `;

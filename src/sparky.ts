@@ -29,6 +29,7 @@ export interface IRenderReturn {
 }
 
 export interface IStateRoute {
+    hash?: string;
     path: RegExp | string;
     component: ISparkyComponent;
 }
@@ -81,6 +82,7 @@ export class Sparky {
         })
 
         const routeState = getStateByHash(stateRoute, location.hash);
+        routeState.hash = location.hash;
         setStateRoute(stateRoute);
         pushToAbstractHistory(routeState)
         return routeState.component;

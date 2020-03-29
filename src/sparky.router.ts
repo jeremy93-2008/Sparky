@@ -13,6 +13,7 @@ export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Funct
                 return
             };
             const newState = getStateByHash(stateRoute, location.hash);
+            newState.hash = location.hash;
             pushToAbstractHistory(newState);
             if(newState) {
                 callbackFn(newState.component);
@@ -21,13 +22,13 @@ export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Funct
     })
 }
 
-export function getStateByHash(stateRoute: IStateRoute[], path: string) {
+export function getStateByHash(stateRoute: IStateRoute[], newPath: string) {
     return stateRoute.find((state, i) => {
         if (state.path instanceof RegExp) {
-            return path.search(state.path);
+            return newPath.search(state.path) != -1;
         }
         else if (typeof state.path == "string") {
-            return path.includes(state.path);
+            return newPath.includes(state.path);
         }
         else {
             return false;
@@ -50,10 +51,11 @@ export function Sparky_cleanHistory() {
     location.hash = "";
 } 
 
-export function Sparky__goToState(path: string) {
-    const routeState = getStateByHash(statesRouter, path);
+export function Sparky__goToState(newPath: string) {
+    const routeState = getStateByHash(statesRouter, newPath);
+    routeState.hash = newPath;
     stateChanging = true;
-    location.hash = path;
+    location.hash = newPath;
     pushToAbstractHistory(routeState);
     Sparky.mount(routeState.component);
 }
@@ -62,7 +64,7 @@ export function Sparky__back() {
     if(currentIndex - 1 < 0) return;
     const state = abstractHistory[--currentIndex];
     stateChanging = true;
-    location.hash = state.path.toString();
+    location.hash = state.hash;
     Sparky.mount(state.component);
 }
 
@@ -70,7 +72,7 @@ export function Sparky__forward() {
     if(currentIndex + 1 > abstractHistory.length - 1) return; 
     const state = abstractHistory[++currentIndex];
     stateChanging = true;
-    location.hash = state.path.toString();
+    location.hash = state.hash;
     Sparky.mount(state.component)
 }
 

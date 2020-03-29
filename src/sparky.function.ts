@@ -63,7 +63,7 @@ export const Sparky__update = (callbackFn: UpdateCallback, dependenciesChanged?:
 
 export const Sparky__state = <S>(initialState: S): [S, ISetState<S>] => {
     const currentContext = getContext();
-    const bound = { context: currentContext, state: currentContext.indexes.state }
+    const bound = { context: currentContext, state: currentContext.indexes.state, history: null, rootElement: null }
     const currentState = currentContext.cachedState[currentContext.indexes.state];
     if(currentState) {
         currentContext.indexes.state++;
@@ -79,4 +79,8 @@ export const Sparky__state = <S>(initialState: S): [S, ISetState<S>] => {
 export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: ArgumentsList) => {
     const currentContext = getContext();
     callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged)
+}
+
+export const Sparky__router = () => {
+    
 }

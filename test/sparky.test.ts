@@ -229,90 +229,33 @@ describe("Mount function", () => {
         // console.log(document.body.innerHTML)
         expect(document.body).toMatchSnapshot()
     });
-})
-
-describe("Routing function", () => {
-    test("Basic Routing", () => {
-        const component = Sparky.component(() => {
-            return html `<div>Hola mundo</div>`;
-        });
-        Sparky.mount(Sparky.router([{
-            path: "",
-            component
-        }]), document.body);
-        expect(document.body).toMatchSnapshot()
-    });
-
-    test("Basic goTo Routing", () => {
-        dangerouslyCleanHistory();
-        const component = Sparky.component(() => {
-            const click = () => {
-                goToState("#dos")
-            };
-            return html `<div id="unique" onclick=${click}>Hola mundo</div>`;
-        });
-        const goToComponent = Sparky.component(() => {
-            return html `<div>GoTo Mundo</div>`;
-        });
-        const test = SparkyTest.test(() => 
-        {
-            Sparky.mount(Sparky.router([
-                {
-                    path: "#dos",
-                    component: goToComponent
-                },
-                {
-                    path: "",
-                    component
-                }
-            ]), document.body)
-        });
-        test.selector("#unique").simulate("click");
-        expect(document.body).toMatchSnapshot()
-    });
-
-    test("goBack Basic goTo Routing", () => {
-        dangerouslyCleanHistory();
-        const component = Sparky.component(() => {
-            const click = () => {
-                goToState("#dos")
-            };
-            return html `<div id="unique" onclick=${click}>Hola mundo</div>`;
-        });
-        const goToComponent = Sparky.component(() => {
-            const click = () => {
-                goBack();
-            }
-            return html `<div id="unique-back" onclick=${click}>GoTo Mundo</div>`;
-        });
-        const test = SparkyTest.test(() => 
-        {
-            Sparky.mount(Sparky.router([
-                {
-                    path: "#dos",
-                    component: goToComponent
-                },
-                {
-                    path: "",
-                    component
-                }
-            ]), document.body)
-        });
-        test.selector("#unique").simulate("click");
-        test.selector("#unique-back").simulate("click");
-        expect(document.body).toMatchSnapshot()
-    });
-    test("goForward Basic goTo Routing", () => {
+    test("Routing Functionality", () => {
         dangerouslyCleanHistory();
         const component = Sparky.component(() => {
             const clickState = () => {
-                goToState("#dos")
+                goBack();
+                goForward();
+                goToState("#tres")
             };
+            const back = () => {
+                goBack();
+            };
+            return html `<div> <span id="unique1" onclick=${clickState}>GoTo</span> <span id="unique-back" onclick=${back}>Everyone</span></div>`;
+        });
+        const regexpComponent = Sparky.component(() => {
+            const click = () => {
+                goToState("#dos")
+            }
             const forward = () => {
                 goForward();
+            }
+            const clickPrimero = () => {
+                goToState("");
             };
-            return html `<div> <span id="unique1" onclick=${clickState}>GoTo</span> <span id="unique-forward" onclick=${forward}>Everyone</span></div>`;
-        });
+            return html `<div><span id="unique-state" onclick=${click}>Hola </span> 
+            <span id="unique2" onclick=${clickPrimero}>mundo</span> 
+            <span id="unique-forward" onclick=${forward}>lol</span></div>`;
+        })
         const goToComponent = Sparky.component(() => {
             const clickUno = () => {
                 goBack();
@@ -323,8 +266,12 @@ describe("Routing function", () => {
         {
             Sparky.mount(Sparky.router([
                 {
-                    path: "#dos",
+                    path: /#dos/gi,
                     component: goToComponent
+                },
+                {
+                    path: /#tres/gi,
+                    component: regexpComponent
                 },
                 {
                     path: "",
@@ -333,7 +280,10 @@ describe("Routing function", () => {
             ]), document.body)
         });
         test.selector("#unique1").simulate("click");
+        test.selector("#unique-state").simulate("click");
         test.selector("#unique-backen").simulate("click");
+        test.selector("#unique2").simulate("click");
+        test.selector("#unique-back").simulate("click");
         test.selector("#unique-forward").simulate("click");
         expect(document.body).toMatchSnapshot()
     });
