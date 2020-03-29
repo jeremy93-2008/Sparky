@@ -3,16 +3,16 @@ import nanoid from "nanoid/non-secure";
 import 'mdn-polyfills/Array.from';
 import 'mdn-polyfills/Array.prototype.find';
 
-import { reconciliate, getCurrentDom, setCurrentDom } from "./sparky.dom";
+import { reconciliate } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
-import { SparkyComponent } from "./sparky.component";
+import { SparkyComponent, HTMLElementSparkyEnhanced } from "./sparky.component";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
 
 import cloneDeep from "clone-deep";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected";
-import { Sparky__state, Sparky__update, Sparky__memoize } from "./sparky.function";
-import { listeningHashChange, getStateByHash, pushToAbstractHistory, Sparky__goToState, Sparky__back, Sparky__forward, setStateRoute, Sparky_cleanHistory } from "./sparky.router";
+import { Sparky__state, Sparky__update, Sparky__memoize, Sparky__internal_history } from "./sparky.function";
+import { listeningHashChange, getStateByHash } from "./sparky.router";
 
 isConnectedPolyfill();
 
@@ -54,6 +54,13 @@ export interface ISparkyComponent {
     renderFn: ISelfFunction;
 }
 
+export interface ISparkyRouter {
+    type: string;
+    component: ISparkyComponent;
+    routing: IStateRoute[];
+    history: any[];
+}
+
 export interface ISparkyProps {
     [key: string]: any;
 }
@@ -76,16 +83,10 @@ export class Sparky {
      * Create a routing component that manage history
      * @param stateRoute 
      */
-    static router(stateRoute: IStateRoute[], dom?: HTMLElement) {
-        listeningHashChange(stateRoute, (component) => {
-            Sparky.mount(component);
-        })
-
+    static router(stateRoute: IStateRoute[]): ISparkyRouter {
         const routeState = getStateByHash(stateRoute, location.hash);
         routeState.hash = location.hash;
-        setStateRoute(stateRoute);
-        pushToAbstractHistory(routeState)
-        return routeState.component;
+        return { type: "SparkyRouter", component: routeState.component, routing: stateRoute, history: [routeState] };
     }
 
     /**
@@ -93,38 +94,45 @@ export class Sparky {
      * @param component Sparky Component
      * @param dom The dom element where you want to mount this component
      */
-    static mount(component: ISparkyComponent, dom?: HTMLElement): ISparkySelf {
+    static mount(element: ISparkyComponent | ISparkyRouter, dom: HTMLElementSparkyEnhanced): ISparkySelf {
         if (Sparky._DEV_)
             console.time();
+        
+        const component = ((element.type == "SparkyComponent") ? element : (element as ISparkyRouter).component) as ISparkyComponent 
+
+        initialiseDOM(dom, element);
 
         const { context, renderFn } = component;
 
         const keepIndexes = cloneDeep(component.currentContext.indexes);
 
+        context.__rootElement = dom; 
         SparkyContext.setCurrentContext(context);
         SparkyContext.resetIndexes();
 
         const render = renderFn(Object.freeze(context.props)) as IRenderReturn;
 
+        const oldDom = dom.__sparkyRoot.updateAt ? (dom.firstElementChild as HTMLElementSparkyEnhanced) : null;
         let nextDOM = renderToDOMNode(render.html);
 
         nextDOM = SparkyComponent.populate(nextDOM, render, component);
 
-        let finalDOM = reconciliate(getCurrentDom(), nextDOM);
+
+        let finalDOM = reconciliate(oldDom, nextDOM);
         if (!finalDOM) return;
         if (!finalDOM.isConnected && dom)
             dom.appendChild(finalDOM);
 
-        EventManager.listen(finalDOM);
+        dom.__sparkyRoot.updateAt = new Date().getTime();
 
-        setCurrentDom(finalDOM as HTMLElement);
+        EventManager.listen(finalDOM);
 
         if (Sparky._DEV_)
             console.timeEnd();
 
         if(typeof thisTest != "undefined" && thisTest.testing) {
             thisTest.__testUtilData = {
-                root: getCurrentDom(),
+                root: dom,
                 component,
                 eventList: thisTestEvent
             };
@@ -163,10 +171,10 @@ export const state = Sparky__state;
  */
 export const memoize = Sparky__memoize;
 
-export const goToState = Sparky__goToState;
-export const goBack = Sparky__back;
-export const goForward = Sparky__forward;
-export const dangerouslyCleanHistory = Sparky_cleanHistory;
+/**
+ * Return the current routing functions, ex.: goToState, goBack, goAfter, cleanHistory
+ */
+export const router = Sparky__internal_history;
 
 /**
  * Render the html string template to HTML elements
@@ -219,6 +227,29 @@ function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFun
             htmlLine += `<span class='computed'>${computedProps[i]}</span>`;
     }
     return htmlLine;
+}
+
+function initialiseDOM(dom: HTMLElementSparkyEnhanced, element: ISparkyComponent | ISparkyRouter) {
+    if (dom && !dom.__sparkyRoot) {
+        setRootProperties(dom);
+        if (element.type == "SparkyRouter") {
+            const { history, routing } = element as ISparkyRouter;
+            listeningHashChange(routing, (component) => {
+                Sparky.mount(component, dom);
+            }, dom);
+            dom.__sparkyRoot = { ...dom.__sparkyRoot, history, routing };
+        }
+    }
+    ;
+}
+
+function setRootProperties(dom: HTMLElementSparkyEnhanced) {
+    dom.__sparkyRoot = { 
+        historyIndex: 0,
+        history: [],
+        routing: [],
+        updateAt: null
+    };
 }
 
 export function renderToDOMNode(html: string) {

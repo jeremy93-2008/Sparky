@@ -1,4 +1,4 @@
-import { Sparky, html, memoize, state, update, goToState, goBack, goForward } from "../../src/sparky";
+import { Sparky, html, memoize, state, update, router} from "../../src/sparky";
 
 const routingState = [
     {
@@ -18,6 +18,7 @@ interface IProps {
 }
 
 function Main(props: IProps) {
+    const { goBack, goToState, goAfter} = router();
     const [name, setName] = state("Hugo");
     const [text, setText] = state(["The world"]); 
     const [input, setInput] = state("");
@@ -44,7 +45,7 @@ function Main(props: IProps) {
     }
 
     const after = () => {
-        goForward()
+        goAfter()
     }
 
     const onClick = (event) => {
@@ -96,6 +97,7 @@ function SpanNest(props: IProps) {
 }
 
 function Span(props: IProps) {
+    const { goBack, goToState } = router();
     const name = props ? props.name : "Esto no es una prop";
     const [ver, setVer] = state(new Date().toLocaleString());
     const click = () => {

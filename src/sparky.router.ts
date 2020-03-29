@@ -1,20 +1,17 @@
 import { IStateRoute, Sparky } from "./sparky"
+import { HTMLElementSparkyEnhanced } from "./sparky.component";
 
-let currentIndex = 0;
-let stateChanging = false;
-let statesRouter = [];
-let abstractHistory: IStateRoute[] = [];
-
-export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Function) {
+export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Function, dom: HTMLElementSparkyEnhanced) {
     window.requestIdleCallback(() => {
         window.addEventListener("hashchange", (evt) => {
-            if(evt.oldURL == evt.newURL || stateChanging) {
-                stateChanging = false;
-                return
+            const { history, historyIndex } = dom.__sparkyRoot;
+            if(evt.oldURL == evt.newURL) {
+                //stateChange
+                return;
             };
             const newState = getStateByHash(stateRoute, location.hash);
             newState.hash = location.hash;
-            pushToAbstractHistory(newState);
+            pushToAbstractHistory(history, historyIndex, newState);
             if(newState) {
                 callbackFn(newState.component);
             }
@@ -37,49 +34,44 @@ export function getStateByHash(stateRoute: IStateRoute[], newPath: string) {
 }
 
 
-export function pushToAbstractHistory(stateRoute: IStateRoute) {
-    if(currentIndex < (abstractHistory.length - 1)) {
-        abstractHistory = abstractHistory.slice(0, currentIndex + 1)
+export function pushToAbstractHistory(history: IStateRoute[], historyIndex: number, stateRoute: IStateRoute) {
+    if(historyIndex < (history.length - 1)) {
+        history = history.slice(0, historyIndex + 1)
     }
-    abstractHistory.push(stateRoute);
-    currentIndex = abstractHistory.length - 1;
+    history.push(stateRoute);
+    historyIndex = history.length - 1;
 }
 
-export function Sparky_cleanHistory() {
-    abstractHistory = [];
-    stateChanging = true;
+export function Sparky_cleanHistory(this: HTMLElementSparkyEnhanced) {
+    this.__sparkyRoot.history = [];
+    this.__sparkyRoot.historyIndex = 0;
+    //StateChange
     location.hash = "";
 } 
 
-export function Sparky__goToState(newPath: string) {
-    const routeState = getStateByHash(statesRouter, newPath);
+export function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPath: string) {
+    let { routing, history, historyIndex } = this.__sparkyRoot;
+    const routeState = getStateByHash(routing, newPath);
     routeState.hash = newPath;
-    stateChanging = true;
+    //stateChanging = true;
     location.hash = newPath;
-    pushToAbstractHistory(routeState);
-    Sparky.mount(routeState.component);
+    pushToAbstractHistory(history, historyIndex, routeState);
+    Sparky.mount(routeState.component, this);
 }
 
-export function Sparky__back() {
-    if(currentIndex - 1 < 0) return;
-    const state = abstractHistory[--currentIndex];
-    stateChanging = true;
+export function Sparky__back(this: HTMLElementSparkyEnhanced) {
+    let { history, historyIndex } = this.__sparkyRoot;
+    if(historyIndex - 1 < 0) return;
+    const state = history[--historyIndex];
     location.hash = state.hash;
-    Sparky.mount(state.component);
+    Sparky.mount(state.component, this);
 }
 
-export function Sparky__forward() {
-    if(currentIndex + 1 > abstractHistory.length - 1) return; 
-    const state = abstractHistory[++currentIndex];
-    stateChanging = true;
+export function Sparky__forward(this: HTMLElementSparkyEnhanced) {
+    let { history, historyIndex } = this.__sparkyRoot;
+    if(historyIndex + 1 > history.length - 1) return; 
+    const state = history[++historyIndex];
+    // stateChanging = true;
     location.hash = state.hash;
-    Sparky.mount(state.component)
-}
-
-export function setStateRoute(stateRoute: IStateRoute[]) {
-    statesRouter = stateRoute;
-}
-
-export function getStateRoute() {
-    return statesRouter;
+    Sparky.mount(state.component, this)
 }

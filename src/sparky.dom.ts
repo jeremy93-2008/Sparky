@@ -1,15 +1,5 @@
 import { HTMLElementSparkyEnhanced } from "./sparky.component";
 
-let currentDom: HTMLElement = null;
-
-export function getCurrentDom() {
-    return currentDom;
-}
-
-export function setCurrentDom(dom: HTMLElement) {
-    currentDom = dom;
-}
-
 export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
     if (!nextDom) return null;
     if (!currentDom && nextDom) return nextDom;
@@ -26,6 +16,11 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
         if(nextElem.nodeName != "#text" && (nextElem as HTMLElementSparkyEnhanced).__sparkyEvent) {
             (currentElem as HTMLElementSparkyEnhanced).__sparkyEvent = 
                 (nextElem as HTMLElementSparkyEnhanced).__sparkyEvent;
+        }
+
+        if(nextElem.nodeName != "#text" && (nextElem as HTMLElementSparkyEnhanced).__sparkyRoot) {
+            (currentElem as HTMLElementSparkyEnhanced).__sparkyRoot = 
+                (nextElem as HTMLElementSparkyEnhanced).__sparkyRoot;
         }
 
         const nextElemChildren = nextElem.childNodes;

@@ -2,12 +2,14 @@ import { Sparky } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { callCachedFn } from "./sparky.function.helper";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
+import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory } from "./sparky.router";
 
 export type ArgumentsList = any[];
 type UpdateCallback = () => void;
 type IBoundSetCurrentState = {
     context: ISparkySelf;
     state: number;
+    rootElement: HTMLElement;
 };
 
 export interface IFnCached {
@@ -39,11 +41,11 @@ const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S): 
     currentContext.indexes.state++;
     if (currentContext.__root) {
         SparkyContext.setCurrentContext(Sparky.mount({ 
-            ...currentContext.__root, currentContext }));
+            ...currentContext.__root, currentContext }, currentContext.__rootElement));
     } else {
         SparkyContext.setCurrentContext(
             Sparky.mount({ type: "SparkyComponent", 
-            context: currentContext, currentContext, renderFn: currentContext.renderFunc }));
+            context: currentContext, currentContext, renderFn: currentContext.renderFunc }, currentContext.__rootElement));
     }
     return setCurrentState;
 }
@@ -63,7 +65,7 @@ export const Sparky__update = (callbackFn: UpdateCallback, dependenciesChanged?:
 
 export const Sparky__state = <S>(initialState: S): [S, ISetState<S>] => {
     const currentContext = getContext();
-    const bound = { context: currentContext, state: currentContext.indexes.state, history: null, rootElement: null }
+    const bound = { context: currentContext, state: currentContext.indexes.state }
     const currentState = currentContext.cachedState[currentContext.indexes.state];
     if(currentState) {
         currentContext.indexes.state++;
@@ -81,6 +83,12 @@ export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: Argumen
     callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged)
 }
 
-export const Sparky__router = () => {
-    
+export const Sparky__internal_history = () => {
+    const currentContext = getContext();
+    const goToState = Sparky__goToState.bind(currentContext.__rootElement);
+    const goBack = Sparky__back.bind(currentContext.__rootElement);
+    const goAfter = Sparky__forward.bind(currentContext.__rootElement);
+    const cleanHistory = Sparky_cleanHistory.bind(currentContext.__rootElement);
+
+    return { goToState, goBack, goAfter, cleanHistory };
 }
