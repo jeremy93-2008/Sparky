@@ -245,7 +245,11 @@ function initialiseDOM(dom: HTMLElementSparkyEnhanced, element: ISparkyComponent
 
 function setRootProperties(dom: HTMLElementSparkyEnhanced) {
     dom.__sparkyRoot = { 
+        id: nanoid(12),
+        forceURLUpdate: false,
+        type: "hash",
         historyIndex: 0,
+        stateChanging: false,
         history: [],
         routing: [],
         updateAt: null

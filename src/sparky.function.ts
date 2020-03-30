@@ -2,7 +2,7 @@ import { Sparky } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { callCachedFn } from "./sparky.function.helper";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
-import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory } from "./sparky.router";
+import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, IRoutingTypes } from "./sparky.router";
 
 export type ArgumentsList = any[];
 type UpdateCallback = () => void;
@@ -83,8 +83,10 @@ export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: Argumen
     callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged)
 }
 
-export const Sparky__internal_history = () => {
+export const Sparky__internal_history = (type?: IRoutingTypes, forceURLUpdate?: boolean) => {
     const currentContext = getContext();
+    currentContext.__rootElement.__sparkyRoot.type = type;
+    currentContext.__rootElement.__sparkyRoot.forceURLUpdate = forceURLUpdate;
     const goToState = Sparky__goToState.bind(currentContext.__rootElement);
     const goBack = Sparky__back.bind(currentContext.__rootElement);
     const goAfter = Sparky__forward.bind(currentContext.__rootElement);

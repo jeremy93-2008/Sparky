@@ -1,7 +1,13 @@
-import { renderToDOMNode, state, memoize, update, html, Sparky, goToState, goBack, goForward, dangerouslyCleanHistory } from "../src/sparky";
+import { renderToDOMNode, state, memoize, update, html, Sparky, router } from "../src/sparky";
 import { SparkyTest } from "../src/sparky.test-util";
 
 const lib = require("../src/sparky");
+
+document.body.innerHTML = `
+    <div id="app"></div>
+    <div id="app2"></div>
+    <div id="app3"></div>
+`;
 
 describe("Diff method", () => {
     test("Nothing to render", () => {
@@ -112,8 +118,8 @@ describe("Mount function", () => {
                 <p>Hola a todos</p>
             </div>
             `
-        }), document.body);
-        expect(document.body).toMatchSnapshot()
+        }), document.getElementById("app"));
+        expect(document.getElementById("app")).toMatchSnapshot()
     });
     test("Computed function", () => {
         Sparky.mount(Sparky.component(() => {
@@ -123,9 +129,9 @@ describe("Mount function", () => {
                 <p>Hola a todos ${a}</p>
             </div>
             `
-        }), document.body);
-        // console.log(document.body.innerHTML)
-        expect(document.body).toMatchSnapshot()
+        }), document.getElementById("app"));
+        // console.log(document.getElementById("app").innerHTML)
+        expect(document.getElementById("app")).toMatchSnapshot()
     });
     test("Computed w/ State function", () => {
         Sparky.mount(Sparky.component(() => {
@@ -135,9 +141,9 @@ describe("Mount function", () => {
                 <p>Hola a todos ${a}</p>
             </div>
             `
-        }), document.body);
-        // console.log(document.body.innerHTML)
-        expect(document.body).toMatchSnapshot()
+        }), document.getElementById("app"));
+        // console.log(document.getElementById("app").innerHTML)
+        expect(document.getElementById("app")).toMatchSnapshot()
     });
     test("Computed, State w/ Event function", () => {
         const test = SparkyTest.test(() => {
@@ -151,11 +157,11 @@ describe("Mount function", () => {
                     <p id="unique" onclick=${onClick}>Hola a todos ${a}</p>
                 </div>
                 `
-            }), document.body);
+            }), document.getElementById("app"));
         });
         test.selector("#unique").simulate("click");
-        // console.log(document.body.innerHTML)
-        expect(document.body).toMatchSnapshot()
+        // console.log(document.getElementById("app").innerHTML)
+        expect(document.getElementById("app")).toMatchSnapshot()
     });
     test("Computed, State, Memo w/ Event and Click function", () => {
 
@@ -195,13 +201,13 @@ describe("Mount function", () => {
                 <div>${Sparky.component(Span)}</div>
             </div>
             `
-            }), document.body);
+            }), document.getElementById("app"));
         });
 
         test.selector("#paragraph").simulate("click");
         test.selector("#paragraph-1").simulate("click");
-        // console.log(document.body.innerHTML)
-        expect(document.body).toMatchSnapshot()
+        // console.log(document.getElementById("app").innerHTML)
+        expect(document.getElementById("app")).toMatchSnapshot()
     });
 
     test("Computed, State w/ Event function with Render inside", () => {
@@ -223,19 +229,19 @@ describe("Mount function", () => {
                     })}</div>
                 </div>
                 `
-            }), document.body);
+            }), document.getElementById("app"));
         });
         test.selector("#unique").simulate("click");
-        // console.log(document.body.innerHTML)
-        expect(document.body).toMatchSnapshot()
+        // console.log(document.getElementById("app").innerHTML)
+        expect(document.getElementById("app")).toMatchSnapshot()
     });
-    test("Routing Functionality", () => {
-        dangerouslyCleanHistory();
+    test("Routing Functionality with Hash History", () => {
         const component = Sparky.component(() => {
+            const { goToState, goBack, goAfter} = router("hash");
             const clickState = () => {
                 goBack();
-                goForward();
-                goToState("#tres")
+                goAfter();
+                goToState("tres")
             };
             const back = () => {
                 goBack();
@@ -243,11 +249,12 @@ describe("Mount function", () => {
             return html `<div> <span id="unique1" onclick=${clickState}>GoTo</span> <span id="unique-back" onclick=${back}>Everyone</span></div>`;
         });
         const regexpComponent = Sparky.component(() => {
+            const { goToState, goAfter} = router("hash");
             const click = () => {
-                goToState("#dos")
+                goToState("dos")
             }
             const forward = () => {
-                goForward();
+                goAfter();
             }
             const clickPrimero = () => {
                 goToState("");
@@ -257,6 +264,7 @@ describe("Mount function", () => {
             <span id="unique-forward" onclick=${forward}>lol</span></div>`;
         })
         const goToComponent = Sparky.component(() => {
+            const { goBack } = router("hash");
             const clickUno = () => {
                 goBack();
             }
@@ -266,18 +274,18 @@ describe("Mount function", () => {
         {
             Sparky.mount(Sparky.router([
                 {
-                    path: /#dos/gi,
+                    path: /dos/gi,
                     component: goToComponent
                 },
                 {
-                    path: /#tres/gi,
+                    path: /tres/gi,
                     component: regexpComponent
                 },
                 {
                     path: "",
                     component
                 }
-            ]), document.body)
+            ]), document.getElementById("app2"))
         });
         test.selector("#unique1").simulate("click");
         test.selector("#unique-state").simulate("click");
@@ -285,6 +293,67 @@ describe("Mount function", () => {
         test.selector("#unique2").simulate("click");
         test.selector("#unique-back").simulate("click");
         test.selector("#unique-forward").simulate("click");
-        expect(document.body).toMatchSnapshot()
+        expect(document.getElementById("app2")).toMatchSnapshot()
+    });
+    test("Routing Functionality with Browser History", () => {
+        const component = Sparky.component(() => {
+            const { goToState, goBack, goAfter} = router("browser");
+            const clickState = () => {
+                goBack();
+                goAfter();
+                goToState("tres")
+            };
+            const back = () => {
+                goBack();
+            };
+            return html `<div> <span id="unique1" onclick=${clickState}>GoTo</span> <span id="unique-back" onclick=${back}>Everyone</span></div>`;
+        });
+        const regexpComponent = Sparky.component(() => {
+            const { goToState, goAfter, cleanHistory} = router("browser");
+            const click = () => {
+                goToState("dos")
+            }
+            const forward = () => {
+                goAfter();
+                cleanHistory();
+            }
+            const clickPrimero = () => {
+                goToState("");
+            };
+            return html `<div><span id="unique-state" onclick=${click}>Hola </span> 
+            <span id="unique2" onclick=${clickPrimero}>mundo</span> 
+            <span id="unique-forward" onclick=${forward}>lol</span></div>`;
+        })
+        const goToComponent = Sparky.component(() => {
+            const { goBack } = router("browser");
+            const clickUno = () => {
+                goBack();
+            }
+            return html `<div> <span id="unique-backen" onclick=${clickUno}>GoTo</span> Mundo</div>`;
+        });
+        const test = SparkyTest.test(() => 
+        {
+            Sparky.mount(Sparky.router([
+                {
+                    path: /dos/gi,
+                    component: goToComponent
+                },
+                {
+                    path: /tres/gi,
+                    component: regexpComponent
+                },
+                {
+                    path: "",
+                    component
+                }
+            ]), document.getElementById("app3"))
+        });
+        test.selector("#unique1").simulate("click");
+        test.selector("#unique-state").simulate("click");
+        test.selector("#unique-backen").simulate("click");
+        test.selector("#unique2").simulate("click");
+        test.selector("#unique-back").simulate("click");
+        test.selector("#unique-forward").simulate("click");
+        expect(document.getElementById("app3")).toMatchSnapshot()
     });
 })

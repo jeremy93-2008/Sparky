@@ -1,16 +1,23 @@
 import { IRenderReturn, ISparkyComponent, renderToDOMNode, IStateRoute } from "./sparky";
 import { findEvent } from "./sparky.event";
-import { EventManager, eventCallbackFn, eventListSingle, IEventSingle } from "./sparky.eventmanager";
+import { eventCallbackFn, IEventSingle } from "./sparky.eventmanager";
 import { SparkyContext } from "./sparky.context";
+import { IRoutingTypes } from "./sparky.router";
+
+export interface ISparkyRoot {
+    id: string;
+    type: IRoutingTypes;
+    forceURLUpdate: boolean;
+    historyIndex: number;
+    stateChanging: boolean;
+    history: IStateRoute[];
+    routing: IStateRoute[];
+    updateAt: number;
+}
 
 export interface HTMLElementSparkyEnhanced extends HTMLElement {
     __sparkyEvent?: IEventSingle;
-    __sparkyRoot?: {
-        historyIndex: number;
-        history: IStateRoute[];
-        routing: IStateRoute[];
-        updateAt: number;
-    };
+    __sparkyRoot?: ISparkyRoot;
 }
 
 interface ICachedComponent {
@@ -59,12 +66,12 @@ export class SparkyComponent {
                 }
                 SparkyContext.setCurrentContext(currentComp.context);
                 SparkyContext.resetIndexes();
+                currentComp.context.__root = rootComponent;
+                currentComp.context.__rootElement = rootComponent.context.__rootElement;
                 const renderChild = currentComp.renderFn(Object.freeze(currentComp.context.props));
                 if(!commentDom) return;
                 const renderChildDOM = renderToDOMNode(renderChild.html);
                 commentDom.parentNode.replaceChild(renderChildDOM, commentDom);
-                currentComp.context.__root = rootComponent;
-                currentComp.context.__rootElement = rootComponent.context.__rootElement;
                 render.func.push(...renderChild.func);
                 renderQueue.push([renderChild, currentComp, renderChildDOM]);
 

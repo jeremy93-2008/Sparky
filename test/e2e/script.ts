@@ -18,7 +18,7 @@ interface IProps {
 }
 
 function Main(props: IProps) {
-    const { goBack, goToState, goAfter} = router();
+    const { goBack, goToState, goAfter} = router("hash");
     const [name, setName] = state("Hugo");
     const [text, setText] = state(["The world"]); 
     const [input, setInput] = state("");
@@ -97,7 +97,7 @@ function SpanNest(props: IProps) {
 }
 
 function Span(props: IProps) {
-    const { goBack, goToState } = router();
+    const { goBack, goToState } = router("hash");
     const name = props ? props.name : "Esto no es una prop";
     const [ver, setVer] = state(new Date().toLocaleString());
     const click = () => {
