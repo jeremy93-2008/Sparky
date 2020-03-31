@@ -1,5 +1,5 @@
 import { IStateRoute, Sparky } from "./sparky"
-import { HTMLElementSparkyEnhanced, ISparkyRoot } from "./sparky.component";
+import { HTMLElementSparkyEnhanced, ISparkyRoot, IParams } from "./sparky.component";
 
 declare var thisTest;
 export type IRoutingTypes = "browser" | "hash" | "abstract";
@@ -20,6 +20,7 @@ export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Funct
         Object.defineProperty(evt, 'newURL', {writable: true, value: "#"});
         changeStateByEvent(evt, stateRoute, callbackFn, dom);
         dom.__sparkyRoot.stateChanging = true;
+        dom.__sparkyRoot.basename = dom.__sparkyRoot.basename ? dom.__sparkyRoot.basename : ""; 
         dom.__sparkyRoot.forceURLUpdate = true;
         changeStateByEvent(evt, stateRoute, callbackFn, dom)
     }
@@ -42,6 +43,7 @@ function changeStateByEvent(evt: HashChangeEvent, stateRoute: IStateRoute[], cal
     };
     const newState = getStateByHash(stateRoute, location.hash);
     newState.hash = location.hash;
+    this.__sparkyRoot.params = getParamsByPath(newState.path, location.hash);
     pushToAbstractHistory(dom.__sparkyRoot, newState);
     if(newState) {
         callbackFn(newState.component);
@@ -51,16 +53,12 @@ function changeStateByEvent(evt: HashChangeEvent, stateRoute: IStateRoute[], cal
 
 export function getStateByHash(stateRoute: IStateRoute[], newPath: string) {
     return stateRoute.find((state, i) => {
-        if (state.path instanceof RegExp) {
-            return newPath.search(state.path) != -1;
+        if (typeof state.path == "string") {
+            state.exact = true;
+            return matchUrl(state.path, newPath);
         }
-        else if (typeof state.path == "string") {
-            return newPath.includes(state.path);
-        }
-        else {
-            return false;
-        }
-    }) || stateRoute[0];
+        return false;
+    }) || {...stateRoute[0], exact: false};
 }
 
 
@@ -83,11 +81,13 @@ export function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPath: stri
     let { routing, type } = this.__sparkyRoot;
     const routeState = getStateByHash(routing, newPath);
     routeState.hash = newPath;
+    if(routeState.exact)
+        this.__sparkyRoot.params = getParamsByPath(routeState.path, newPath);
     this.__sparkyRoot.stateChanging = true;
     let normalizePath = newPath;
     switch(type) {
-        case "hash": location.hash = "/#/" + normalizePath; break;
-        case "browser": location.hash = normalizePath; break;
+        case "hash": location.hash = "/" + normalizePath; break;
+        case "browser": location.pathname = "/" + normalizePath; break;
     }
     pushToAbstractHistory(this.__sparkyRoot, routeState);
     Sparky.mount(routeState.component, this);
@@ -97,11 +97,13 @@ export function Sparky__back(this: HTMLElementSparkyEnhanced) {
     let { history, type } = this.__sparkyRoot;
     if (this.__sparkyRoot.historyIndex - 1 < 0) return;
     const state = history[--this.__sparkyRoot.historyIndex];
+    if(state.exact)
+        this.__sparkyRoot.params = getParamsByPath(state.path, state.hash);
     this.__sparkyRoot.stateChanging = true;
     let normalizePath = state.hash;
     switch(type) {
-        case "hash": location.hash = "/#/" + normalizePath; break;
-        case "browser": location.hash = normalizePath; break;
+        case "hash": location.hash = "/" + normalizePath; break;
+        case "browser": location.pathname = "/" + normalizePath; break;
     }
     Sparky.mount(state.component, this);
 }
@@ -110,11 +112,55 @@ export function Sparky__forward(this: HTMLElementSparkyEnhanced) {
     let { history, type } = this.__sparkyRoot;
     if (this.__sparkyRoot.historyIndex + 1 > history.length - 1) return; 
     const state = history[++this.__sparkyRoot.historyIndex];
+    if(state.exact)
+        this.__sparkyRoot.params = getParamsByPath(state.path, state.hash);
     this.__sparkyRoot.stateChanging = true;
     let normalizePath = state.hash;
     switch(type) {
-        case "hash": location.hash = "/#/" + normalizePath; break;
-        case "browser": location.hash = normalizePath; break;
+        case "hash": location.hash = "/" + normalizePath; break;
+        case "browser": location.pathname = "/" + normalizePath; break;
     }
     Sparky.mount(state.component, this)
+}
+
+export function Sparky__params(this: HTMLElementSparkyEnhanced) {
+    const { params } = this.__sparkyRoot;
+    return params;
+}
+
+export function getParamsByPath(path:string, url: string): IParams[] {
+    if(path.includes("*")) {  
+        const pathArray = path.split("*");  
+        if(pathArray[1].includes("/")) 
+            throw TypeError("The wildcard can only be the last element to be identified on the url");        
+    }
+    const urlParts = url.split("/");
+    const params = [];
+    path.split("/").reduce((params, pathPart, i) =>  {
+        if(pathPart.startsWith(":")) {
+            const obj = {};
+            obj[pathPart.slice(1, pathPart.length)] = urlParts[i];
+            params.push(obj as IParams);
+        } else if(pathPart.startsWith("*")) {
+            const obj = {};
+            obj[pathPart.slice(1, pathPart.length)] = urlParts.slice(i, urlParts.length).join("");
+            params.push(obj as IParams)
+        }
+        return params;
+    }, params);
+
+    return params;
+}
+
+export function matchUrl(path:string, url: string) {
+    if(path.includes("*")) {
+        const pathArray = path.split("*");
+        if(pathArray[1].includes("/")) 
+            throw TypeError("The wildcard can only be the last element to be identified on the url");        
+    }
+    const pathPart = path.split("/").filter((part) => {
+        return !part.startsWith(":") && !part.startsWith("*")
+    })
+
+    return url.includes(pathPart.join("/"))
 }

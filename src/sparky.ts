@@ -5,14 +5,14 @@ import 'mdn-polyfills/Array.prototype.find';
 
 import { reconciliate } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
-import { SparkyComponent, HTMLElementSparkyEnhanced } from "./sparky.component";
+import { SparkyComponent, HTMLElementSparkyEnhanced, IParams } from "./sparky.component";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
 
 import cloneDeep from "clone-deep";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected";
 import { Sparky__state, Sparky__update, Sparky__memoize, Sparky__internal_history } from "./sparky.function";
-import { listeningHashChange, getStateByHash } from "./sparky.router";
+import { listeningHashChange, getStateByHash, getParamsByPath } from "./sparky.router";
 
 isConnectedPolyfill();
 
@@ -30,7 +30,8 @@ export interface IRenderReturn {
 
 export interface IStateRoute {
     hash?: string;
-    path: RegExp | string;
+    exact?: boolean;
+    path: string;
     component: ISparkyComponent;
 }
 
@@ -54,11 +55,19 @@ export interface ISparkyComponent {
     renderFn: ISelfFunction;
 }
 
+export interface ISparkyRouterOptions {
+    type?: "hash" | "abstract" | "browser";
+    basename?: string;
+    forceUrlUpdate?: boolean;
+}
+
 export interface ISparkyRouter {
     type: string;
     component: ISparkyComponent;
     routing: IStateRoute[];
-    history: any[];
+    history: IStateRoute[];
+    params: IParams[];
+    options: ISparkyRouterOptions;
 }
 
 export interface ISparkyProps {
@@ -83,10 +92,20 @@ export class Sparky {
      * Create a routing component that manage history
      * @param stateRoute 
      */
-    static router(stateRoute: IStateRoute[]): ISparkyRouter {
-        const routeState = getStateByHash(stateRoute, location.hash);
-        routeState.hash = location.hash;
-        return { type: "SparkyRouter", component: routeState.component, routing: stateRoute, history: [routeState] };
+    static router(stateRoute: IStateRoute[], options?: ISparkyRouterOptions): ISparkyRouter {
+        if(!options) options = { type: "hash" };
+        let locationString = "";
+        if(options.type == "hash") {
+            locationString = location.hash.slice(2, location.hash.length);
+        } else if (options.type == "browser") {
+            locationString = location.pathname;
+        }
+        const routeState = getStateByHash(stateRoute, locationString);
+        routeState.hash = locationString;
+        let params = []
+        if(routeState.exact)
+            params = getParamsByPath(routeState.path, locationString);
+        return { type: "SparkyRouter", component: routeState.component, routing: stateRoute, history: [routeState], params, options };
     }
 
     /**
@@ -233,11 +252,16 @@ function initialiseDOM(dom: HTMLElementSparkyEnhanced, element: ISparkyComponent
     if (dom && !dom.__sparkyRoot) {
         setRootProperties(dom);
         if (element.type == "SparkyRouter") {
-            const { history, routing } = element as ISparkyRouter;
+            const { history, routing, params, options } = element as ISparkyRouter;
             listeningHashChange(routing, (component) => {
                 Sparky.mount(component, dom);
             }, dom);
-            dom.__sparkyRoot = { ...dom.__sparkyRoot, history, routing };
+            dom.__sparkyRoot = { ...dom.__sparkyRoot, history, 
+                routing, params, 
+                basename: options?.basename, 
+                forceURLUpdate: options?.forceUrlUpdate,
+                type: options?.type
+            };
         }
     }
     ;
@@ -246,6 +270,8 @@ function initialiseDOM(dom: HTMLElementSparkyEnhanced, element: ISparkyComponent
 function setRootProperties(dom: HTMLElementSparkyEnhanced) {
     dom.__sparkyRoot = { 
         id: nanoid(12),
+        basename: "",
+        params: [],
         forceURLUpdate: false,
         type: "hash",
         historyIndex: 0,

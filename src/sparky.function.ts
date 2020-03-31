@@ -2,7 +2,7 @@ import { Sparky } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { callCachedFn } from "./sparky.function.helper";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
-import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, IRoutingTypes } from "./sparky.router";
+import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, IRoutingTypes, Sparky__params } from "./sparky.router";
 
 export type ArgumentsList = any[];
 type UpdateCallback = () => void;
@@ -83,14 +83,13 @@ export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: Argumen
     callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged)
 }
 
-export const Sparky__internal_history = (type?: IRoutingTypes, forceURLUpdate?: boolean) => {
+export const Sparky__internal_history = () => {
     const currentContext = getContext();
-    currentContext.__rootElement.__sparkyRoot.type = type;
-    currentContext.__rootElement.__sparkyRoot.forceURLUpdate = forceURLUpdate;
     const goToState = Sparky__goToState.bind(currentContext.__rootElement);
     const goBack = Sparky__back.bind(currentContext.__rootElement);
     const goAfter = Sparky__forward.bind(currentContext.__rootElement);
+    const getParams = Sparky__params.bind(currentContext.__rootElement);
     const cleanHistory = Sparky_cleanHistory.bind(currentContext.__rootElement);
 
-    return { goToState, goBack, goAfter, cleanHistory };
+    return { goToState, goBack, goAfter, getParams, cleanHistory };
 }

@@ -4,12 +4,17 @@ import { eventCallbackFn, IEventSingle } from "./sparky.eventmanager";
 import { SparkyContext } from "./sparky.context";
 import { IRoutingTypes } from "./sparky.router";
 
+export interface IParams {
+    [x: string]: string
+}
 export interface ISparkyRoot {
     id: string;
     type: IRoutingTypes;
+    basename: string;
     forceURLUpdate: boolean;
     historyIndex: number;
     stateChanging: boolean;
+    params: IParams[];
     history: IStateRoute[];
     routing: IStateRoute[];
     updateAt: number;

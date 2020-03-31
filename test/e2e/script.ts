@@ -2,23 +2,23 @@ import { Sparky, html, memoize, state, update, router} from "../../src/sparky";
 
 const routingState = [
     {
-        path: "#lol",
+        path: "lol/:id",
         component: Sparky.component(Main, { name: "Hugo" })
     },
     {
-        path: "#dos",
+        path: "dos/tres/:uno/*hola",
         component: Sparky.component(Span, { name: "Hugo" })
     }
 ];
 
-Sparky.mount(Sparky.router(routingState), document.getElementById("app"))
+Sparky.mount(Sparky.router(routingState, {type: "hash"}), document.getElementById("app"))
 
 interface IProps {
     name: string;
 }
 
 function Main(props: IProps) {
-    const { goBack, goToState, goAfter} = router("hash");
+    const { goBack, goToState, goAfter, getParams} = router();
     const [name, setName] = state("Hugo");
     const [text, setText] = state(["The world"]); 
     const [input, setInput] = state("");
@@ -37,7 +37,7 @@ function Main(props: IProps) {
     }, [])
 
     const route = () => {
-        goToState("#dos")
+        goToState("dos/tres/15")
     }
 
     const back = () => {
@@ -63,6 +63,9 @@ function Main(props: IProps) {
             <button onclick=${onClick}>Hey!</button>
             <div>
                 <div>${Sparky.component(Span, {name})}</div>
+            </div>
+            <div>
+                ${getParams().map((elm) => Object.entries(elm))}
             </div>
             ${Sparky.component(SpanNest)}
             <input id="text" type="text" oninput=${onInput} />
@@ -97,14 +100,14 @@ function SpanNest(props: IProps) {
 }
 
 function Span(props: IProps) {
-    const { goBack, goToState } = router("hash");
+    const { goBack, goToState } = router();
     const name = props ? props.name : "Esto no es una prop";
     const [ver, setVer] = state(new Date().toLocaleString());
     const click = () => {
         setVer(new Date().toLocaleString())
     }
     const route = () => {
-        goToState("#lol");
+        goToState("lol/14");
     }
     const back = () => {
         goBack()
