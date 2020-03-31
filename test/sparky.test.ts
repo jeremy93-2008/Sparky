@@ -237,7 +237,7 @@ describe("Mount function", () => {
     });
     test("Routing Functionality with Hash History", () => {
         const component = Sparky.component(() => {
-            const { goToState, goBack, goAfter} = router("hash");
+            const { goToState, goBack, goAfter} = router();
             const clickState = () => {
                 goBack();
                 goAfter();
@@ -249,7 +249,7 @@ describe("Mount function", () => {
             return html `<div> <span id="unique1" onclick=${clickState}>GoTo</span> <span id="unique-back" onclick=${back}>Everyone</span></div>`;
         });
         const regexpComponent = Sparky.component(() => {
-            const { goToState, goAfter} = router("hash");
+            const { goToState, goAfter} = router();
             const click = () => {
                 goToState("dos")
             }
@@ -264,7 +264,7 @@ describe("Mount function", () => {
             <span id="unique-forward" onclick=${forward}>lol</span></div>`;
         })
         const goToComponent = Sparky.component(() => {
-            const { goBack } = router("hash");
+            const { goBack } = router();
             const clickUno = () => {
                 goBack();
             }
@@ -274,11 +274,11 @@ describe("Mount function", () => {
         {
             Sparky.mount(Sparky.router([
                 {
-                    path: /dos/gi,
+                    path: "dos",
                     component: goToComponent
                 },
                 {
-                    path: /tres/gi,
+                    path: "tres",
                     component: regexpComponent
                 },
                 {
@@ -297,7 +297,7 @@ describe("Mount function", () => {
     });
     test("Routing Functionality with Browser History", () => {
         const component = Sparky.component(() => {
-            const { goToState, goBack, goAfter} = router("browser");
+            const { goToState, goBack, goAfter} = router();
             const clickState = () => {
                 goBack();
                 goAfter();
@@ -309,7 +309,7 @@ describe("Mount function", () => {
             return html `<div> <span id="unique1" onclick=${clickState}>GoTo</span> <span id="unique-back" onclick=${back}>Everyone</span></div>`;
         });
         const regexpComponent = Sparky.component(() => {
-            const { goToState, goAfter, cleanHistory} = router("browser");
+            const { goToState, goAfter, cleanHistory} = router();
             const click = () => {
                 goToState("dos")
             }
@@ -325,7 +325,7 @@ describe("Mount function", () => {
             <span id="unique-forward" onclick=${forward}>lol</span></div>`;
         })
         const goToComponent = Sparky.component(() => {
-            const { goBack } = router("browser");
+            const { goBack } = router();
             const clickUno = () => {
                 goBack();
             }
@@ -335,18 +335,18 @@ describe("Mount function", () => {
         {
             Sparky.mount(Sparky.router([
                 {
-                    path: /dos/gi,
+                    path: "dos",
                     component: goToComponent
                 },
                 {
-                    path: /tres/gi,
+                    path: "tres",
                     component: regexpComponent
                 },
                 {
                     path: "",
                     component
                 }
-            ]), document.getElementById("app3"))
+            ], {type: "browser"}), document.getElementById("app3"))
         });
         test.selector("#unique1").simulate("click");
         test.selector("#unique-state").simulate("click");
