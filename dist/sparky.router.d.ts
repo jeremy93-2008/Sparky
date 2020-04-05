@@ -1,10 +1,16 @@
 import { IStateRoute } from "./sparky";
-export declare function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Function): void;
-export declare function getStateByHash(stateRoute: IStateRoute[], path: string): IStateRoute;
-export declare function pushToAbstractHistory(stateRoute: IStateRoute): void;
-export declare function Sparky_cleanHistory(): void;
-export declare function Sparky__goToState(path: string): void;
-export declare function Sparky__back(): void;
-export declare function Sparky__forward(): void;
-export declare function setStateRoute(stateRoute: IStateRoute[]): void;
-export declare function getStateRoute(): any[];
+import { HTMLElementSparkyEnhanced, ISparkyRoot, IParams } from "./sparky.component";
+export declare type IRoutingTypes = "browser" | "hash" | "abstract";
+export interface documentSparkyEnhanced extends Document {
+    __sparkyRoutingId: string;
+}
+export declare function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Function, dom: HTMLElementSparkyEnhanced): void;
+export declare function getStateByHash(stateRoute: IStateRoute[], newPath: string): IStateRoute;
+export declare function pushToAbstractHistory(sparkyRoot: ISparkyRoot, stateRoute: IStateRoute): void;
+export declare function Sparky_cleanHistory(this: HTMLElementSparkyEnhanced): void;
+export declare function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPath: string): void;
+export declare function Sparky__back(this: HTMLElementSparkyEnhanced): void;
+export declare function Sparky__forward(this: HTMLElementSparkyEnhanced): void;
+export declare function Sparky__params(this: HTMLElementSparkyEnhanced): IParams[];
+export declare function getParamsByPath(path: string, url: string): IParams[];
+export declare function matchUrl(path: string, url: string): boolean;

@@ -9,6 +9,8 @@ export interface documentSparkyEnhanced extends Document {
 }
 
 export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Function, dom: HTMLElementSparkyEnhanced) {
+    if(!dom.__sparkyRoot.isRoutingEnabled)
+        throw TypeError("To use route() function, you need to pass a Sparky.router object on the mount function");
     window.requestIdleCallback(() => {
         window.addEventListener("hashchange", (evt) => {
             changeStateByEvent(evt, stateRoute, callbackFn, dom)
@@ -92,7 +94,6 @@ export function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPath: stri
     pushToAbstractHistory(this.__sparkyRoot, routeState);
     Sparky.mount(routeState.component, this);
 }
-
 export function Sparky__back(this: HTMLElementSparkyEnhanced) {
     let { history, type, basename } = this.__sparkyRoot;
     if (this.__sparkyRoot.historyIndex - 1 < 0) return;

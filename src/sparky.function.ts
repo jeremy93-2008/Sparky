@@ -2,7 +2,8 @@ import { Sparky } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { callCachedFn } from "./sparky.function.helper";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
-import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, IRoutingTypes, Sparky__params } from "./sparky.router";
+import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, Sparky__params } from "./sparky.router";
+import { IParams } from "./sparky.component";
 
 export type ArgumentsList = any[];
 type UpdateCallback = () => void;
@@ -12,12 +13,35 @@ type IBoundSetCurrentState = {
     rootElement: HTMLElement;
 };
 
+export interface IReturnRouterFunctions {
+    /**
+     * Convenience method for transitioning to a new state.
+     * @params newPath to transitioning to that new state
+     */
+    goToState: (newPath: string) => void, 
+    /**
+     * Convenience method for transitioning go back on history
+     */
+    goBack: () => void, 
+    /**
+     * Convenience method for transitioning go forward on history
+     */
+    goAfter: () => void, 
+    /**
+     * Returns an object of key/value pairs of parameters matched on the url
+     */
+    getParams: () => IParams[], 
+    /**
+     * Convenience method to clean History stack
+     */
+    cleanHistory: () => void
+}
+
 export interface IFnCached {
     fn: Function;
     dependencies: string[];
     result: any;
 }
-
 
 export type ISetState<S> = (newState: S) => ISetState<S>;
 
@@ -83,8 +107,10 @@ export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: Argumen
     callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged)
 }
 
-export const Sparky__internal_history = () => {
+export const Sparky__internal_history = () : IReturnRouterFunctions => {
     const currentContext = getContext();
+    if(!currentContext.__rootElement.__sparkyRoot.isRoutingEnabled)
+        throw TypeError("To use route() function, you need to pass a Sparky.router object on the mount function");
     const goToState = Sparky__goToState.bind(currentContext.__rootElement);
     const goBack = Sparky__back.bind(currentContext.__rootElement);
     const goAfter = Sparky__forward.bind(currentContext.__rootElement);

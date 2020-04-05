@@ -191,7 +191,7 @@ export const state = Sparky__state;
 export const memoize = Sparky__memoize;
 
 /**
- * Return the current routing functions, ex.: goToState, goBack, goAfter, cleanHistory
+ * Returns routing functions for current mounted component
  */
 export const router = Sparky__internal_history;
 
@@ -256,6 +256,7 @@ function initialiseDOM(dom: HTMLElementSparkyEnhanced, element: ISparkyComponent
             dom.__sparkyRoot = { ...dom.__sparkyRoot, history, 
                 routing, params, 
                 basename: options?.basename, 
+                isRoutingEnabled: true,
                 forceURLUpdate: options?.forceUrlUpdate,
                 type: options?.type
             };
@@ -272,6 +273,7 @@ function initialiseDOM(dom: HTMLElementSparkyEnhanced, element: ISparkyComponent
 function setRootProperties(dom: HTMLElementSparkyEnhanced) {
     dom.__sparkyRoot = { 
         id: nanoid(12),
+        isRoutingEnabled: false,
         basename: "",
         params: [],
         forceURLUpdate: false,

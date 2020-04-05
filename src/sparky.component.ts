@@ -9,6 +9,7 @@ export interface IParams {
 }
 export interface ISparkyRoot {
     id: string;
+    isRoutingEnabled: boolean;
     type: IRoutingTypes;
     basename: string;
     forceURLUpdate: boolean;
