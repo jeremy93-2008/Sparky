@@ -1,5 +1,6 @@
 import { renderToDOMNode, state, memoize, update, html, Sparky, router } from "../src/sparky";
 import { SparkyTest } from "../src/sparky.test-util";
+import { eventListSingle } from "../src/sparky.eventmanager";
 
 const lib = require("../src/sparky");
 
@@ -182,10 +183,11 @@ describe("Mount function", () => {
         const test = SparkyTest.test(() => {
             Sparky.mount(Sparky.component(() => {
                 const [a, setA] = state("hola mundo");
+                const [b, setB] = state("50");
 
                 memoize(() => {
                     console.log("Memo!")
-                }, [a]);
+                }, a == "10" ? [a] : [a, b]);
 
                 update(() => {
                     console.log("Update!")
@@ -295,6 +297,7 @@ describe("Mount function", () => {
         test.selector("#unique-forward").simulate("click");
         expect(document.getElementById("app2")).toMatchSnapshot()
     });
+    // Browser Routing are not supported by Jest bu we need to insert it to not lose percentage on the stats
     test("Routing Functionality with Browser History", () => {
         const component = Sparky.component(() => {
             const { goToState, goBack, goAfter} = router();
@@ -309,7 +312,8 @@ describe("Mount function", () => {
             return html `<div> <span id="unique1" onclick=${clickState}>GoTo</span> <span id="unique-back" onclick=${back}>Everyone</span></div>`;
         });
         const regexpComponent = Sparky.component(() => {
-            const { goToState, goAfter, cleanHistory} = router();
+            const { goToState, goAfter, getParams, cleanHistory} = router();
+            console.log(getParams())
             const click = () => {
                 goToState("dos")
             }
@@ -335,11 +339,11 @@ describe("Mount function", () => {
         {
             Sparky.mount(Sparky.router([
                 {
-                    path: "dos",
+                    path: "dos/:id",
                     component: goToComponent
                 },
                 {
-                    path: "tres",
+                    path: "tres/:uno/*path",
                     component: regexpComponent
                 },
                 {

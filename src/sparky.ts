@@ -253,15 +253,17 @@ function initialiseDOM(dom: HTMLElementSparkyEnhanced, element: ISparkyComponent
         setRootProperties(dom);
         if (element.type == "SparkyRouter") {
             const { history, routing, params, options } = element as ISparkyRouter;
-            listeningHashChange(routing, (component) => {
-                Sparky.mount(component, dom);
-            }, dom);
             dom.__sparkyRoot = { ...dom.__sparkyRoot, history, 
                 routing, params, 
                 basename: options?.basename, 
                 forceURLUpdate: options?.forceUrlUpdate,
                 type: options?.type
             };
+            if(dom.__sparkyRoot.type == "hash") {
+                listeningHashChange(routing, (component) => {
+                    Sparky.mount(component, dom);
+                }, dom);                
+            }
         }
     }
     ;

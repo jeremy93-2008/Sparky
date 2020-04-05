@@ -43,7 +43,7 @@ function changeStateByEvent(evt: HashChangeEvent, stateRoute: IStateRoute[], cal
     };
     const newState = getStateByHash(stateRoute, location.hash);
     newState.hash = location.hash;
-    this.__sparkyRoot.params = getParamsByPath(newState.path, location.hash);
+    dom.__sparkyRoot.params = getParamsByPath(newState.path, location.hash);
     pushToAbstractHistory(dom.__sparkyRoot, newState);
     if(newState) {
         callbackFn(newState.component);
@@ -78,7 +78,7 @@ export function Sparky_cleanHistory(this: HTMLElementSparkyEnhanced) {
 } 
 
 export function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPath: string) {
-    let { routing, type } = this.__sparkyRoot;
+    let { routing, type, basename } = this.__sparkyRoot;
     const routeState = getStateByHash(routing, newPath);
     routeState.hash = newPath;
     if(routeState.exact)
@@ -87,14 +87,14 @@ export function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPath: stri
     let normalizePath = newPath;
     switch(type) {
         case "hash": location.hash = "/" + normalizePath; break;
-        case "browser": location.pathname = "/" + normalizePath; break;
+        case "browser": location.pathname = basename + "/" + normalizePath; break;
     }
     pushToAbstractHistory(this.__sparkyRoot, routeState);
     Sparky.mount(routeState.component, this);
 }
 
 export function Sparky__back(this: HTMLElementSparkyEnhanced) {
-    let { history, type } = this.__sparkyRoot;
+    let { history, type, basename } = this.__sparkyRoot;
     if (this.__sparkyRoot.historyIndex - 1 < 0) return;
     const state = history[--this.__sparkyRoot.historyIndex];
     if(state.exact)
@@ -103,13 +103,13 @@ export function Sparky__back(this: HTMLElementSparkyEnhanced) {
     let normalizePath = state.hash;
     switch(type) {
         case "hash": location.hash = "/" + normalizePath; break;
-        case "browser": location.pathname = "/" + normalizePath; break;
+        case "browser": location.pathname = basename + "/" + normalizePath; break;
     }
     Sparky.mount(state.component, this);
 }
 
 export function Sparky__forward(this: HTMLElementSparkyEnhanced) {
-    let { history, type } = this.__sparkyRoot;
+    let { history, type, basename } = this.__sparkyRoot;
     if (this.__sparkyRoot.historyIndex + 1 > history.length - 1) return; 
     const state = history[++this.__sparkyRoot.historyIndex];
     if(state.exact)
@@ -118,7 +118,7 @@ export function Sparky__forward(this: HTMLElementSparkyEnhanced) {
     let normalizePath = state.hash;
     switch(type) {
         case "hash": location.hash = "/" + normalizePath; break;
-        case "browser": location.pathname = "/" + normalizePath; break;
+        case "browser": location.pathname = basename + "/" + normalizePath; break;
     }
     Sparky.mount(state.component, this)
 }
