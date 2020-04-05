@@ -1,8 +1,5 @@
 import { renderToDOMNode, state, memoize, update, html, Sparky, router } from "../src/sparky";
 import { SparkyTest } from "../src/sparky.test-util";
-import { eventListSingle } from "../src/sparky.eventmanager";
-
-const lib = require("../src/sparky");
 
 document.body.innerHTML = `
     <div id="app"></div>
@@ -297,8 +294,10 @@ describe("Mount function", () => {
         test.selector("#unique-forward").simulate("click");
         expect(document.getElementById("app2")).toMatchSnapshot()
     });
-    // Browser Routing are not supported by Jest bu we need to insert it to not lose percentage on the stats
     test("Routing Functionality with Browser History", () => {
+        delete window.location;
+        //@ts-ignore
+        window.location = { pathname: "" };
         const component = Sparky.component(() => {
             const { goToState, goBack, goAfter} = router();
             const clickState = () => {
