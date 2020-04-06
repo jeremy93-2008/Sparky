@@ -12,5 +12,6 @@ export declare function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPa
 export declare function Sparky__back(this: HTMLElementSparkyEnhanced): void;
 export declare function Sparky__forward(this: HTMLElementSparkyEnhanced): void;
 export declare function Sparky__params(this: HTMLElementSparkyEnhanced): IParams[];
+export declare function Sparky__currentState(this: HTMLElementSparkyEnhanced): IStateRoute;
 export declare function getParamsByPath(path: string, url: string): IParams[];
 export declare function matchUrl(path: string, url: string): boolean;

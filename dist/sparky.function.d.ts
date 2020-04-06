@@ -24,6 +24,10 @@ export interface IReturnRouterFunctions {
      * Convenience method to clean History stack
      */
     cleanHistory: () => void;
+    /**
+     * Get current state of the router
+     */
+    getCurrentState: () => void;
 }
 export interface IFnCached {
     fn: Function;
