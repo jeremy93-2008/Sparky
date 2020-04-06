@@ -77,7 +77,6 @@ export interface ISparkyProps {
 export type ISparkyState = ISparkyProps;
 
 export class Sparky {
-    public static _DEV_: boolean = true;
 
     /**
      * Generate a Sparky Component that can be mount.
@@ -114,7 +113,7 @@ export class Sparky {
      * @param dom The dom element where you want to mount this component
      */
     static mount(element: ISparkyComponent | ISparkyRouter, dom: HTMLElementSparkyEnhanced): ISparkySelf {
-        if (Sparky._DEV_)
+        if (process.env.NODE_ENV === 'development')
             console.time();
         
         const component = ((element.type == "SparkyComponent") ? element : (element as ISparkyRouter).component) as ISparkyComponent 
@@ -146,7 +145,7 @@ export class Sparky {
 
         EventManager.listen(finalDOM);
 
-        if (Sparky._DEV_)
+        if (process.env.NODE_ENV === 'development')
             console.timeEnd();
 
         if(typeof thisTest != "undefined" && thisTest.testing) {
