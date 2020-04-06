@@ -311,8 +311,9 @@ describe("Mount function", () => {
             return html `<div> <span id="unique1" onclick=${clickState}>GoTo</span> <span id="unique-back" onclick=${back}>Everyone</span></div>`;
         });
         const regexpComponent = Sparky.component(() => {
-            const { goToState, goAfter, getParams, cleanHistory} = router();
+            const { goToState, goAfter, getParams, cleanHistory, getCurrentState} = router();
             console.log(getParams())
+            console.log(getCurrentState())
             const click = () => {
                 goToState("dos")
             }

@@ -129,6 +129,11 @@ export function Sparky__params(this: HTMLElementSparkyEnhanced) {
     return params;
 }
 
+export function Sparky__currentState(this: HTMLElementSparkyEnhanced) {
+    const { history, historyIndex } = this.__sparkyRoot;
+    return history[historyIndex];
+}
+
 export function getParamsByPath(path:string, url: string): IParams[] {
     if(path.includes("*")) {  
         const pathArray = path.split("*");  

@@ -2,7 +2,7 @@ import { Sparky } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { callCachedFn } from "./sparky.function.helper";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
-import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, Sparky__params } from "./sparky.router";
+import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, Sparky__params, Sparky__currentState } from "./sparky.router";
 import { IParams } from "./sparky.component";
 
 export type ArgumentsList = any[];
@@ -34,7 +34,11 @@ export interface IReturnRouterFunctions {
     /**
      * Convenience method to clean History stack
      */
-    cleanHistory: () => void
+    cleanHistory: () => void,
+    /**
+     * Get current state of the router
+     */
+    getCurrentState: () => void
 }
 
 export interface IFnCached {
@@ -116,6 +120,7 @@ export const Sparky__internal_history = () : IReturnRouterFunctions => {
     const goAfter = Sparky__forward.bind(currentContext.__rootElement);
     const getParams = Sparky__params.bind(currentContext.__rootElement);
     const cleanHistory = Sparky_cleanHistory.bind(currentContext.__rootElement);
+    const getCurrentState = Sparky__currentState.bind(currentContext.__rootElement);
 
-    return { goToState, goBack, goAfter, getParams, cleanHistory };
+    return { goToState, goBack, goAfter, getParams, cleanHistory, getCurrentState };
 }

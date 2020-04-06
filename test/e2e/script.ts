@@ -18,7 +18,7 @@ interface IProps {
 }
 
 function Main(props: IProps) {
-    const { goBack, goToState, goAfter, getParams} = router();
+    const { goBack, goToState, goAfter, getParams,getCurrentState } = router();
     const [name, setName] = state("Hugo");
     const [text, setText] = state(["The world"]); 
     const [input, setInput] = state("");
@@ -33,6 +33,7 @@ function Main(props: IProps) {
 
     update(() => {
         console.log("after dom render");
+        console.log(getCurrentState())
         console.log(document.getElementById("uno").innerHTML);
     }, [])
 
