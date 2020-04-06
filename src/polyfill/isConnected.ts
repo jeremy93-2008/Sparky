@@ -6,8 +6,9 @@
  * Public domain.
  * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
  */
+declare var thisTest;
 export function isConnectedPolyfill() {
-    if (!('isConnected' in Node.prototype)) {
+    if (!('isConnected' in Node.prototype) || (typeof (window as any).test != "undefined")) {
         Object.defineProperty(Node.prototype, 'isConnected', {
         get() {
             return (

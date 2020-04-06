@@ -1,5 +1,6 @@
 import 'mdn-polyfills/Array.from';
 import 'mdn-polyfills/Array.prototype.find';
+import { HTMLElementSparkyEnhanced, IParams } from "./sparky.component";
 import { ISparkySelf } from "./sparky.context";
 export interface IRenderReturn {
     type: string;
@@ -8,6 +9,12 @@ export interface IRenderReturn {
     nestedComponents: ISparkyComponent[];
     children: IRenderReturn[];
     renderId: string;
+}
+export interface IStateRoute {
+    hash?: string;
+    exact?: boolean;
+    path: string;
+    component: ISparkyComponent;
 }
 export interface IReconciliateProps {
     dom: HTMLElement;
@@ -25,6 +32,19 @@ export interface ISparkyComponent {
     currentContext: ISparkySelf;
     renderFn: ISelfFunction;
 }
+export interface ISparkyRouterOptions {
+    type?: "hash" | "abstract" | "browser";
+    basename?: string;
+    forceUrlUpdate?: boolean;
+}
+export interface ISparkyRouter {
+    type: string;
+    component: ISparkyComponent;
+    routing: IStateRoute[];
+    history: IStateRoute[];
+    params: IParams[];
+    options: ISparkyRouterOptions;
+}
 export interface ISparkyProps {
     [key: string]: any;
 }
@@ -37,11 +57,16 @@ export declare class Sparky {
      */
     static component(renderFunc: ISelfFunction, props?: ISparkyProps): ISparkyComponent;
     /**
+     * Create a routing component that manage history
+     * @param stateRoute
+     */
+    static router(stateRoute: IStateRoute[], options?: ISparkyRouterOptions): ISparkyRouter;
+    /**
      * Mount a Sparky Component in the DOM Tree and keep it updated.
      * @param component Sparky Component
      * @param dom The dom element where you want to mount this component
      */
-    static mount(component: ISparkyComponent, dom?: HTMLElement): ISparkySelf;
+    static mount(element: ISparkyComponent | ISparkyRouter, dom: HTMLElementSparkyEnhanced): ISparkySelf;
     /**
      * Reconciliate the current DOM with the new DOM Node
      * @param oldNode Node that need to be reconcile
@@ -67,10 +92,14 @@ export declare const state: <S>(initialState: S) => [S, import("./sparky.functio
  */
 export declare const memoize: (callbackFn: Function, argumentsChanged?: import("./sparky.function").ArgumentsList) => void;
 /**
+ * Returns routing functions for current mounted component
+ */
+export declare const router: () => import("./sparky.function").IReturnRouterFunctions;
+/**
  * Render the html string template to HTML elements
  * @param html Array of HTML String
  * @param computedProps Computed Props used to pass Javascript into template
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
  */
-export declare function render(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn;
+export declare function html(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn;
 export declare function renderToDOMNode(html: string): HTMLElement;

@@ -2,6 +2,7 @@ import nanoid from "nanoid/non-secure";
 import cloneDeep from "clone-deep";
 import { ISparkyProps, ISparkyState, ISparkyComponent, IRenderReturn } from "./sparky";
 import { IFnCached } from "./sparky.function";
+import { HTMLElementSparkyEnhanced } from "./sparky.component";
 
 export interface ISparkySelf {
     props: ISparkyProps;
@@ -17,10 +18,12 @@ export interface ISparkySelf {
     },
     __id?: string,
     __root?: ISparkyComponent,
+    __rootElement?: HTMLElementSparkyEnhanced
     renderFunc: (props?: any) => IRenderReturn;
 }
 
 const emptyContext: ISparkySelf = {
+    __rootElement: null,
     __root: null,
     __id: "",
     props: {},

@@ -1,10 +1,20 @@
 import { isConnectedPolyfill } from "./polyfill/isConnected"
 import { ISparkySelf } from "./sparky.context";
+import { HTMLElementSparkyEnhanced } from "./sparky.component";
 
 isConnectedPolyfill();
 
+interface windowTesting extends Window {
+    thisTestEvent: eventListSingle[]
+}
 export interface eventListSingle {
     dom: HTMLElement;
+    type: string;
+    context: ISparkySelf;
+    callbackFn: eventCallbackFn;
+}
+
+export interface IEventSingle {
     type: string;
     context: ISparkySelf;
     callbackFn: eventCallbackFn;
@@ -17,20 +27,22 @@ export class EventManager {
     static eventList: eventListSingle[] = [];
     static eventListType: string[] = [];
 
-    static listen(eventList?: eventListSingle[]) {
+    static listen(finalDOM: HTMLElement) {
+        EventManager.removeAllEvents();
+        EventManager.populateEvents(finalDOM);
         EventManager.removeUnusedEvents();
-        const evtList = eventList || this.eventList
-        evtList.forEach((event) => {
+        (window as unknown as windowTesting).thisTestEvent = EventManager.eventList;
+        this.eventList.forEach((event) => {
             const { type } = event;
             if(!this.isEventTypeListening(type)) {
-                document.addEventListener(type, (event) => this.dispatchEvent(event, evtList))
+                document.addEventListener(type, (event) => this.dispatchEvent(event))
                 this.eventListType.push(type);
             }
         });
     }
 
-    static dispatchEvent(event: Event, eventList: eventListSingle[]) {
-        eventList.find((evtList) => {
+    static dispatchEvent(event: Event) {
+        this.eventList.find((evtList) => {
             if(this.isEventTarget(evtList, event)) {
                 if(evtList.type === event.type) {
                     evtList.callbackFn(event);
@@ -42,6 +54,26 @@ export class EventManager {
     static addEvent(eventSingle: eventListSingle) {
         const {dom, type, context, callbackFn} = eventSingle;
         this.eventList.push({ dom, type, context, callbackFn });
+    }
+
+    private static populateEvents(finalDOM: HTMLElementSparkyEnhanced) {
+        const domQueue = [finalDOM];
+        while(domQueue.length > 0) {
+            const elem = domQueue.shift();
+            
+            if(elem.__sparkyEvent) {
+                const { callbackFn, type, context } = elem.__sparkyEvent;
+                this.addEvent({dom: elem, type, context, callbackFn});
+            }
+    
+            for(let index = 0; index < elem.children.length; index++) {
+                domQueue.push(elem.children[index] as HTMLElement)
+            }
+        }
+    }
+
+    private static removeAllEvents() {
+        this.eventList = [];
     }
 
     private static removeUnusedEvents() {

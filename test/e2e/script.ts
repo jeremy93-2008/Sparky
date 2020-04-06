@@ -1,14 +1,27 @@
-import { Sparky, render, memoize, state, update } from "../../src/sparky";
+import { Sparky, html, memoize, state, update, router} from "../../src/sparky";
 
-Sparky.mount(Sparky.component(Main, { name: "Hugo"}), document.getElementById("app"))
+const routingState = [
+    {
+        path: "lol/:id",
+        component: Sparky.component(Main, { name: "Hugo" })
+    },
+    {
+        path: "dos/tres/:uno/*hola",
+        component: Sparky.component(Span, { name: "Hugo" })
+    }
+];
+
+Sparky.mount(Sparky.router(routingState, {type: "hash"}), document.getElementById("app"))
 
 interface IProps {
     name: string;
 }
 
 function Main(props: IProps) {
+    const { goBack, goToState, goAfter, getParams,getCurrentState } = router();
     const [name, setName] = state("Hugo");
     const [text, setText] = state(["The world"]); 
+    const [input, setInput] = state("");
 
     memoize((du) => {
         console.log("Memo :) " + du);
@@ -20,22 +33,47 @@ function Main(props: IProps) {
 
     update(() => {
         console.log("after dom render");
+        console.log(getCurrentState())
         console.log(document.getElementById("uno").innerHTML);
     }, [])
+
+    const route = () => {
+        goToState("dos/tres/15")
+    }
+
+    const back = () => {
+        goBack()
+    }
+
+    const after = () => {
+        goAfter()
+    }
 
     const onClick = (event) => {
         setName("Jeremy");
         setText(["Hola","Buenas","Adios"]);
     }
 
-    return render /*html*/`
+    const onInput = (event: Event) => {
+        setInput((event.target as HTMLInputElement).value)
+    }
+
+    return html`
         <div id="uno" class="lol">
-            Hola a todos ${ name !== "Hugo" ? render /*html*/`<b onclick=${onClick}>${name}</b>` : `no hay nada`}
+            Hola a todos ${ name !== "Hugo" ? html`<b onclick=${onClick}>${name}</b>` : `no hay nada`}
             <button onclick=${onClick}>Hey!</button>
             <div>
                 <div>${Sparky.component(Span, {name})}</div>
             </div>
+            <div>
+                ${getParams().map((elm) => Object.entries(elm))}
+            </div>
             ${Sparky.component(SpanNest)}
+            <input id="text" type="text" oninput=${onInput} />
+            <a onclick=${route}>A Dos</a>
+            <a onclick=${back}>A Back</a>
+            <a onclick=${after}>A After</a>
+            <span>${input}</span>
             <ul>
                 ${text.map(t => `<li>${t}</li>`)}
             </ul>
@@ -48,7 +86,7 @@ function SpanNest(props: IProps) {
     const doIt = () => {
         setVer("Uno para ti");
     }
-    return render/*html*/`
+    return html`
         <div>
             <span ondblclick=${doIt}>Hazlo 2</span>
             <span>
@@ -63,14 +101,23 @@ function SpanNest(props: IProps) {
 }
 
 function Span(props: IProps) {
+    const { goBack, goToState } = router();
     const name = props ? props.name : "Esto no es una prop";
     const [ver, setVer] = state(new Date().toLocaleString());
     const click = () => {
         setVer(new Date().toLocaleString())
     }
-    return render/*html*/`
+    const route = () => {
+        goToState("lol/14");
+    }
+    const back = () => {
+        goBack()
+    }
+    return html`
         <div>
             <span ondblclick=${click}>Hazlo</span>
+            <a onclick=${route}>A Main</a>
+            <a onclick=${back}>A Back</a>
             <span>
                 <span>Un nuevo Mundo ${name}</span>
                 ${ver}

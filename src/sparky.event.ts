@@ -1,7 +1,8 @@
 import 'mdn-polyfills/String.prototype.startsWith';
+import { HTMLElementSparkyEnhanced } from './sparky.component';
 
 interface IEventReturn {
-    dom: HTMLElement;
+    dom: HTMLElementSparkyEnhanced;
     attr: Attr;
 }
 

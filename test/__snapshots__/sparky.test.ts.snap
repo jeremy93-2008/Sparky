@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Mount function Basic function 1`] = `
-<body>
+<div
+  id="app"
+>
   <div>
     
                 
@@ -11,11 +13,13 @@ exports[`Mount function Basic function 1`] = `
     
             
   </div>
-</body>
+</div>
 `;
 
 exports[`Mount function Computed function 1`] = `
-<body>
+<div
+  id="app"
+>
   <div>
     
                 
@@ -30,11 +34,13 @@ exports[`Mount function Computed function 1`] = `
     
             
   </div>
-</body>
+</div>
 `;
 
 exports[`Mount function Computed w/ State function 1`] = `
-<body>
+<div
+  id="app"
+>
   <div>
     
                 
@@ -49,11 +55,13 @@ exports[`Mount function Computed w/ State function 1`] = `
     
             
   </div>
-</body>
+</div>
 `;
 
 exports[`Mount function Computed, State w/ Event function 1`] = `
-<body>
+<div
+  id="app"
+>
   <div>
     
                     
@@ -70,11 +78,13 @@ exports[`Mount function Computed, State w/ Event function 1`] = `
     
                 
   </div>
-</body>
+</div>
 `;
 
 exports[`Mount function Computed, State w/ Event function with Render inside 1`] = `
-<body>
+<div
+  id="app"
+>
   <div>
     
                     
@@ -105,11 +115,13 @@ exports[`Mount function Computed, State w/ Event function with Render inside 1`]
     
                 
   </div>
-</body>
+</div>
 `;
 
 exports[`Mount function Computed, State, Memo w/ Event and Click function 1`] = `
-<body>
+<div
+  id="app"
+>
   <div>
     
                 
@@ -146,5 +158,47 @@ exports[`Mount function Computed, State, Memo w/ Event and Click function 1`] = 
     
             
   </div>
-</body>
+</div>
+`;
+
+exports[`Mount function Routing Functionality with Browser History 1`] = `
+<div
+  id="app3"
+>
+  <div>
+     
+    <span
+      id="unique1"
+    >
+      GoTo
+    </span>
+     
+    <span
+      id="unique-back"
+    >
+      Everyone
+    </span>
+  </div>
+</div>
+`;
+
+exports[`Mount function Routing Functionality with Hash History 1`] = `
+<div
+  id="app2"
+>
+  <div>
+     
+    <span
+      id="unique1"
+    >
+      GoTo
+    </span>
+     
+    <span
+      id="unique-back"
+    >
+      Everyone
+    </span>
+  </div>
+</div>
 `;

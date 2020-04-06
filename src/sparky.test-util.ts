@@ -20,6 +20,11 @@ interface IReturnSelector {
     dom: HTMLElement;
 }
 
+type ISimulateEvent = {
+    dom: HTMLElement;
+    testData: ITestData;
+};
+
 export class SparkyTest {
     public static test(callback: Function) {
         const thisTest = { testing: true, __testUtilData: {} } as IBoundMountComponent;
@@ -39,18 +44,13 @@ export class SparkyTest {
         };
     }
 
-    private static simulate(this: { dom: HTMLElement, testData: ITestData }, eventType: string) {
-        const currentEvt = SparkyTest.getCurrentEvent(this.testData, this.dom, eventType);
-
-        if(this.testData.eventList.length > 0) {
-            const testEvent = this.testData.eventList[0];
-            const evt = new Event(testEvent.type);
-            Object.defineProperty(evt, 'target', {writable: false, value: testEvent.dom});
-            EventManager.dispatchEvent(evt, this.testData.eventList)            
-        }
-
-        if(currentEvt)
-            currentEvt.callbackFn(new Event(eventType));
+    private static simulate(this: ISimulateEvent, eventType: string) {
+        const currentSyntheticEvt = SparkyTest.getCurrentEvent(this.testData, this.dom, eventType);
+        if(!currentSyntheticEvt) return;
+        const testEvent = currentSyntheticEvt;
+        const evt = new Event(testEvent.type);
+        Object.defineProperty(evt, 'target', {writable: false, value: testEvent.dom});
+        EventManager.dispatchEvent(evt);
     }
 
     private static getCurrentEvent(testData: ITestData, dom: HTMLElement, eventType: string) {

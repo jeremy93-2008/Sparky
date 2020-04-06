@@ -1,12 +1,4 @@
-let currentDom: HTMLElement = null;
-
-export function getCurrentDom() {
-    return currentDom;
-}
-
-export function setCurrentDom(dom: HTMLElement) {
-    currentDom = dom;
-}
+import { HTMLElementSparkyEnhanced } from "./sparky.component";
 
 export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
     if (!nextDom) return null;
@@ -20,10 +12,20 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
         const [currentElem, nextElem] = domQueue.shift();
         const removedList: Node[] = [];
         reconciliateAttribute(currentElem as HTMLElement, nextElem as HTMLElement);
+        
+        if(nextElem.nodeName != "#text" && (nextElem as HTMLElementSparkyEnhanced).__sparkyEvent) {
+            (currentElem as HTMLElementSparkyEnhanced).__sparkyEvent = 
+                (nextElem as HTMLElementSparkyEnhanced).__sparkyEvent;
+        }
+
+        if(nextElem.nodeName != "#text" && (nextElem as HTMLElementSparkyEnhanced).__sparkyRoot) {
+            (currentElem as HTMLElementSparkyEnhanced).__sparkyRoot = 
+                (nextElem as HTMLElementSparkyEnhanced).__sparkyRoot;
+        }
 
         const nextElemChildren = nextElem.childNodes;
         currentElem.childNodes.forEach((node, i) => {
-            const nextNode = nextElemChildren.item(i);
+            const nextNode = nextElemChildren.item(i) as HTMLElementSparkyEnhanced;
 
             if(!nextNode) {
                 removedList.push(node)
@@ -33,7 +35,9 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
             if(node.isEqualNode(nextNode)) return;
 
             if(node.nodeName !== nextNode.nodeName) {
-                currentElem.replaceChild(nextNode.cloneNode(true), node);
+                const newNextNode = nextNode.cloneNode(true);
+                const oldNextNode = nextNode.parentElement.replaceChild(newNextNode, nextNode);
+                currentElem.replaceChild(oldNextNode, node);
                 return;
             }
 
@@ -47,7 +51,9 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
 
         for(let i = currentElem.childNodes.length; i < nextElem.childNodes.length; i++) {
             const childNode = nextElem.childNodes.item(i);
-            currentElem.appendChild(childNode.cloneNode(true))
+            const newNextNode = childNode.cloneNode(true);
+            const oldNextNode = childNode.parentElement.replaceChild(newNextNode, childNode);
+            currentElem.appendChild(oldNextNode)
         }
 
         removedList.forEach((rmElem) => {

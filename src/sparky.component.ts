@@ -1,10 +1,29 @@
-import { IRenderReturn, ISparkyComponent, renderToDOMNode } from "./sparky";
+import { IRenderReturn, ISparkyComponent, renderToDOMNode, IStateRoute } from "./sparky";
 import { findEvent } from "./sparky.event";
-import { EventManager, eventCallbackFn, eventListSingle } from "./sparky.eventmanager";
+import { eventCallbackFn, IEventSingle } from "./sparky.eventmanager";
 import { SparkyContext } from "./sparky.context";
+import { IRoutingTypes } from "./sparky.router";
 
-interface windowTesting extends Window {
-    thisTestEvent: eventListSingle[]
+export interface IParams {
+    [x: string]: string
+}
+export interface ISparkyRoot {
+    id: string;
+    isRoutingEnabled: boolean;
+    type: IRoutingTypes;
+    basename: string;
+    forceURLUpdate: boolean;
+    historyIndex: number;
+    stateChanging: boolean;
+    params: IParams[];
+    history: IStateRoute[];
+    routing: IStateRoute[];
+    updateAt: number;
+}
+
+export interface HTMLElementSparkyEnhanced extends HTMLElement {
+    __sparkyEvent?: IEventSingle;
+    __sparkyRoot?: ISparkyRoot;
 }
 
 interface ICachedComponent {
@@ -27,12 +46,11 @@ export class SparkyComponent {
             currentRender.func.forEach((currentFunc, index) => {
                 const currentEvent = findEvent(currentDOM, currentRender.renderId, index);
                 const eventName = currentEvent.attr.name.replace("on", "");
-                EventManager.addEvent({
-                    dom: currentEvent.dom,
+                currentEvent.dom.__sparkyEvent = {
                     type: eventName,
                     context: currentComponent.context,
                     callbackFn: currentFunc.func as eventCallbackFn
-                })
+                };
                 currentEvent.dom.removeAttribute(currentEvent.attr.name)
             })
 
@@ -54,11 +72,12 @@ export class SparkyComponent {
                 }
                 SparkyContext.setCurrentContext(currentComp.context);
                 SparkyContext.resetIndexes();
+                currentComp.context.__root = rootComponent;
+                currentComp.context.__rootElement = rootComponent.context.__rootElement;
                 const renderChild = currentComp.renderFn(Object.freeze(currentComp.context.props));
                 if(!commentDom) return;
                 const renderChildDOM = renderToDOMNode(renderChild.html);
                 commentDom.parentNode.replaceChild(renderChildDOM, commentDom);
-                currentComp.context.__root = rootComponent;
                 render.func.push(...renderChild.func);
                 renderQueue.push([renderChild, currentComp, renderChildDOM]);
 
@@ -70,9 +89,7 @@ export class SparkyComponent {
             if(currentRender.nestedComponents.length > 0)
                 depthHorizontal++;
         }
-
-        (window as unknown as windowTesting).thisTestEvent = EventManager.eventList;
-
+        
         return nextDOM;
     }
 
