@@ -70,6 +70,9 @@ export interface ISparkyRouter {
     options: ISparkyRouterOptions;
 }
 
+export type ISparkyStoreDispatcher<T> = (store, action) => T;
+export type ISparkyStoreReturn<T> = [T, (store) => T]
+
 export interface ISparkyProps {
     [key: string]: any;
 }
@@ -157,6 +160,10 @@ export class Sparky {
         }
         
         return {...component.currentContext, indexes: keepIndexes};
+    }
+
+    static createStore<T>(newStore: T, dispatcher: ISparkyStoreDispatcher<T>): ISparkyStoreReturn<T> {
+        return [newStore, (action) => dispatcher(newStore, action)];
     }
 
     /**

@@ -7,6 +7,7 @@ import { IParams } from "./sparky.component";
 
 export type ArgumentsList = any[];
 type UpdateCallback = () => void;
+type INewStateFunction<S> = (prevState: S) => S;
 type IBoundSetCurrentState = {
     context: ISparkySelf;
     state: number;
@@ -47,7 +48,7 @@ export interface IFnCached {
     result: any;
 }
 
-export type ISetState<S> = (newState: S) => ISetState<S>;
+export type ISetState<S> = (newState: S | INewStateFunction<S>) => ISetState<S>;
 
 const getContext = () => {
     const currentContext = SparkyContext.getCurrentContext();
@@ -61,11 +62,13 @@ const setContext = (newContext: ISparkySelf) => {
     SparkyContext.resetIndexes();
 }
 
-const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S): ISetState<S> {
+const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S | ((prevState: S) => S) ): ISetState<S> {
     setContext(this.context);
     const currentContext = getContext();
     currentContext.indexes.state = this.state;
-    currentContext.cachedState[currentContext.indexes.state] = newState;
+    const prevState = currentContext.cachedState[currentContext.indexes.state];
+    currentContext.cachedState[currentContext.indexes.state] = 
+        typeof(newState) == "function" ? (newState as INewStateFunction<S>)(prevState) : newState;
     currentContext.indexes.state++;
     if (currentContext.__root) {
         SparkyContext.setCurrentContext(Sparky.mount({ 
@@ -123,4 +126,16 @@ export const Sparky__internal_history = () : IReturnRouterFunctions => {
     const getCurrentState = Sparky__currentState.bind(currentContext.__rootElement);
 
     return { goToState, goBack, goAfter, getParams, cleanHistory, getCurrentState };
+}
+
+export const Sparky__selector = () => {
+    
+}
+
+export const Sparky__dispatch = () => {
+
+}
+
+export const Sparky__store = () => {
+    
 }
