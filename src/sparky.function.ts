@@ -1,4 +1,4 @@
-import { Sparky } from "./sparky";
+import { Sparky, ISparkyStoreReturn } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { callCachedFn } from "./sparky.function.helper";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
@@ -117,7 +117,7 @@ export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: Argumen
 export const Sparky__internal_history = () : IReturnRouterFunctions => {
     const currentContext = getContext();
     if(!currentContext.__rootElement.__sparkyRoot.isRoutingEnabled)
-        throw TypeError("To use route() function, you need to pass a Sparky.router object on the mount function");
+        throw TypeError("To use router() function, you need to pass a Sparky.router object on the mount function");
     const goToState = Sparky__goToState.bind(currentContext.__rootElement);
     const goBack = Sparky__back.bind(currentContext.__rootElement);
     const goAfter = Sparky__forward.bind(currentContext.__rootElement);
@@ -128,14 +128,14 @@ export const Sparky__internal_history = () : IReturnRouterFunctions => {
     return { goToState, goBack, goAfter, getParams, cleanHistory, getCurrentState };
 }
 
-export const Sparky__selector = () => {
-    
+export const Sparky__selector = <T, S>(store: ISparkyStoreReturn<T>, callback: (state: T) => S) => {
+    return callback(store.store);
 }
 
-export const Sparky__dispatch = () => {
-
+export const Sparky__dispatch = <T>(store: ISparkyStoreReturn<T>, action: string) => {
+    store.dispatcher(action);
 }
 
-export const Sparky__store = () => {
-    
+export const Sparky__store = <T>(store: ISparkyStoreReturn<T>) => {
+    return [store.store, store.dispatcher];
 }

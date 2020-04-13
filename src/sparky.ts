@@ -11,7 +11,7 @@ import { SparkyContext, ISparkySelf } from "./sparky.context";
 import cloneDeep from "clone-deep";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected";
-import { Sparky__state, Sparky__update, Sparky__memoize, Sparky__internal_history } from "./sparky.function";
+import { Sparky__state, Sparky__update, Sparky__memoize, Sparky__internal_history, Sparky__selector } from "./sparky.function";
 import { listeningHashChange, getStateByHash, getParamsByPath } from "./sparky.router";
 
 isConnectedPolyfill();
@@ -70,8 +70,7 @@ export interface ISparkyRouter {
     options: ISparkyRouterOptions;
 }
 
-export type ISparkyStoreDispatcher<T> = (store, action) => T;
-export type ISparkyStoreReturn<T> = [T, (store) => T]
+export type ISparkyStoreReturn<T> = {store: T, dispatcher : (action: string) => void, type: string}
 
 export interface ISparkyProps {
     [key: string]: any;
@@ -162,8 +161,17 @@ export class Sparky {
         return {...component.currentContext, indexes: keepIndexes};
     }
 
-    static createStore<T>(newStore: T, dispatcher: ISparkyStoreDispatcher<T>): ISparkyStoreReturn<T> {
-        return [newStore, (action) => dispatcher(newStore, action)];
+    /**
+     * Create a Store to using it on components
+     * @param newStore Object that will be Store
+     * @param dispatcher Function that will run for changing programatically store object
+     */
+    static createStore<S>(newStore: S, dispatcher: (state: S, action: string) => S): ISparkyStoreReturn<S> {
+        return {
+            type: "SparkyStore",
+            store: newStore,
+            dispatcher: (action) => { newStore = dispatcher(newStore, action) }
+        };
     }
 
     /**
@@ -200,6 +208,8 @@ export const memoize = Sparky__memoize;
  * Returns routing functions for current mounted component
  */
 export const router = Sparky__internal_history;
+
+export const selector = Sparky__selector;
 
 /**
  * Render the html string template to HTML elements

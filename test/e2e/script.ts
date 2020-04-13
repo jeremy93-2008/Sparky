@@ -1,4 +1,4 @@
-import { Sparky, html, memoize, state, update, router} from "../../src/sparky";
+import { Sparky, html, selector, state, update, router} from "../../src/sparky";
 
 const routingState = [
     {
@@ -11,6 +11,12 @@ const routingState = [
     }
 ];
 
+const store = Sparky.createStore({
+    counter: 1
+}, (state, action) => { 
+    return action == "" ? {...state, counter: 2} : {...state, counter: 3}  
+});
+
 Sparky.mount(Sparky.router(routingState, {type: "hash"}), document.getElementById("app"))
 
 interface IProps {
@@ -19,7 +25,8 @@ interface IProps {
 
 function Main(props: IProps) {
     const [list, setList] = state([]);
-    
+    const data = selector(store, (state) => state.counter)
+    console.log(data);
     const onClick= () => {
         setList((prevState) => [...prevState, new Date().toLocaleString()]);
     }
