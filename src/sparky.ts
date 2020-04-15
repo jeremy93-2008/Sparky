@@ -11,7 +11,7 @@ import { SparkyContext, ISparkySelf } from "./sparky.context";
 import cloneDeep from "clone-deep";
 
 import { isConnectedPolyfill } from "./polyfill/isConnected";
-import { Sparky__state, Sparky__update, Sparky__memoize, Sparky__internal_history, Sparky__selector } from "./sparky.function";
+import { Sparky__state, Sparky__update, Sparky__memoize, Sparky__internal_history, Sparky__store } from "./sparky.function";
 import { listeningHashChange, getStateByHash, getParamsByPath } from "./sparky.router";
 
 isConnectedPolyfill();
@@ -70,7 +70,7 @@ export interface ISparkyRouter {
     options: ISparkyRouterOptions;
 }
 
-export type ISparkyStoreReturn<T> = {store: T, dispatcher : (action: string) => void, type: string}
+export type ISparkyStoreReturn<T> = {store: T, dispatcher : (store: ISparkyStoreReturn<T>, action: string) => void, type: string}
 
 export interface ISparkyProps {
     [key: string]: any;
@@ -170,7 +170,7 @@ export class Sparky {
         return {
             type: "SparkyStore",
             store: newStore,
-            dispatcher: (action) => { newStore = dispatcher(newStore, action) }
+            dispatcher: (store, action) => { store.store = dispatcher(store.store, action) }
         };
     }
 
@@ -209,7 +209,7 @@ export const memoize = Sparky__memoize;
  */
 export const router = Sparky__internal_history;
 
-export const selector = Sparky__selector;
+export const store = Sparky__store;
 
 /**
  * Render the html string template to HTML elements

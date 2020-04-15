@@ -128,14 +128,6 @@ export const Sparky__internal_history = () : IReturnRouterFunctions => {
     return { goToState, goBack, goAfter, getParams, cleanHistory, getCurrentState };
 }
 
-export const Sparky__selector = <T, S>(store: ISparkyStoreReturn<T>, callback: (state: T) => S) => {
-    return callback(store.store);
-}
-
-export const Sparky__dispatch = <T>(store: ISparkyStoreReturn<T>, action: string) => {
-    store.dispatcher(action);
-}
-
-export const Sparky__store = <T>(store: ISparkyStoreReturn<T>) => {
-    return [store.store, store.dispatcher];
+export const Sparky__store = <T>(store: ISparkyStoreReturn<T>): [T, (action: string) => void] => {
+    return [store.store, (action: string) => store.dispatcher(store, action)];
 }
