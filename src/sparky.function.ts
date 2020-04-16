@@ -94,7 +94,13 @@ export const Sparky__update = (callbackFn: UpdateCallback, dependenciesChanged?:
     }, { timeout: 250 });
 }
 
-export const Sparky__state = <S>(initialState: S): [S, ISetState<S>] => {
+export const Sparky__state = <S>(initialState: S | ISparkyStoreReturn<S>): [S, ISetState<S>] => {
+    if(typeof(initialState) == "object") {
+        const initialStore = initialState as ISparkyStoreReturn<S>;
+        if(initialStore.type && initialStore.type == "SparkyStore") {
+            return Sparky__store(initialStore);
+        }
+    }
     const currentContext = getContext();
     const bound = { context: currentContext, state: currentContext.indexes.state }
     const currentState = currentContext.cachedState[currentContext.indexes.state];
