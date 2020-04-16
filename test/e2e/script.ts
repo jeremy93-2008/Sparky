@@ -1,4 +1,4 @@
-import { Sparky, html, state, update, router, store} from "../../src/sparky";
+import { Sparky, html, state, router} from "../../src/sparky";
 
 const routingState = [
     {
@@ -25,9 +25,6 @@ interface IProps {
 
 function Main(props: IProps) {
     const [list, setList] = state([]);
-    const [st, dispatch] = store(storeObj);
-    dispatch("uno");
-    console.log(st);
     const onClick= () => {
         setList((prevState) => [...prevState, new Date().toLocaleString()]);
     }

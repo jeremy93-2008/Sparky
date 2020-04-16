@@ -1,4 +1,4 @@
-import { Sparky, ISparkyStoreReturn } from "./sparky";
+import { Sparky, ISparkyStore } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { callCachedFn } from "./sparky.function.helper";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
@@ -48,7 +48,7 @@ export interface IFnCached {
     result: any;
 }
 
-export type ISetState<S> = (newState: S | INewStateFunction<S>) => ISetState<S>;
+export type ISetState<S> = (newStateOrAction: S | string | INewStateFunction<S>) => void;
 
 const getContext = () => {
     const currentContext = SparkyContext.getCurrentContext();
@@ -62,7 +62,7 @@ const setContext = (newContext: ISparkySelf) => {
     SparkyContext.resetIndexes();
 }
 
-const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S | ((prevState: S) => S) ): ISetState<S> {
+const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S | ((prevState: S) => S) ) {
     setContext(this.context);
     const currentContext = getContext();
     currentContext.indexes.state = this.state;
@@ -78,7 +78,6 @@ const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S | 
             Sparky.mount({ type: "SparkyComponent", 
             context: currentContext, currentContext, renderFn: currentContext.renderFunc }, currentContext.__rootElement));
     }
-    return setCurrentState;
 }
 
 const setInitialState = <S>(newState: S): ISetState<S> => {
@@ -94,9 +93,9 @@ export const Sparky__update = (callbackFn: UpdateCallback, dependenciesChanged?:
     }, { timeout: 250 });
 }
 
-export const Sparky__state = <S>(initialState: S | ISparkyStoreReturn<S>): [S, ISetState<S>] => {
+export const Sparky__state = <S>(initialState: S | ISparkyStore<S>): [S, ISetState<S>] => {
     if(typeof(initialState) == "object") {
-        const initialStore = initialState as ISparkyStoreReturn<S>;
+        const initialStore = initialState as ISparkyStore<S>;
         if(initialStore.type && initialStore.type == "SparkyStore") {
             return Sparky__store(initialStore);
         }
@@ -134,6 +133,6 @@ export const Sparky__internal_history = () : IReturnRouterFunctions => {
     return { goToState, goBack, goAfter, getParams, cleanHistory, getCurrentState };
 }
 
-export const Sparky__store = <T>(store: ISparkyStoreReturn<T>): [T, (action: string) => void] => {
+export const Sparky__store = <T>(store: ISparkyStore<T>): [T, (action: string) => void] => {
     return [store.store, (action: string) => store.dispatcher(store, action)];
 }

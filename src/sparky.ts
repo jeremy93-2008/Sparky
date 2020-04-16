@@ -70,7 +70,7 @@ export interface ISparkyRouter {
     options: ISparkyRouterOptions;
 }
 
-export type ISparkyStoreReturn<T> = {store: T, dispatcher : (store: ISparkyStoreReturn<T>, action: string) => void, type: string}
+export type ISparkyStore<T> = {store: T, dispatcher : (store: ISparkyStore<T>, action: string) => void, type: string}
 
 export interface ISparkyProps {
     [key: string]: any;
@@ -166,7 +166,7 @@ export class Sparky {
      * @param newStore Object that will be Store
      * @param dispatcher Function that will run for changing programatically store object
      */
-    static createStore<S>(newStore: S, dispatcher: (state: S, action: string) => S): ISparkyStoreReturn<S> {
+    static createStore<S>(newStore: S, dispatcher: (state: S, action: string) => S): ISparkyStore<S> {
         return {
             type: "SparkyStore",
             store: newStore,
@@ -208,8 +208,6 @@ export const memoize = Sparky__memoize;
  * Returns routing functions for current mounted component
  */
 export const router = Sparky__internal_history;
-
-export const store = Sparky__store;
 
 /**
  * Render the html string template to HTML elements
