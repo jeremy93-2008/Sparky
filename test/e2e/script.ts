@@ -25,6 +25,9 @@ interface IProps {
 
 function Main(props: IProps) {
     const [list, setList] = state([]);
+    const [store, dispatch] = state(storeObj);
+    console.log(store);
+    dispatch("uno")
     const onClick= () => {
         setList((prevState) => [...prevState, new Date().toLocaleString()]);
     }

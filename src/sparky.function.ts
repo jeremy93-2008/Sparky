@@ -48,7 +48,7 @@ export interface IFnCached {
     result: any;
 }
 
-export type ISetState<S> = (newStateOrAction: S | string | INewStateFunction<S>) => void;
+export type ISetStateOrDispatcher<S> = (newStateOrAction: S | string | INewStateFunction<S>) => void;
 
 const getContext = () => {
     const currentContext = SparkyContext.getCurrentContext();
@@ -80,7 +80,7 @@ const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S | 
     }
 }
 
-const setInitialState = <S>(newState: S): ISetState<S> => {
+const setInitialState = <S>(newState: S): ISetStateOrDispatcher<S> => {
     const currentContext = getContext();
     currentContext.cachedState[currentContext.indexes.state] = newState;
     return setCurrentState;
@@ -93,7 +93,7 @@ export const Sparky__update = (callbackFn: UpdateCallback, dependenciesChanged?:
     }, { timeout: 250 });
 }
 
-export const Sparky__state = <S>(initialState: S | ISparkyStore<S>): [S, ISetState<S>] => {
+export const Sparky__state = <S>(initialState: S | ISparkyStore<S>): [S, ISetStateOrDispatcher<S>] => {
     if(typeof(initialState) == "object") {
         const initialStore = initialState as ISparkyStore<S>;
         if(initialStore.type && initialStore.type == "SparkyStore") {
