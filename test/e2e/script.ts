@@ -14,7 +14,7 @@ const routingState = [
 const storeObj = Sparky.createStore({
     counter: 1
 }, (state, action) => { 
-    return action == "uno" ? {counter: 2} : {counter:3};  
+    return action.type == "uno" ? {counter: 2} : {counter:3};  
 });
 
 Sparky.mount(Sparky.router(routingState, {type: "hash"}), document.getElementById("app"))
@@ -27,7 +27,7 @@ function Main(props: IProps) {
     const [list, setList] = state([]);
     const [store, dispatch] = state(storeObj);
     console.log(store);
-    dispatch("uno")
+    dispatch({ type: "uno" })
     const onClick= () => {
         setList((prevState) => [...prevState, new Date().toLocaleString()]);
     }

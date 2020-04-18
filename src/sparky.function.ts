@@ -5,7 +5,9 @@ import { SparkyContext, ISparkySelf } from "./sparky.context";
 import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, Sparky__params, Sparky__currentState } from "./sparky.router";
 import { IParams } from "./sparky.component";
 
+export type ISetStateOrDispatcher<S> = (newStateOrAction: S | IDispatcherAction | INewStateFunction<S>) => void;
 export type ArgumentsList = any[];
+export type IDispatcherAction = { [x: string]: string | number | boolean | null | undefined};
 type UpdateCallback = () => void;
 type INewStateFunction<S> = (prevState: S) => S;
 type IBoundSetCurrentState = {
@@ -47,8 +49,6 @@ export interface IFnCached {
     dependencies: string[];
     result: any;
 }
-
-export type ISetStateOrDispatcher<S> = (newStateOrAction: S | string | INewStateFunction<S>) => void;
 
 const getContext = () => {
     const currentContext = SparkyContext.getCurrentContext();
@@ -133,6 +133,6 @@ export const Sparky__internal_history = () : IReturnRouterFunctions => {
     return { goToState, goBack, goAfter, getParams, cleanHistory, getCurrentState };
 }
 
-export const Sparky__store = <T>(store: ISparkyStore<T>): [T, (action: string) => void] => {
-    return [store.store, (action: string) => store.dispatcher(store, action)];
+export const Sparky__store = <T>(store: ISparkyStore<T>): [T, (action: IDispatcherAction) => void] => {
+    return [store.store, (action: IDispatcherAction) => store.dispatcher(store, action)];
 }
