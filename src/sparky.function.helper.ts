@@ -1,10 +1,13 @@
 import { arrayAreSame } from "./sparky.helper";
-import { IFnCached, ArgumentsList } from "./sparky.function";
+import { IFnCached, IArgumentsList } from "./sparky.function";
 import { ISparkySelf } from "./sparky.context";
 
-type CachedType = "memoize" | "update";
+type ICachedType = "memoize" | "update";
 
-export function callCachedFn(context: ISparkySelf, type: CachedType, cachedArray: IFnCached[], callbackFn: Function, argumentsChanged?: ArgumentsList) {
+/**
+ * @internal
+ */
+export function callCachedFn(context: ISparkySelf, type: ICachedType, cachedArray: IFnCached[], callbackFn: Function, argumentsChanged?: IArgumentsList) {
     const fnCached = cachedArray[getIndexByType(context, type)];
     incrementIndexByType(context, type)
 
@@ -29,12 +32,19 @@ export function callCachedFn(context: ISparkySelf, type: CachedType, cachedArray
     return fnCached.result;
 }
 
-function getIndexByType(context: ISparkySelf, type: CachedType) {
+/**
+ * @internal
+ */
+function getIndexByType(context: ISparkySelf, type: ICachedType) {
     if (type == "memoize")
         return context.indexes.memo;
     return context.indexes.update;
 }
-function incrementIndexByType(context: ISparkySelf, type: CachedType) {
+
+/**
+ * @internal
+ */
+function incrementIndexByType(context: ISparkySelf, type: ICachedType) {
     if (type == "memoize")
         return ++context.indexes.memo;
     return ++context.indexes.update;

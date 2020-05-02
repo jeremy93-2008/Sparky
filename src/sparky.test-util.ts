@@ -1,12 +1,18 @@
 import { eventListSingle, EventManager } from "./sparky.eventmanager";
 import { ISparkyComponent } from "./sparky";
 
+/**
+ * @internal
+ */
 export interface IBoundMountComponent {
     testing: boolean;
     __testUtilData: ITestData;
     simulate: Function;
 }
 
+/**
+ * @internal
+ */
 export interface ITestData {
     root: HTMLElement;
     component: ISparkyComponent;
@@ -20,6 +26,9 @@ interface IReturnSelector {
     dom: HTMLElement;
 }
 
+/**
+ * @internal
+ */
 type ISimulateEvent = {
     dom: HTMLElement;
     testData: ITestData;

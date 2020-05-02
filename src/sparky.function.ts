@@ -1,19 +1,22 @@
-import { Sparky } from "./sparky";
+import { Sparky, ISparkyStore } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { callCachedFn } from "./sparky.function.helper";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
 import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, Sparky__params, Sparky__currentState } from "./sparky.router";
 import { IParams } from "./sparky.component";
 
-export type ArgumentsList = any[];
-type UpdateCallback = () => void;
+export type ISetStateOrDispatcher<S> = (newStateOrAction: S | IDispatcherAction | INewStateFunction<S>) => void;
+export type IArgumentsList = any[];
+export type IDispatcherAction = { [x: string]: string | number | boolean | null | undefined};
+type IUpdateCallback = () => void;
+type INewStateFunction<S> = (prevState: S) => S;
 type IBoundSetCurrentState = {
     context: ISparkySelf;
     state: number;
     rootElement: HTMLElement;
 };
 
-export interface IReturnRouterFunctions {
+export interface IRouterFunctions {
     /**
      * Convenience method for transitioning to a new state.
      * @params newPath to transitioning to that new state
@@ -41,14 +44,18 @@ export interface IReturnRouterFunctions {
     getCurrentState: () => void
 }
 
+/**
+ * @internal
+ */
 export interface IFnCached {
     fn: Function;
     dependencies: string[];
     result: any;
 }
 
-export type ISetState<S> = (newState: S) => ISetState<S>;
-
+/**
+ * @internal
+ */
 const getContext = () => {
     const currentContext = SparkyContext.getCurrentContext();
     if (!currentContext)
@@ -56,16 +63,24 @@ const getContext = () => {
     return currentContext;
 }
 
+/**
+ * @internal
+ */
 const setContext = (newContext: ISparkySelf) => {
     SparkyContext.setCurrentContext(newContext);
     SparkyContext.resetIndexes();
 }
 
-const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S): ISetState<S> {
+/**
+ * @internal
+ */
+const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S | ((prevState: S) => S) ) {
     setContext(this.context);
     const currentContext = getContext();
     currentContext.indexes.state = this.state;
-    currentContext.cachedState[currentContext.indexes.state] = newState;
+    const prevState = currentContext.cachedState[currentContext.indexes.state];
+    currentContext.cachedState[currentContext.indexes.state] = 
+        typeof(newState) == "function" ? (newState as INewStateFunction<S>)(prevState) : newState;
     currentContext.indexes.state++;
     if (currentContext.__root) {
         SparkyContext.setCurrentContext(Sparky.mount({ 
@@ -75,23 +90,37 @@ const setCurrentState = function <S>(this: IBoundSetCurrentState, newState: S): 
             Sparky.mount({ type: "SparkyComponent", 
             context: currentContext, currentContext, renderFn: currentContext.renderFunc }, currentContext.__rootElement));
     }
-    return setCurrentState;
 }
 
-const setInitialState = <S>(newState: S): ISetState<S> => {
+/**
+ * @internal
+ */
+const setInitialState = <S>(newState: S): ISetStateOrDispatcher<S> => {
     const currentContext = getContext();
     currentContext.cachedState[currentContext.indexes.state] = newState;
     return setCurrentState;
 }
 
-export const Sparky__update = (callbackFn: UpdateCallback, dependenciesChanged?: ArgumentsList) => {
+/**
+ * @internal
+ */
+export const Sparky__update = (callbackFn: IUpdateCallback, dependenciesChanged?: IArgumentsList) => {
     const currentContext = getContext();
     window.requestIdleCallback(() => {
         callCachedFn(currentContext, "update", currentContext.cachedUpdate, callbackFn, dependenciesChanged)
     }, { timeout: 250 });
 }
 
-export const Sparky__state = <S>(initialState: S): [S, ISetState<S>] => {
+/**
+ * @internal
+ */
+export const Sparky__state = <S>(initialState: S | ISparkyStore<S>): [S, ISetStateOrDispatcher<S>] => {
+    if(typeof(initialState) == "object") {
+        const initialStore = initialState as ISparkyStore<S>;
+        if(initialStore.type && initialStore.type == "SparkyStore") {
+            return Sparky__store(initialStore);
+        }
+    }
     const currentContext = getContext();
     const bound = { context: currentContext, state: currentContext.indexes.state }
     const currentState = currentContext.cachedState[currentContext.indexes.state];
@@ -106,15 +135,21 @@ export const Sparky__state = <S>(initialState: S): [S, ISetState<S>] => {
     return [currentContext.cachedState[lastIndex] as S, setState.bind(bound)];
 }
 
-export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: ArgumentsList) => {
+/**
+ * @internal
+ */
+export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: IArgumentsList) => {
     const currentContext = getContext();
     callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged)
 }
 
-export const Sparky__internal_history = () : IReturnRouterFunctions => {
+/**
+ * @internal
+ */
+export const Sparky__internal_history = () : IRouterFunctions => {
     const currentContext = getContext();
     if(!currentContext.__rootElement.__sparkyRoot.isRoutingEnabled)
-        throw TypeError("To use route() function, you need to pass a Sparky.router object on the mount function");
+        throw TypeError("To use router() function, you need to pass a Sparky.router object on the mount function");
     const goToState = Sparky__goToState.bind(currentContext.__rootElement);
     const goBack = Sparky__back.bind(currentContext.__rootElement);
     const goAfter = Sparky__forward.bind(currentContext.__rootElement);
@@ -123,4 +158,11 @@ export const Sparky__internal_history = () : IReturnRouterFunctions => {
     const getCurrentState = Sparky__currentState.bind(currentContext.__rootElement);
 
     return { goToState, goBack, goAfter, getParams, cleanHistory, getCurrentState };
+}
+
+/**
+ * @internal
+ */
+export const Sparky__store = <T>(store: ISparkyStore<T>): [T, (action: IDispatcherAction) => void] => {
+    return [store.store, (action: IDispatcherAction) => store.dispatcher(store, action)];
 }

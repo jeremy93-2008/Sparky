@@ -1,4 +1,4 @@
-import { Sparky, html, memoize, state, update, router} from "../../src/sparky";
+import { Sparky, html, state, router} from "../../src/sparky";
 
 const routingState = [
     {
@@ -11,6 +11,12 @@ const routingState = [
     }
 ];
 
+const storeObj = Sparky.createStore({
+    counter: 1
+}, (state, action) => { 
+    return action.type == "uno" ? {counter: 2} : {counter:3};  
+});
+
 Sparky.mount(Sparky.router(routingState, {type: "hash"}), document.getElementById("app"))
 
 interface IProps {
@@ -18,67 +24,22 @@ interface IProps {
 }
 
 function Main(props: IProps) {
-    const { goBack, goToState, goAfter, getParams,getCurrentState } = router();
-    const [name, setName] = state("Hugo");
-    const [text, setText] = state(["The world"]); 
-    const [input, setInput] = state("");
-
-    memoize((du) => {
-        console.log("Memo :) " + du);
-    }, [name]);
-
-    memoize((du) => {
-        console.log("Memo 2 :) " + du);
-    }, [text]);
-
-    update(() => {
-        console.log("after dom render");
-        console.log(getCurrentState())
-        console.log(document.getElementById("uno").innerHTML);
-    }, [])
-
-    const route = () => {
-        goToState("dos/tres/15")
-    }
-
-    const back = () => {
-        goBack()
-    }
-
-    const after = () => {
-        goAfter()
-    }
-
-    const onClick = (event) => {
-        setName("Jeremy");
-        setText(["Hola","Buenas","Adios"]);
-    }
-
-    const onInput = (event: Event) => {
-        setInput((event.target as HTMLInputElement).value)
+    const [list, setList] = state([]);
+    const [store, dispatch] = state(storeObj);
+    console.log(store);
+    dispatch({ type: "uno" })
+    const onClick= () => {
+        setList((prevState) => [...prevState, new Date().toLocaleString()]);
     }
 
     return html`
-        <div id="uno" class="lol">
-            Hola a todos ${ name !== "Hugo" ? html`<b onclick=${onClick}>${name}</b>` : `no hay nada`}
-            <button onclick=${onClick}>Hey!</button>
-            <div>
-                <div>${Sparky.component(Span, {name})}</div>
-            </div>
-            <div>
-                ${getParams().map((elm) => Object.entries(elm))}
-            </div>
-            ${Sparky.component(SpanNest)}
-            <input id="text" type="text" oninput=${onInput} />
-            <a onclick=${route}>A Dos</a>
-            <a onclick=${back}>A Back</a>
-            <a onclick=${after}>A After</a>
-            <span>${input}</span>
+        <div>
+            <button onclick=${onClick}>Hola</button>
             <ul>
-                ${text.map(t => `<li>${t}</li>`)}
+                ${list.map(item => `<li>${item}</li>`)}
             </ul>
         </div>
-    `;    
+    `;
 }
 
 function SpanNest(props: IProps) {

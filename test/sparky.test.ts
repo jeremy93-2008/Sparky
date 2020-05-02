@@ -143,6 +143,25 @@ describe("Mount function", () => {
         // console.log(document.getElementById("app").innerHTML)
         expect(document.getElementById("app")).toMatchSnapshot()
     });
+    test("Computed w/ Store function", () => {
+        const storeObj = Sparky.createStore({
+            counter: 1
+        }, (state, action) => { 
+            return action.type == "uno" ? {counter: 2} : {counter:3};  
+        });
+        
+        Sparky.mount(Sparky.component(() => {
+            const [store, dispatch] = state(storeObj);
+            dispatch({ type: "uno" });
+            return html /*html*/`
+            <div>
+                <p>Hola a todos ${store.counter}</p>
+            </div>
+            `
+        }), document.getElementById("app"));
+        // console.log(document.getElementById("app").innerHTML)
+        expect(document.getElementById("app")).toMatchSnapshot()
+    });
     test("Computed, State w/ Event function", () => {
         const test = SparkyTest.test(() => {
             Sparky.mount(Sparky.component(() => {

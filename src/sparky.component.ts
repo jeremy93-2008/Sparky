@@ -26,11 +26,17 @@ export interface HTMLElementSparkyEnhanced extends HTMLElement {
     __sparkyRoot?: ISparkyRoot;
 }
 
+/**
+ * @internal
+ */
 interface ICachedComponent {
     component: ISparkyComponent,
     dom: HTMLElement
 }
 
+/**
+ * @internal
+ */
 export class SparkyComponent {
     private static cachedComponent: ICachedComponent[][] = [];
     static populate(nextDOM: HTMLElement, render: IRenderReturn, rootComponent: ISparkyComponent) {
@@ -108,6 +114,9 @@ export class SparkyComponent {
     }
 }
 
+/**
+ * @internal
+ */
 function getCachedComponent(cached: ICachedComponent, currentComp: ISparkyComponent) {
     cached.component.context.props = currentComp.context.props;
     currentComp = cached.component;
