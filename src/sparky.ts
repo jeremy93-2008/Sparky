@@ -124,7 +124,8 @@ export class Sparky {
      * @param dom The dom element where you want to mount this component
      */
     static mount(element: ISparkyComponent | ISparkyRouter, dom: HTMLElementSparkyEnhanced): ISparkySelf {
-        if (process.env.NODE_ENV === 'development')
+        const processEnvNode = createProcessIfNotExist();
+        if (processEnvNode === 'development')
             console.time();
         
         const component = ((element.type == "SparkyComponent") ? element : (element as ISparkyRouter).component) as ISparkyComponent 
@@ -156,7 +157,7 @@ export class Sparky {
 
         EventManager.listen(finalDOM);
 
-        if (process.env.NODE_ENV === 'development')
+        if (processEnvNode === 'development')
             console.timeEnd();
 
         if(typeof thisTest != "undefined" && thisTest.testing) {
@@ -192,6 +193,13 @@ export class Sparky {
     static reconciliate(oldNode: HTMLElement, newNode: HTMLElement) {
         return reconciliate(oldNode, newNode)
     }
+}
+
+function createProcessIfNotExist() {
+    if(typeof process !== "undefined" && process.env) {
+        return process.env.NODE_ENV;
+    };
+    return "production";
 }
 
 /**
