@@ -1,5 +1,8 @@
-import { IFnCached, ArgumentsList } from "./sparky.function";
+import { IFnCached, IArgumentsList } from "./sparky.function";
 import { ISparkySelf } from "./sparky.context";
-declare type CachedType = "memoize" | "update";
-export declare function callCachedFn(context: ISparkySelf, type: CachedType, cachedArray: IFnCached[], callbackFn: Function, argumentsChanged?: ArgumentsList): any;
+declare type ICachedType = "memoize" | "update";
+/**
+ * @internal
+ */
+export declare function callCachedFn(context: ISparkySelf, type: ICachedType, cachedArray: IFnCached[], callbackFn: Function, argumentsChanged?: IArgumentsList): any;
 export {};

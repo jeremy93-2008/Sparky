@@ -1,6 +1,9 @@
 import { ISparkyProps, ISparkyState, ISparkyComponent, IRenderReturn } from "./sparky";
 import { IFnCached } from "./sparky.function";
 import { HTMLElementSparkyEnhanced } from "./sparky.component";
+/**
+ * @internal
+ */
 export interface ISparkySelf {
     props: ISparkyProps;
     state?: ISparkyState;
@@ -18,6 +21,9 @@ export interface ISparkySelf {
     __rootElement?: HTMLElementSparkyEnhanced;
     renderFunc: (props?: any) => IRenderReturn;
 }
+/**
+ * @internal
+ */
 export declare class SparkyContext {
     private static __context;
     private static __defaultContext;

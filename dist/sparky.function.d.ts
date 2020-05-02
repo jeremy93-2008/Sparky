@@ -1,8 +1,14 @@
+import { ISparkyStore } from "./sparky";
 import 'requestidlecallback-polyfill';
 import { IParams } from "./sparky.component";
-export declare type ArgumentsList = any[];
-declare type UpdateCallback = () => void;
-export interface IReturnRouterFunctions {
+export declare type ISetStateOrDispatcher<S> = (newStateOrAction: S | IDispatcherAction | INewStateFunction<S>) => void;
+export declare type IArgumentsList = any[];
+export declare type IDispatcherAction = {
+    [x: string]: string | number | boolean | null | undefined;
+};
+declare type IUpdateCallback = () => void;
+declare type INewStateFunction<S> = (prevState: S) => S;
+export interface IRouterFunctions {
     /**
      * Convenience method for transitioning to a new state.
      * @params newPath to transitioning to that new state
@@ -29,14 +35,32 @@ export interface IReturnRouterFunctions {
      */
     getCurrentState: () => void;
 }
+/**
+ * @internal
+ */
 export interface IFnCached {
     fn: Function;
     dependencies: string[];
     result: any;
 }
-export declare type ISetState<S> = (newState: S) => ISetState<S>;
-export declare const Sparky__update: (callbackFn: UpdateCallback, dependenciesChanged?: ArgumentsList) => void;
-export declare const Sparky__state: <S>(initialState: S) => [S, ISetState<S>];
-export declare const Sparky__memoize: (callbackFn: Function, argumentsChanged?: ArgumentsList) => void;
-export declare const Sparky__internal_history: () => IReturnRouterFunctions;
+/**
+ * @internal
+ */
+export declare const Sparky__update: (callbackFn: IUpdateCallback, dependenciesChanged?: IArgumentsList) => void;
+/**
+ * @internal
+ */
+export declare const Sparky__state: <S>(initialState: S | ISparkyStore<S>) => [S, ISetStateOrDispatcher<S>];
+/**
+ * @internal
+ */
+export declare const Sparky__memoize: (callbackFn: Function, argumentsChanged?: IArgumentsList) => void;
+/**
+ * @internal
+ */
+export declare const Sparky__internal_history: () => IRouterFunctions;
+/**
+ * @internal
+ */
+export declare const Sparky__store: <T>(store: ISparkyStore<T>) => [T, (action: IDispatcherAction) => void];
 export {};

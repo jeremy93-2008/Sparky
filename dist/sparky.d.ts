@@ -2,6 +2,7 @@ import 'mdn-polyfills/Array.from';
 import 'mdn-polyfills/Array.prototype.find';
 import { HTMLElementSparkyEnhanced, IParams } from "./sparky.component";
 import { ISparkySelf } from "./sparky.context";
+import { IDispatcherAction } from "./sparky.function";
 export interface IRenderReturn {
     type: string;
     html: string;
@@ -16,11 +17,14 @@ export interface IStateRoute {
     path: string;
     component: ISparkyComponent;
 }
+/**
+ * @internal
+ */
 export interface IReconciliateProps {
     dom: HTMLElement;
     func: ISparkyEventFunc[];
 }
-export declare type ISelfFunction = (props?: any) => IRenderReturn;
+export declare type ISparkyFunction = (props?: any) => IRenderReturn;
 export interface ISparkyEventFunc {
     renderId: string;
     index: number;
@@ -30,7 +34,7 @@ export interface ISparkyComponent {
     type: string;
     context: ISparkySelf;
     currentContext: ISparkySelf;
-    renderFn: ISelfFunction;
+    renderFn: ISparkyFunction;
 }
 export interface ISparkyRouterOptions {
     type?: "hash" | "abstract" | "browser";
@@ -45,17 +49,21 @@ export interface ISparkyRouter {
     params: IParams[];
     options: ISparkyRouterOptions;
 }
+export declare type ISparkyStore<T> = {
+    store: T;
+    dispatcher: (store: ISparkyStore<T>, action: IDispatcherAction) => void;
+    type: string;
+};
 export interface ISparkyProps {
     [key: string]: any;
 }
 export declare type ISparkyState = ISparkyProps;
 export declare class Sparky {
-    static _DEV_: boolean;
     /**
      * Generate a Sparky Component that can be mount.
      * @param renderFunc The function that going to be execute to render html template
      */
-    static component(renderFunc: ISelfFunction, props?: ISparkyProps): ISparkyComponent;
+    static component(renderFunc: ISparkyFunction, props?: ISparkyProps): ISparkyComponent;
     /**
      * Create a routing component that manage history
      * @param stateRoute
@@ -68,7 +76,14 @@ export declare class Sparky {
      */
     static mount(element: ISparkyComponent | ISparkyRouter, dom: HTMLElementSparkyEnhanced): ISparkySelf;
     /**
+     * Create a Store to using it on components
+     * @param newStore Object that will be Store
+     * @param dispatcher Function that will run for changing programatically store object
+     */
+    static createStore<S>(newStore: S, dispatcher: (state: S, action: IDispatcherAction) => S): ISparkyStore<S>;
+    /**
      * Reconciliate the current DOM with the new DOM Node
+     * @internal
      * @param oldNode Node that need to be reconcile
      * @param newNode Node that have the new elements
      */
@@ -79,22 +94,22 @@ export declare class Sparky {
  * @param callbackFn - The function to run
  * @param dependenciesChanged - Array of values that the function depends on
  */
-export declare const update: (callbackFn: () => void, dependenciesChanged?: import("./sparky.function").ArgumentsList) => void;
+export declare const update: (callbackFn: () => void, dependenciesChanged?: import("./sparky.function").IArgumentsList) => void;
 /**
  * Returns a stateful value, and a function to update it.
  * @param initialState The value during the first render
  */
-export declare const state: <S>(initialState: S) => [S, import("./sparky.function").ISetState<S>];
+export declare const state: <S>(initialState: S | ISparkyStore<S>) => [S, import("./sparky.function").ISetStateOrDispatcher<S>];
 /**
  * Run and returns a memoized value
  * @param callbackFn - Function will be run on rendering phase
  * @param argumentsChanged - Array of values that the function depends on
  */
-export declare const memoize: (callbackFn: Function, argumentsChanged?: import("./sparky.function").ArgumentsList) => void;
+export declare const memoize: (callbackFn: Function, argumentsChanged?: import("./sparky.function").IArgumentsList) => void;
 /**
  * Returns routing functions for current mounted component
  */
-export declare const router: () => import("./sparky.function").IReturnRouterFunctions;
+export declare const router: () => import("./sparky.function").IRouterFunctions;
 /**
  * Render the html string template to HTML elements
  * @param html Array of HTML String
@@ -102,4 +117,8 @@ export declare const router: () => import("./sparky.function").IReturnRouterFunc
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
  */
 export declare function html(html: TemplateStringsArray | string, ...computedProps: any[]): IRenderReturn;
+/**
+ * @internal
+ * @param html
+ */
 export declare function renderToDOMNode(html: string): HTMLElement;

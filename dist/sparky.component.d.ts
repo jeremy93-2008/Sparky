@@ -21,6 +21,9 @@ export interface HTMLElementSparkyEnhanced extends HTMLElement {
     __sparkyEvent?: IEventSingle;
     __sparkyRoot?: ISparkyRoot;
 }
+/**
+ * @internal
+ */
 export declare class SparkyComponent {
     private static cachedComponent;
     static populate(nextDOM: HTMLElement, render: IRenderReturn, rootComponent: ISparkyComponent): HTMLElement;

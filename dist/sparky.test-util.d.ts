@@ -1,10 +1,16 @@
 import { eventListSingle } from "./sparky.eventmanager";
 import { ISparkyComponent } from "./sparky";
+/**
+ * @internal
+ */
 export interface IBoundMountComponent {
     testing: boolean;
     __testUtilData: ITestData;
     simulate: Function;
 }
+/**
+ * @internal
+ */
 export interface ITestData {
     root: HTMLElement;
     component: ISparkyComponent;
