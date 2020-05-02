@@ -58,6 +58,27 @@ exports[`Mount function Computed w/ State function 1`] = `
 </div>
 `;
 
+exports[`Mount function Computed w/ Store function 1`] = `
+<div
+  id="app"
+>
+  <div>
+    
+                
+    <p>
+      Hola a todos 
+      <span
+        class="computed"
+      >
+        1
+      </span>
+    </p>
+    
+            
+  </div>
+</div>
+`;
+
 exports[`Mount function Computed, State w/ Event function 1`] = `
 <div
   id="app"
