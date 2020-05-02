@@ -16,7 +16,13 @@ import { listeningHashChange, getStateByHash, getParamsByPath } from "./sparky.r
 
 isConnectedPolyfill();
 
+/**
+ * @internal
+ */
 declare var thisTest;
+/**
+ * @internal
+ */
 declare var thisTestEvent;
 
 export interface IRenderReturn {
@@ -35,12 +41,15 @@ export interface IStateRoute {
     component: ISparkyComponent;
 }
 
+/**
+ * @internal
+ */
 export interface IReconciliateProps {
     dom: HTMLElement,
     func: ISparkyEventFunc[],
 }
 
-export type ISelfFunction = (props?: any) => IRenderReturn;
+export type ISparkyFunction = (props?: any) => IRenderReturn;
 
 export interface ISparkyEventFunc {
     renderId: string;
@@ -52,7 +61,7 @@ export interface ISparkyComponent {
     type: string;
     context: ISparkySelf;
     currentContext: ISparkySelf;
-    renderFn: ISelfFunction;
+    renderFn: ISparkyFunction;
 }
 
 export interface ISparkyRouterOptions {
@@ -84,7 +93,7 @@ export class Sparky {
      * Generate a Sparky Component that can be mount.
      * @param renderFunc The function that going to be execute to render html template
      */
-    static component(renderFunc: ISelfFunction, props?: ISparkyProps) {
+    static component(renderFunc: ISparkyFunction, props?: ISparkyProps) {
         const sparkyContext = SparkyContext.newContext({ props, renderFunc });
         return { type: "SparkyComponent", context: sparkyContext, currentContext: sparkyContext, renderFn: renderFunc } as ISparkyComponent;
     }
@@ -176,6 +185,7 @@ export class Sparky {
 
     /**
      * Reconciliate the current DOM with the new DOM Node
+     * @internal
      * @param oldNode Node that need to be reconcile
      * @param newNode Node that have the new elements
      */
@@ -235,6 +245,16 @@ export function html(html: TemplateStringsArray | string, ...computedProps: any[
     return { type: "SparkyRender", html: innerHTML, func, nestedComponents, children, renderId };
 }
 
+/**
+ * @internal
+ * @param computedProps 
+ * @param i 
+ * @param func 
+ * @param htmlLine 
+ * @param nestedComponents 
+ * @param children 
+ * @param renderId 
+ */
 function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFunc[], htmlLine: string, nestedComponents: ISparkyComponent[], children: IRenderReturn[], renderId: string) {
     if (typeof computedProps[i] == "function") {
         func.push({ index: func.length - 1, renderId, func: computedProps[i] });
@@ -262,6 +282,11 @@ function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFun
     return htmlLine;
 }
 
+/**
+ * @internal
+ * @param dom 
+ * @param element 
+ */
 function initialiseDOM(dom: HTMLElementSparkyEnhanced, element: ISparkyComponent | ISparkyRouter) {
     if (dom && !dom.__sparkyRoot) {
         setRootProperties(dom);
@@ -284,6 +309,10 @@ function initialiseDOM(dom: HTMLElementSparkyEnhanced, element: ISparkyComponent
     ;
 }
 
+/**
+ * @internal
+ * @param dom 
+ */
 function setRootProperties(dom: HTMLElementSparkyEnhanced) {
     dom.__sparkyRoot = { 
         id: nanoid(12),
@@ -300,6 +329,10 @@ function setRootProperties(dom: HTMLElementSparkyEnhanced) {
     };
 }
 
+/**
+ * @internal
+ * @param html 
+ */
 export function renderToDOMNode(html: string) {
     const div = document.createElement("div");
     div.innerHTML = html;

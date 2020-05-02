@@ -4,6 +4,9 @@ import { ISparkyProps, ISparkyState, ISparkyComponent, IRenderReturn } from "./s
 import { IFnCached } from "./sparky.function";
 import { HTMLElementSparkyEnhanced } from "./sparky.component";
 
+/**
+ * @internal
+ */
 export interface ISparkySelf {
     props: ISparkyProps;
     state?: ISparkyState;
@@ -22,6 +25,9 @@ export interface ISparkySelf {
     renderFunc: (props?: any) => IRenderReturn;
 }
 
+/**
+ * @internal
+ */
 const emptyContext: ISparkySelf = {
     __rootElement: null,
     __root: null,
@@ -39,6 +45,9 @@ const emptyContext: ISparkySelf = {
     renderFunc: null
 };
 
+/**
+ * @internal
+ */
 export class SparkyContext {
     private static __context: ISparkySelf
     private static __defaultContext : ISparkySelf = emptyContext

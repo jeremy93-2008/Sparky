@@ -1,8 +1,14 @@
+/**
+ * @internal
+ */
 interface ISortArray {
     bigArray: any[];
     smallArray: any[];
 }
 
+/**
+ * @internal
+ */
 export function arrayAreSame(array1: any[], array2: any[]) {
     const { bigArray, smallArray } = sortArrayInObject(array1, array2);
 
@@ -11,6 +17,9 @@ export function arrayAreSame(array1: any[], array2: any[]) {
     })
 }
 
+/**
+ * @internal
+ */
 function sortArrayInObject(array1: any[], array2: any[]): ISortArray {
     const length_1 = array1.length;
     const length_2 = array2.length;

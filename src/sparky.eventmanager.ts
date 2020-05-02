@@ -4,9 +4,16 @@ import { HTMLElementSparkyEnhanced } from "./sparky.component";
 
 isConnectedPolyfill();
 
+/**
+ * @internal
+ */
 interface windowTesting extends Window {
     thisTestEvent: eventListSingle[]
 }
+
+/**
+ * @internal
+ */
 export interface eventListSingle {
     dom: HTMLElement;
     type: string;
@@ -14,14 +21,24 @@ export interface eventListSingle {
     callbackFn: eventCallbackFn;
 }
 
+/**
+ * @internal
+ */
 export interface IEventSingle {
     type: string;
     context: ISparkySelf;
     callbackFn: eventCallbackFn;
 }
 
+
+/**
+ * @internal
+ */
 export type eventCallbackFn = (evt: Event) => void;
 
+/**
+ * @internal
+ */
 export class EventManager {
     static oldEventType: string[] = [];
     static eventList: eventListSingle[] = [];

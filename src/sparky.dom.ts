@@ -1,5 +1,8 @@
 import { HTMLElementSparkyEnhanced } from "./sparky.component";
 
+/**
+ * @internal
+ */
 export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
     if (!nextDom) return null;
     if (!currentDom && nextDom) return nextDom;
@@ -65,6 +68,9 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
     return currentDom;
 }
 
+/**
+ * @internal
+ */
 function reconciliateAttribute(currentElem: HTMLElement, nextElem: HTMLElement) {
     if(!currentElem.attributes || !nextElem.attributes) return;
 
@@ -100,6 +106,9 @@ function reconciliateAttribute(currentElem: HTMLElement, nextElem: HTMLElement) 
     removedAttr.forEach(attr => currentElem.removeAttribute(attr.name))
 }
 
+/**
+ * @internal
+ */
 function attributeSort(a: Attr, b: Attr) {
     return (a.name < b.name ? -1 : (a.name > b.name ? 1 : 0));
 }

@@ -1,13 +1,20 @@
 import { IStateRoute, Sparky } from "./sparky"
 import { HTMLElementSparkyEnhanced, ISparkyRoot, IParams } from "./sparky.component";
-
+/**
+ * @internal
+ */
 declare var thisTest;
 export type IRoutingTypes = "browser" | "hash" | "abstract";
-
+/**
+ * @internal
+ */
 export interface documentSparkyEnhanced extends Document {
     __sparkyRoutingId: string;
 }
 
+/**
+ * @internal
+ */
 export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Function, dom: HTMLElementSparkyEnhanced) {
     if(!dom.__sparkyRoot.isRoutingEnabled)
         throw TypeError("To use route() function, you need to pass a Sparky.router object on the mount function");
@@ -28,6 +35,9 @@ export function listeningHashChange(stateRoute: IStateRoute[], callbackFn: Funct
     }
 }
 
+/**
+ * @internal
+ */
 function changeStateByEvent(evt: HashChangeEvent, stateRoute: IStateRoute[], callbackFn: Function, dom: HTMLElementSparkyEnhanced) {
     const documentSparky = document as documentSparkyEnhanced;
 
@@ -53,6 +63,9 @@ function changeStateByEvent(evt: HashChangeEvent, stateRoute: IStateRoute[], cal
     documentSparky.__sparkyRoutingId = dom.__sparkyRoot.id;
 }
 
+/**
+ * @internal
+ */
 export function getStateByHash(stateRoute: IStateRoute[], newPath: string) {
     return stateRoute.find((state, i) => {
         if (typeof state.path == "string") {
@@ -63,7 +76,9 @@ export function getStateByHash(stateRoute: IStateRoute[], newPath: string) {
     }) || {...stateRoute[0], exact: false};
 }
 
-
+/**
+ * @internal
+ */
 export function pushToAbstractHistory(sparkyRoot: ISparkyRoot, stateRoute: IStateRoute) {
     if(sparkyRoot.historyIndex < (history.length - 1)) {
         sparkyRoot.history = sparkyRoot.history.slice(0, sparkyRoot.historyIndex + 1)
@@ -72,6 +87,9 @@ export function pushToAbstractHistory(sparkyRoot: ISparkyRoot, stateRoute: IStat
     sparkyRoot.historyIndex = sparkyRoot.history.length - 1;
 }
 
+/**
+ * @internal
+ */
 export function Sparky_cleanHistory(this: HTMLElementSparkyEnhanced) {
     this.__sparkyRoot.history = [];
     this.__sparkyRoot.historyIndex = 0;
@@ -79,6 +97,9 @@ export function Sparky_cleanHistory(this: HTMLElementSparkyEnhanced) {
     location.hash = "";
 } 
 
+/**
+ * @internal
+ */
 export function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPath: string) {
     let { routing, type, basename } = this.__sparkyRoot;
     const routeState = getStateByHash(routing, newPath);
@@ -94,6 +115,10 @@ export function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPath: stri
     pushToAbstractHistory(this.__sparkyRoot, routeState);
     Sparky.mount(routeState.component, this);
 }
+
+/**
+ * @internal
+ */
 export function Sparky__back(this: HTMLElementSparkyEnhanced) {
     let { history, type, basename } = this.__sparkyRoot;
     if (this.__sparkyRoot.historyIndex - 1 < 0) return;
@@ -109,6 +134,9 @@ export function Sparky__back(this: HTMLElementSparkyEnhanced) {
     Sparky.mount(state.component, this);
 }
 
+/**
+ * @internal
+ */
 export function Sparky__forward(this: HTMLElementSparkyEnhanced) {
     let { history, type, basename } = this.__sparkyRoot;
     if (this.__sparkyRoot.historyIndex + 1 > history.length - 1) return; 
@@ -124,16 +152,25 @@ export function Sparky__forward(this: HTMLElementSparkyEnhanced) {
     Sparky.mount(state.component, this)
 }
 
+/**
+ * @internal
+ */
 export function Sparky__params(this: HTMLElementSparkyEnhanced) {
     const { params } = this.__sparkyRoot;
     return params;
 }
 
+/**
+ * @internal
+ */
 export function Sparky__currentState(this: HTMLElementSparkyEnhanced) {
     const { history, historyIndex } = this.__sparkyRoot;
     return history[historyIndex];
 }
 
+/**
+ * @internal
+ */
 export function getParamsByPath(path:string, url: string): IParams[] {
     if(path.includes("*")) {  
         const pathArray = path.split("*");  
@@ -158,6 +195,9 @@ export function getParamsByPath(path:string, url: string): IParams[] {
     return params;
 }
 
+/**
+ * @internal
+ */
 export function matchUrl(path:string, url: string) {
     if(path.includes("*")) {
         const pathArray = path.split("*");
