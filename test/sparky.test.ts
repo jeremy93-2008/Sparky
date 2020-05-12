@@ -75,6 +75,28 @@ describe("Diff method", () => {
         </ul></div>`).html);
     });
 
+    test("Adding a new nodes inserting it before old one by diff", () => {
+        const currentDom = renderToDOMNode(html(`<div>Hola a todos <ul>
+            <li>Hola</li>
+            <li>Adios</li>
+            <li>Buenas</li>
+        </ul></div>`).html);
+        const diff = Sparky.reconciliate(currentDom, renderToDOMNode(html(`<div>Hola a todos <ul>
+            <li>Hola</li>
+            <li>Adios</li>
+            <li>Uno</li>
+            <li>Buenas</li>
+        </ul></div>`).html));
+
+        expect(diff).toBe(currentDom);
+        expect(diff.outerHTML).toBe(html(`<div>Hola a todos <ul>
+            <li>Hola</li>
+            <li>Adios</li>
+            <li>Uno</li>
+            <li>Buenas</li>
+        </ul></div>`).html);
+    });
+
     test("Add new attributes to an element", () => {
         const currentDom = renderToDOMNode(html(`<div>Hola a todos <b>Before</b></div>`).html);
         const diff = Sparky.reconciliate(currentDom, renderToDOMNode(html(`<div>Hola a todos <b class='selected'>After</b></div>`).html));
@@ -111,7 +133,7 @@ describe("Diff method", () => {
 describe("Mount function", () => {
     test("Basic function", () => {
         Sparky.mount(Sparky.component(() => {
-            return html /*html*/`
+            return html `
             <div>
                 <p>Hola a todos</p>
             </div>
@@ -207,7 +229,12 @@ describe("Mount function", () => {
 
                 update(() => {
                     console.log("Update!")
-                })
+                }, [])
+
+                update(() => {
+                    console.log("Update!")
+                    setA("" + Date.now())
+                }, [])
 
                 const onClick = () => {
                     setA("10")

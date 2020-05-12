@@ -1,8 +1,5 @@
 import nanoid from "nanoid/non-secure";
 
-import 'mdn-polyfills/Array.from';
-import 'mdn-polyfills/Array.prototype.find';
-
 import { reconciliate } from "./sparky.dom";
 import { EventManager } from "./sparky.eventmanager";
 import { SparkyComponent, HTMLElementSparkyEnhanced, IParams } from "./sparky.component";
@@ -10,11 +7,8 @@ import { SparkyContext, ISparkySelf } from "./sparky.context";
 
 import cloneDeep from "clone-deep";
 
-import { isConnectedPolyfill } from "./polyfill/isConnected";
 import { Sparky__state, Sparky__update, Sparky__memoize, Sparky__internal_history, Sparky__store, IDispatcherAction } from "./sparky.function";
 import { listeningHashChange, getStateByHash, getParamsByPath } from "./sparky.router";
-
-isConnectedPolyfill();
 
 /**
  * @internal
@@ -279,13 +273,9 @@ function getComputedValue(computedProps: any[], i: number, func: ISparkyEventFun
         nestedComponents.push(comp);
     }
     else {
-
         computedProps[i] = Array.isArray(computedProps[i]) ?
             computedProps[i].join("") : new String(computedProps[i]);
-        if ((computedProps[i] as string).startsWith("<"))
-            htmlLine += computedProps[i];
-        else
-            htmlLine += `<span class='computed'>${computedProps[i]}</span>`;
+        htmlLine += computedProps[i];
     }
     return htmlLine;
 }

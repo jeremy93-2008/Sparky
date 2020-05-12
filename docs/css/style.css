@@ -1,0 +1,208 @@
+body {
+    margin: 0;
+}
+
+#app {
+    font-family: "Open Sans";
+}
+.header {
+    display: flex;
+    position: relative;
+    background: #7281f5;
+    z-index: 2;
+    font-family: "Montserrat";
+    justify-content: space-between;
+    padding: 5px 10px;
+}
+.header .logo {
+    cursor: pointer;
+}
+.header .logo a {
+    text-decoration: none;
+}
+.header .logo img {
+    width: 48px;
+    vertical-align: middle;
+}
+.header h2 {
+    display: inline-block;
+    vertical-align: middle;
+    color: white;
+}
+.header ul {
+    align-self: center;
+    margin-right: 10px;
+}
+.header ul, .header ul li {
+    display: inline-block;
+    cursor: default;
+}
+
+.header ul li {
+    cursor: pointer;
+    margin:0 10px;
+}
+
+.header ul li a {
+    text-decoration: none;
+    color: white;
+}
+
+.header ul li .border {
+    background-color: white;
+    margin-top: 2px;
+    margin-bottom: -2px;
+    margin-left: 50%;
+    width: 0;
+    height: 2px;
+    transition: width .1s linear, margin-left .1s linear;
+}
+
+.header ul li:hover .border {
+    margin-left: 0;
+    width: 100%;
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 0;
+    margin-top: -15px;
+    padding-top: 15px;
+    height: 40vh;
+    background-color: #8a97f8;
+    color: white;
+}
+
+.content h1 {
+    align-self: center;
+    font-family: "Montserrat";
+    font-size: 26px;
+    margin-left: 15px;
+}
+
+.content h1 span {
+    font-size: 72px;
+    display: block;
+}
+
+.content h1 .content__a {
+    display: inline;
+    font-size: 26px;
+}
+
+.content img {
+    align-self: center;
+    height: 30vh;
+}
+
+.content button  {
+    font-family: "Open Sans";
+    cursor: pointer;
+    margin: auto;
+    margin-top: 10px;
+    background: #7281f5;
+    color: white;
+    width: 193px;
+    font-size: 14px;
+    padding: 10px 20px;
+    border: solid 1px #9ba6f7;
+    border-radius: 5px;
+}
+
+.content .cdnInput {
+    display: block;
+    background-color: #7281f5;
+    margin-top: 10px;
+    font-size: 16px;
+    text-align: center;
+    width: 350px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: white;
+    border: solid 1px #98a3f5;
+}
+
+.description {
+    background-color: #ecedfc;
+}
+
+.description .each {
+    display: flex;
+}
+
+.description .each:nth-child(2n) {
+    background-color: #d6dbfd;
+    color: black;
+}
+
+.description .each .code {
+    flex: 1;
+    padding: 10px 15px;
+}
+.description .each .image {
+    flex: 1;
+    text-align: center;
+}
+.description .each .image img {
+    margin: 30px 5px;
+    box-sizing: border-box;
+    width: 350px;
+    border-radius: 10px;
+    vertical-align: middle;
+}
+
+.description .each .code h2 {
+    color: #7281f5;
+    padding-left: 8vw;
+}
+
+.description .each .code p {
+    color: #1c2888;
+    padding: 0 8vw;
+}
+
+.wrapper .guide {
+    min-height: 100vh;
+    padding: 5px 5vw 45px 5vw;
+}
+
+.footer_bg {
+    background: #8a97f8;
+    height: 15px;
+}
+
+.footer {
+    display: flex;
+    padding: 4vw 1vw .5vw 5vw;
+    color: white;
+    background-color: #7281f5;
+}
+.footer .container {
+    flex: 1;
+    margin-left: 15px;
+}
+.footer .createdBy {
+    flex: 2;
+    margin-top: 14vh;
+    align-self: flex-end;
+    text-align: end;
+}
+.footer .link {
+    font-weight: 600;
+}
+.footer ul {
+    margin-top: 0;
+    padding-top: 10px;
+    padding-left: 25px;
+    list-style-type: none;
+}
+.footer a {
+    color: white;
+    text-decoration: none;
+}
+.footer a:hover {
+    color: #1c2888;
+    font-weight: 600;
+}

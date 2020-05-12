@@ -1,4 +1,4 @@
-import { Sparky, html, state, router} from "../../src/sparky";
+import { Sparky, html, state, router, update} from "../../src/sparky";
 
 const routingState = [
     {
@@ -29,12 +29,12 @@ function Main(props: IProps) {
     console.log(store);
     dispatch({ type: "uno" })
     const onClick= () => {
-        setList((prevState) => [...prevState, new Date().toLocaleString()]);
+        setList((prevState) => [new Date().toLocaleString(), ...prevState]);
     }
 
     return html`
         <div>
-            <button onclick=${onClick}>Hola</button>
+            <button style="${list[0] ? "color: red" : "color: blue"}" onclick=${onClick}>Hola</button>
             <ul>
                 ${list.map(item => `<li>${item}</li>`)}
             </ul>

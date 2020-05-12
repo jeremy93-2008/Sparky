@@ -1,4 +1,3 @@
-import 'mdn-polyfills/String.prototype.startsWith';
 import { HTMLElementSparkyEnhanced } from './sparky.component';
 
 /**

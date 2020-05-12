@@ -9,7 +9,6 @@ type ICachedType = "memoize" | "update";
  */
 export function callCachedFn(context: ISparkySelf, type: ICachedType, cachedArray: IFnCached[], callbackFn: Function, argumentsChanged?: IArgumentsList) {
     const fnCached = cachedArray[getIndexByType(context, type)];
-    incrementIndexByType(context, type)
 
     const newMemo = {
         fn: callbackFn,
@@ -17,7 +16,7 @@ export function callCachedFn(context: ISparkySelf, type: ICachedType, cachedArra
         dependencies: argumentsChanged
     };
 
-    if (!fnCached || !argumentsChanged) {
+    if (!fnCached) {
         newMemo.result = callbackFn.call(window, argumentsChanged ? [...argumentsChanged] : null);
         cachedArray.push(newMemo)
         return newMemo.result;
@@ -44,7 +43,7 @@ function getIndexByType(context: ISparkySelf, type: ICachedType) {
 /**
  * @internal
  */
-function incrementIndexByType(context: ISparkySelf, type: ICachedType) {
+export function incrementIndexByType(context: ISparkySelf, type: ICachedType) {
     if (type == "memoize")
         return ++context.indexes.memo;
     return ++context.indexes.update;

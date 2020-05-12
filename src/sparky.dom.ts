@@ -37,6 +37,13 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
 
             if(node.isEqualNode(nextNode)) return;
 
+            if(node.isEqualNode(nextNode.nextElementSibling)) {
+                const newNextNode = nextNode.cloneNode(true);
+                const oldNextNode = nextNode.parentElement.replaceChild(newNextNode, nextNode);
+                node.parentNode.insertBefore(oldNextNode, node);
+                return;
+            }
+
             if(node.nodeName !== nextNode.nodeName) {
                 const newNextNode = nextNode.cloneNode(true);
                 const oldNextNode = nextNode.parentElement.replaceChild(newNextNode, nextNode);
@@ -55,8 +62,13 @@ export function reconciliate(currentDom: HTMLElement, nextDom: HTMLElement) {
         for(let i = currentElem.childNodes.length; i < nextElem.childNodes.length; i++) {
             const childNode = nextElem.childNodes.item(i);
             const newNextNode = childNode.cloneNode(true);
-            const oldNextNode = childNode.parentElement.replaceChild(newNextNode, childNode);
-            currentElem.appendChild(oldNextNode)
+
+            let oldNextNode: ChildNode = null;
+            // Internet Explorer 9/10/11 strange behavior
+            if(childNode.parentElement) {
+                oldNextNode = childNode.parentElement.replaceChild(newNextNode, childNode);
+                currentElem.appendChild(oldNextNode)
+            }
         }
 
         removedList.forEach((rmElem) => {

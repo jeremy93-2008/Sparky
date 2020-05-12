@@ -1,5 +1,3 @@
-import 'mdn-polyfills/Array.from';
-import 'mdn-polyfills/Array.prototype.find';
 import { HTMLElementSparkyEnhanced, IParams } from "./sparky.component";
 import { ISparkySelf } from "./sparky.context";
 import { IDispatcherAction } from "./sparky.function";

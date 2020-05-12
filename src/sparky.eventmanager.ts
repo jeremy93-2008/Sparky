@@ -1,8 +1,5 @@
-import { isConnectedPolyfill } from "./polyfill/isConnected"
 import { ISparkySelf } from "./sparky.context";
 import { HTMLElementSparkyEnhanced } from "./sparky.component";
-
-isConnectedPolyfill();
 
 /**
  * @internal

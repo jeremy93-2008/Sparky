@@ -1,6 +1,6 @@
 import { Sparky, ISparkyStore } from "./sparky";
 import 'requestidlecallback-polyfill';
-import { callCachedFn } from "./sparky.function.helper";
+import { callCachedFn, incrementIndexByType } from "./sparky.function.helper";
 import { SparkyContext, ISparkySelf } from "./sparky.context";
 import { Sparky__goToState, Sparky__back, Sparky__forward, Sparky_cleanHistory, Sparky__params, Sparky__currentState } from "./sparky.router";
 import { IParams } from "./sparky.component";
@@ -106,8 +106,10 @@ const setInitialState = <S>(newState: S): ISetStateOrDispatcher<S> => {
  */
 export const Sparky__update = (callbackFn: IUpdateCallback, dependenciesChanged?: IArgumentsList) => {
     const currentContext = getContext();
+    const indexes = {...currentContext.indexes};
+    incrementIndexByType(currentContext, "update");
     window.requestIdleCallback(() => {
-        callCachedFn(currentContext, "update", currentContext.cachedUpdate, callbackFn, dependenciesChanged)
+        callCachedFn({...currentContext, indexes}, "update", currentContext.cachedUpdate, callbackFn, dependenciesChanged)
     }, { timeout: 250 });
 }
 
@@ -140,7 +142,8 @@ export const Sparky__state = <S>(initialState: S | ISparkyStore<S>): [S, ISetSta
  */
 export const Sparky__memoize = (callbackFn: Function, argumentsChanged?: IArgumentsList) => {
     const currentContext = getContext();
-    callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged)
+    callCachedFn(currentContext, "memoize", currentContext.cachedMemo, callbackFn, argumentsChanged);
+    incrementIndexByType(currentContext, "memoize");
 }
 
 /**
