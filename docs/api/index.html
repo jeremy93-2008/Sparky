@@ -38,6 +38,8 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 							<input type="checkbox" id="tsd-filter-only-exported" />
 							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
@@ -63,14 +65,22 @@
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
 				<a href="#sparky" id="sparky" style="color: inherit; text-decoration: none;">
-					<h1><code>Sparky</code></h1>
+					<h1>Sparky</h1>
 				</a>
-				<p><img src="https://travis-ci.org/jeremy93-2008/Sparky.svg?branch=master" alt="Travis CI">
-				<a href="https://codecov.io/gh/jeremy93-2008/Sparky"><img src="https://codecov.io/gh/jeremy93-2008/Sparky/branch/master/graph/badge.svg" alt="codecov"></a></p>
+				<p><a href="https://travis-ci.org/github/jeremy93-2008/Sparky"><img src="https://travis-ci.org/jeremy93-2008/Sparky.svg?branch=master" alt="Travis CI"></a>
+					<a href="https://codecov.io/gh/jeremy93-2008/Sparky"><img src="https://codecov.io/gh/jeremy93-2008/Sparky/branch/master/graph/badge.svg" alt="codecov"></a>
+					<a href="https://www.npmjs.com/package/sparky-js"><img src="https://img.shields.io/badge/npm-v1.1.7-informational" alt="Badge"></a>
+					<a href="https://github.com/jeremy93-2008/Sparky/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MPL-green" alt="Badge"></a>
+					<a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fjeremy93-2008%2FSparky?ref=badge_shield"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjeremy93-2008%2FSparky.svg?type=shield" alt="FOSSA Status"></a>
+				<img src="https://img.shields.io/badge/We_%E2%9D%A4-Frontend-red" alt="Badge"></p>
 				<p>Sparky is a library that help you to create dynamic UI using Javascript.</p>
 				<p>You can use it with <strong>Typescript</strong> (as it was think when it was developed) or you can use <strong>plain Javascript</strong> if you want too.</p>
-				<p>The idea behind this library was to create something like React but without the incovenience of it, like transpiling stuff, so to be able to achieve this goal we render HTML from JS with ES6 Template String.</p>
-				<p><strong>Note:</strong> This library are not suitable for production yet, they are a lot of issue to fix and a lot of bug to discover and solve.</p>
+				<p>The idea behind this library was to create something like React but without some inconvenience of it, like transpiling stuff, so to be able to achieve this goal we render HTML from JS with ES6 Template String.</p>
+				<a href="#browser-compatibility" id="browser-compatibility" style="color: inherit; text-decoration: none;">
+					<h2>Browser Compatibility</h2>
+				</a>
+				<p>Sparky supports all browsers that are <a href="http://kangax.github.io/compat-table/es5">ES5-compliant</a> (IE8 and below are not supported).
+				But will need polyfills for some odd and older browsers as Internet Explorer 9, 10 or 11. If you can choose your browser, please use Chrome or Opera 😁 </p>
 				<a href="#example-usage" id="example-usage" style="color: inherit; text-decoration: none;">
 					<h2>Example Usage</h2>
 				</a>
@@ -79,8 +89,12 @@
     Sparky.mount(Sparky.component(Main), <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"app"</span>));
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Main</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">return</span> render <span class="hljs-string">`&lt;span&gt;Hello World&lt;/span&gt;`</span>;
+        <span class="hljs-keyword">return</span> html <span class="hljs-string">`&lt;span&gt;Hello World&lt;/span&gt;`</span>;
     }</code></pre>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p><a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fjeremy93-2008%2FSparky?ref=badge_large"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjeremy93-2008%2FSparky.svg?type=large" alt="FOSSA Status"></a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -182,6 +196,9 @@
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="globals.html#update" class="tsd-kind-icon">update</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createprocessifnotexist" class="tsd-kind-icon">create<wbr>Process<wbr>IfNot<wbr>Exist</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#html" class="tsd-kind-icon">html</a>

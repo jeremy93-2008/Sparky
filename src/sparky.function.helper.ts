@@ -17,18 +17,28 @@ export function callCachedFn(context: ISparkySelf, type: ICachedType, cachedArra
     };
 
     if (!fnCached) {
+        executeSanitizeFunction(fnCached, type);
         newMemo.result = callbackFn.call(window, argumentsChanged ? [...argumentsChanged] : null);
         cachedArray.push(newMemo)
         return newMemo.result;
     }
 
-    if (!arrayAreSame(fnCached.dependencies, argumentsChanged)) {
+    if (!argumentsChanged || !arrayAreSame(fnCached.dependencies, argumentsChanged)) {
+        executeSanitizeFunction(fnCached, type);
         fnCached.dependencies = argumentsChanged;
-        fnCached.result = callbackFn.call(window, ...argumentsChanged);
+        fnCached.result = callbackFn.call(window, ...(argumentsChanged ? argumentsChanged : []));
         return fnCached.result;
     }
 
     return fnCached.result;
+}
+
+function executeSanitizeFunction(fnCached: IFnCached, type: string) {
+    if (fnCached && fnCached.result) {
+        if (typeof fnCached.result == "function" && type == "update") {
+            fnCached.result();
+        }
+    }
 }
 
 /**

@@ -24,12 +24,7 @@ exports[`Mount function Computed function 1`] = `
     
                 
     <p>
-      Hola a todos 
-      <span
-        class="computed"
-      >
-        24
-      </span>
+      Hola a todos 24
     </p>
     
             
@@ -45,12 +40,7 @@ exports[`Mount function Computed w/ State function 1`] = `
     
                 
     <p>
-      Hola a todos 
-      <span
-        class="computed"
-      >
-        uno
-      </span>
+      Hola a todos uno
     </p>
     
             
@@ -66,12 +56,7 @@ exports[`Mount function Computed w/ Store function 1`] = `
     
                 
     <p>
-      Hola a todos 
-      <span
-        class="computed"
-      >
-        1
-      </span>
+      Hola a todos 1
     </p>
     
             
@@ -89,12 +74,7 @@ exports[`Mount function Computed, State w/ Event function 1`] = `
     <p
       id="unique"
     >
-      Hola a todos 
-      <span
-        class="computed"
-      >
-        10
-      </span>
+      Hola a todos 10
     </p>
     
                 
@@ -112,12 +92,7 @@ exports[`Mount function Computed, State w/ Event function with Render inside 1`]
     <p
       id="unique"
     >
-      Hola a todos 
-      <span
-        class="computed"
-      >
-        10
-      </span>
+      Hola a todos 10
     </p>
     
                     
@@ -149,12 +124,7 @@ exports[`Mount function Computed, State, Memo w/ Event and Click function 1`] = 
     <p
       id="paragraph"
     >
-      Hola a todos 
-      <span
-        class="computed"
-      >
-        10
-      </span>
+      Hola a todos 10
     </p>
     
                 
@@ -165,12 +135,7 @@ exports[`Mount function Computed, State, Memo w/ Event and Click function 1`] = 
         <p
           id="paragraph-1"
         >
-          Hola a todos 
-          <span
-            class="computed"
-          >
-            100
-          </span>
+          Hola a todos 100
         </p>
         
             

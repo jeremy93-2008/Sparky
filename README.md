@@ -1,4 +1,4 @@
-# `Sparky`
+# Sparky
 [![Travis CI](https://travis-ci.org/jeremy93-2008/Sparky.svg?branch=master)](https://travis-ci.org/github/jeremy93-2008/Sparky)
 [![codecov](https://codecov.io/gh/jeremy93-2008/Sparky/branch/master/graph/badge.svg)](https://codecov.io/gh/jeremy93-2008/Sparky)
 [![Badge](https://img.shields.io/badge/npm-v1.1.7-informational)](https://www.npmjs.com/package/sparky-js)

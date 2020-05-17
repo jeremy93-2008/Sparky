@@ -1,4 +1,4 @@
-import { IStateRoute, Sparky } from "./sparky"
+import { IStateRoute, Sparky, ISparkyComponent } from "./sparky"
 import { HTMLElementSparkyEnhanced, ISparkyRoot, IParams } from "./sparky.component";
 /**
  * @internal
@@ -58,6 +58,7 @@ function changeStateByEvent(evt: HashChangeEvent, stateRoute: IStateRoute[], cal
     dom.__sparkyRoot.params = getParamsByPath(newState.path, location.hash);
     pushToAbstractHistory(dom.__sparkyRoot, newState);
     if(newState) {
+        resetUpdateCache(newState.component);
         callbackFn(newState.component);
     }
     documentSparky.__sparkyRoutingId = dom.__sparkyRoot.id;
@@ -113,6 +114,7 @@ export function Sparky__goToState(this: HTMLElementSparkyEnhanced, newPath: stri
         case "browser": location.pathname = basename + "/" + normalizePath; break;
     }
     pushToAbstractHistory(this.__sparkyRoot, routeState);
+    resetUpdateCache(routeState.component);
     Sparky.mount(routeState.component, this);
 }
 
@@ -131,6 +133,7 @@ export function Sparky__back(this: HTMLElementSparkyEnhanced) {
         case "hash": location.hash = "/" + normalizePath; break;
         case "browser": location.pathname = basename + "/" + normalizePath; break;
     }
+    resetUpdateCache(state.component);
     Sparky.mount(state.component, this);
 }
 
@@ -149,6 +152,7 @@ export function Sparky__forward(this: HTMLElementSparkyEnhanced) {
         case "hash": location.hash = "/" + normalizePath; break;
         case "browser": location.pathname = basename + "/" + normalizePath; break;
     }
+    resetUpdateCache(state.component);
     Sparky.mount(state.component, this)
 }
 
@@ -209,4 +213,11 @@ export function matchUrl(path:string, url: string) {
     })
 
     return url.includes(pathPart.join("/"))
+}
+
+/**
+ * @internal
+ */
+export function resetUpdateCache(component: ISparkyComponent) {
+    component.context.cachedUpdate = [];
 }

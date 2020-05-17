@@ -103,27 +103,31 @@ o=r.prototype)&&!1!==o.hasOwnProperty("isPrototypeOf"))){const n=new t.construct
 /**
      * @internal
      */
-function g(t,e,r,o,a){var i,s,c,u,p=r[
+function g(t,e,r,o,a){var i=r[
 /**
      * @internal
      */
 function(t,e){return"memoize"==e?t.indexes.memo:t.indexes.update}
 /**
      * @internal
-     */(t,e)],f={fn:o,result:null,dependencies:a};return p?(i=p.dependencies,s=
+     */(t,e)],s={fn:o,result:null,dependencies:a};return i?(a&&
 /**
      * @internal
      */
-function(t,e){var n=t.length,r=e.length;return n>r?{bigArray:t,smallArray:e}:{bigArray:e,smallArray:t}}(i,a),c=s.bigArray,u=s.smallArray,c.every((function(t,e){return t==(u?u[e]:null)}))||(p.dependencies=a,p.result=o.call.apply(o,n([window],a))),p.result):(f.result=o.call(window,a?n(a):null),r.push(f),f.result)}function b(t,e){return"memoize"==e?++t.indexes.memo:++t.indexes.update}
+function(t,e){if(!t||!e)return!1;var n=
 /**
      * @internal
-     */function x(t,e,n){if(!n.__sparkyRoot.isRoutingEnabled)throw TypeError("To use route() function, you need to pass a Sparky.router object on the mount function");if(window.requestIdleCallback((function(){window.addEventListener("hashchange",(function(r){k(r,t,e,n)}))})),"undefined"!=typeof thisTest&&thisTest.testing){var r=new Event("hashchange");Object.defineProperty(r,"oldUrl",{writable:!1,value:""}),Object.defineProperty(r,"newURL",{writable:!0,value:"#"}),k(r,t,e,n),n.__sparkyRoot.stateChanging=!0,n.__sparkyRoot.basename=n.__sparkyRoot.basename?n.__sparkyRoot.basename:"",n.__sparkyRoot.forceURLUpdate=!0,k(r,t,e,n)}}
+     */
+function(t,e){var n=t.length,r=e.length;return n>r?{bigArray:t,smallArray:e}:{bigArray:e,smallArray:t}}(t,e),r=n.bigArray,o=n.smallArray;return r.every((function(t,e){return t==(o?o[e]:null)}))}(i.dependencies,a)||(b(i,e),i.dependencies=a,i.result=o.call.apply(o,n([window],a||[]))),i.result):(b(i,e),s.result=o.call(window,a?n(a):null),r.push(s),s.result)}function b(t,e){t&&t.result&&"function"==typeof t.result&&"update"==e&&t.result()}function x(t,e){return"memoize"==e?++t.indexes.memo:++t.indexes.update}
 /**
      * @internal
-     */function k(t,e,n,r){var o=document;if(r.__sparkyRoot.forceURLUpdate&&(o.__sparkyRoutingId=r.__sparkyRoot.id),o.__sparkyRoutingId&&o.__sparkyRoutingId!=r.__sparkyRoot.id)console.warn("Only one route object can have the control of URL");else if(t.oldURL==t.newURL||r.__sparkyRoot.stateChanging)r.__sparkyRoot.stateChanging=!1;else{var a=C(e,location.hash);a.hash=location.hash,r.__sparkyRoot.params=j(a.path,location.hash),E(r.__sparkyRoot,a),a&&n(a.component),o.__sparkyRoutingId=r.__sparkyRoot.id}}
+     */function k(t,e,n){if(!n.__sparkyRoot.isRoutingEnabled)throw TypeError("To use route() function, you need to pass a Sparky.router object on the mount function");if(window.requestIdleCallback((function(){window.addEventListener("hashchange",(function(r){C(r,t,e,n)}))})),"undefined"!=typeof thisTest&&thisTest.testing){var r=new Event("hashchange");Object.defineProperty(r,"oldUrl",{writable:!1,value:""}),Object.defineProperty(r,"newURL",{writable:!0,value:"#"}),C(r,t,e,n),n.__sparkyRoot.stateChanging=!0,n.__sparkyRoot.basename=n.__sparkyRoot.basename?n.__sparkyRoot.basename:"",n.__sparkyRoot.forceURLUpdate=!0,C(r,t,e,n)}}
 /**
      * @internal
-     */function C(t,n){return t.find((function(t,e){return"string"==typeof t.path&&(t.exact=!0,
+     */function C(t,e,n,r){var o=document;if(r.__sparkyRoot.forceURLUpdate&&(o.__sparkyRoutingId=r.__sparkyRoot.id),o.__sparkyRoutingId&&o.__sparkyRoutingId!=r.__sparkyRoot.id)console.warn("Only one route object can have the control of URL");else if(t.oldURL==t.newURL||r.__sparkyRoot.stateChanging)r.__sparkyRoot.stateChanging=!1;else{var a=E(e,location.hash);a.hash=location.hash,r.__sparkyRoot.params=j(a.path,location.hash),R(r.__sparkyRoot,a),a&&(L(a.component),n(a.component)),o.__sparkyRoutingId=r.__sparkyRoot.id}}
+/**
+     * @internal
+     */function E(t,n){return t.find((function(t,e){return"string"==typeof t.path&&(t.exact=!0,
 /**
      * @internal
      */
@@ -133,28 +137,31 @@ function(t,e){if(t.includes("*")){if(t.split("*")[1].includes("/"))throw TypeErr
      */(t.path,n))}))||e(e({},t[0]),{exact:!1})}
 /**
      * @internal
-     */function E(t,e){t.historyIndex<history.length-1&&(t.history=t.history.slice(0,t.historyIndex+1)),t.history.push(e),t.historyIndex=t.history.length-1}
+     */function R(t,e){t.historyIndex<history.length-1&&(t.history=t.history.slice(0,t.historyIndex+1)),t.history.push(e),t.historyIndex=t.history.length-1}
 /**
      * @internal
-     */function R(){this.__sparkyRoot.history=[],this.__sparkyRoot.historyIndex=0,this.__sparkyRoot.stateChanging=!0,location.hash=""}
+     */function w(){this.__sparkyRoot.history=[],this.__sparkyRoot.historyIndex=0,this.__sparkyRoot.stateChanging=!0,location.hash=""}
 /**
      * @internal
-     */function w(t){var e=this.__sparkyRoot,n=e.routing,r=e.type,o=e.basename,a=C(n,t);a.hash=t,a.exact&&(this.__sparkyRoot.params=j(a.path,t)),this.__sparkyRoot.stateChanging=!0;var i=t;switch(r){case"hash":location.hash="/"+i;break;case"browser":location.pathname=o+"/"+i}E(this.__sparkyRoot,a),N.mount(a.component,this)}
+     */function S(t){var e=this.__sparkyRoot,n=e.routing,r=e.type,o=e.basename,a=E(n,t);a.hash=t,a.exact&&(this.__sparkyRoot.params=j(a.path,t)),this.__sparkyRoot.stateChanging=!0;var i=t;switch(r){case"hash":location.hash="/"+i;break;case"browser":location.pathname=o+"/"+i}R(this.__sparkyRoot,a),L(a.component),D.mount(a.component,this)}
 /**
      * @internal
-     */function S(){var t=this.__sparkyRoot,e=t.history,n=t.type,r=t.basename;if(!(this.__sparkyRoot.historyIndex-1<0)){var o=e[--this.__sparkyRoot.historyIndex];o.exact&&(this.__sparkyRoot.params=j(o.path,o.hash)),this.__sparkyRoot.stateChanging=!0;var a=o.hash;switch(n){case"hash":location.hash="/"+a;break;case"browser":location.pathname=r+"/"+a}N.mount(o.component,this)}}
+     */function A(){var t=this.__sparkyRoot,e=t.history,n=t.type,r=t.basename;if(!(this.__sparkyRoot.historyIndex-1<0)){var o=e[--this.__sparkyRoot.historyIndex];o.exact&&(this.__sparkyRoot.params=j(o.path,o.hash)),this.__sparkyRoot.stateChanging=!0;var a=o.hash;switch(n){case"hash":location.hash="/"+a;break;case"browser":location.pathname=r+"/"+a}L(o.component),D.mount(o.component,this)}}
 /**
      * @internal
-     */function A(){var t=this.__sparkyRoot,e=t.history,n=t.type,r=t.basename;if(!(this.__sparkyRoot.historyIndex+1>e.length-1)){var o=e[++this.__sparkyRoot.historyIndex];o.exact&&(this.__sparkyRoot.params=j(o.path,o.hash)),this.__sparkyRoot.stateChanging=!0;var a=o.hash;switch(n){case"hash":location.hash="/"+a;break;case"browser":location.pathname=r+"/"+a}N.mount(o.component,this)}}
+     */function T(){var t=this.__sparkyRoot,e=t.history,n=t.type,r=t.basename;if(!(this.__sparkyRoot.historyIndex+1>e.length-1)){var o=e[++this.__sparkyRoot.historyIndex];o.exact&&(this.__sparkyRoot.params=j(o.path,o.hash)),this.__sparkyRoot.stateChanging=!0;var a=o.hash;switch(n){case"hash":location.hash="/"+a;break;case"browser":location.pathname=r+"/"+a}L(o.component),D.mount(o.component,this)}}
 /**
      * @internal
-     */function T(){return this.__sparkyRoot.params}
+     */function I(){return this.__sparkyRoot.params}
 /**
      * @internal
-     */function I(){var t=this.__sparkyRoot;return t.history[t.historyIndex]}
+     */function U(){var t=this.__sparkyRoot;return t.history[t.historyIndex]}
 /**
      * @internal
-     */function j(t,e){if(t.includes("*")&&t.split("*")[1].includes("/"))throw TypeError("The wildcard can only be the last element to be identified on the url");var n=e.split("/"),r=[];return t.split("/").reduce((function(t,e,r){if(e.startsWith(":"))(o={})[e.slice(1,e.length)]=n[r],t.push(o);else if(e.startsWith("*")){var o;(o={})[e.slice(1,e.length)]=n.slice(r,n.length).join(""),t.push(o)}return t}),r),r}window.requestIdleCallback=window.requestIdleCallback||function(t){var e=Date.now();return setTimeout((function(){t({didTimeout:!1,timeRemaining:function(){return Math.max(0,50-(Date.now()-e))}})}),1)},window.cancelIdleCallback=window.cancelIdleCallback||function(t){clearTimeout(t)};var U=function(){var t=_.getCurrentContext();if(!t)throw new ReferenceError("Sparky Function only can be used in the lifecycle of a Sparky application");return t},L=function(t){var n;n=this.context,_.setCurrentContext(n),_.resetIndexes();var r=U();r.indexes.state=this.state;var o=r.cachedState[r.indexes.state];r.cachedState[r.indexes.state]="function"==typeof t?t(o):t,r.indexes.state++,r.__root?_.setCurrentContext(N.mount(e(e({},r.__root),{currentContext:r}),r.__rootElement)):_.setCurrentContext(N.mount({type:"SparkyComponent",context:r,currentContext:r,renderFn:r.renderFunc},r.__rootElement))},F=function(t){return[t.store,function(e){return t.dispatcher(t,e)}]},N=/** @class */function(){function t(){}
+     */function j(t,e){if(t.includes("*")&&t.split("*")[1].includes("/"))throw TypeError("The wildcard can only be the last element to be identified on the url");var n=e.split("/"),r=[];return t.split("/").reduce((function(t,e,r){if(e.startsWith(":"))(o={})[e.slice(1,e.length)]=n[r],t.push(o);else if(e.startsWith("*")){var o;(o={})[e.slice(1,e.length)]=n.slice(r,n.length).join(""),t.push(o)}return t}),r),r}function L(t){t.context.cachedUpdate=[]}
+/**
+     * @internal
+     */window.requestIdleCallback=window.requestIdleCallback||function(t){var e=Date.now();return setTimeout((function(){t({didTimeout:!1,timeRemaining:function(){return Math.max(0,50-(Date.now()-e))}})}),1)},window.cancelIdleCallback=window.cancelIdleCallback||function(t){clearTimeout(t)};var F=function(){var t=_.getCurrentContext();if(!t)throw new ReferenceError("Sparky Function only can be used in the lifecycle of a Sparky application");return t},N=function(t){var n;n=this.context,_.setCurrentContext(n),_.resetIndexes();var r=F();r.indexes.state=this.state;var o=r.cachedState[r.indexes.state];r.cachedState[r.indexes.state]="function"==typeof t?t(o):t,r.indexes.state++,r.__root?_.setCurrentContext(D.mount(e(e({},r.__root),{currentContext:r}),r.__rootElement)):_.setCurrentContext(D.mount({type:"SparkyComponent",context:r,currentContext:r,renderFn:r.renderFunc},r.__rootElement))},O=function(t){return[t.store,function(e){return t.dispatcher(t,e)}]},D=/** @class */function(){function t(){}
 /**
          * Generate a Sparky Component that can be mount.
          * @param renderFunc The function that going to be execute to render html template
@@ -163,7 +170,7 @@ function(t,e){if(t.includes("*")){if(t.split("*")[1].includes("/"))throw TypeErr
          * Create a routing component that manage history
          * @param stateRoute
          */
-t.router=function(t,e){e||(e={type:"hash"});var n="";"hash"==e.type?n=location.hash.slice(2,location.hash.length):"browser"==e.type&&(n=location.pathname);var r=C(t,n);r.hash=n;var o=[];return r.exact&&(o=j(r.path,n)),{type:"SparkyRouter",component:r.component,routing:t,history:[r],params:o,options:e}},
+t.router=function(t,e){e||(e={type:"hash"});var n="";"hash"==e.type?n=location.hash.slice(2,location.hash.length):"browser"==e.type&&(n=location.pathname);var r=E(t,n);r.hash=n;var o=[];return r.exact&&(o=j(r.path,n)),{type:"SparkyRouter",component:r.component,routing:t,history:[r],params:o,options:e}},
 /**
          * Mount a Sparky Component in the DOM Tree and keep it updated.
          * @param component Sparky Component
@@ -174,7 +181,7 @@ t.mount=function(t,n){var r=function(){if("undefined"!=typeof process&&process.e
      * @internal
      * @param dom
      * @param element
-     */();"development"===r&&console.time();var o="SparkyComponent"==t.type?t:t.component;O(n,t);var a=o.context,s=o.renderFn,u=m(o.currentContext.indexes);a.__rootElement=n,_.setCurrentContext(a),_.resetIndexes();var p=s(Object.freeze(a.props)),f=n.__sparkyRoot.updateAt?n.firstElementChild:null,l=D(p.html),d=i(f,l=M.populate(l,p,o));if(d)return!d.isConnected&&n&&n.appendChild(d),n.__sparkyRoot.updateAt=(new Date).getTime(),c.listen(d),"development"===r&&console.timeEnd(),"undefined"!=typeof thisTest&&thisTest.testing&&(thisTest.__testUtilData={root:n,component:o,eventList:thisTestEvent}),e(e({},o.currentContext),{indexes:u})},
+     */();"development"===r&&console.time();var o="SparkyComponent"==t.type?t:t.component;M(n,t);var a=o.context,s=o.renderFn,u=m(o.currentContext.indexes);a.__rootElement=n,_.setCurrentContext(a),_.resetIndexes();var p=s(Object.freeze(a.props)),f=n.__sparkyRoot.updateAt?n.firstElementChild:null,l=z(p.html),d=i(f,l=P.populate(l,p,o));if(d)return!d.isConnected&&n&&n.appendChild(d),n.__sparkyRoot.updateAt=(new Date).getTime(),c.listen(d),"development"===r&&console.timeEnd(),"undefined"!=typeof thisTest&&thisTest.testing&&(thisTest.__testUtilData={root:n,component:o,eventList:thisTestEvent}),e(e({},o.currentContext),{indexes:u})},
 /**
          * Create a Store to using it on components
          * @param newStore Object that will be Store
@@ -190,7 +197,7 @@ t.createStore=function(t,e){return{type:"SparkyStore",store:t,dispatcher:functio
 t.reconciliate=function(t,e){return i(t,e)},t}();
 /**
      * @internal
-     */function O(t,n){if(t&&!t.__sparkyRoot&&(
+     */function M(t,n){if(t&&!t.__sparkyRoot&&(
 /**
      * @internal
      * @param dom
@@ -199,17 +206,17 @@ function(t){t.__sparkyRoot={id:a(12),isRoutingEnabled:!1,basename:"",params:[],f
 /**
      * @internal
      * @param html
-     */(t),"SparkyRouter"==n.type)){var r=n,o=r.history,i=r.routing,s=r.params,c=r.options;t.__sparkyRoot=e(e({},t.__sparkyRoot),{history:o,routing:i,params:s,basename:null==c?void 0:c.basename,isRoutingEnabled:!0,forceURLUpdate:null==c?void 0:c.forceUrlUpdate,type:null==c?void 0:c.type}),"hash"==t.__sparkyRoot.type&&x(i,(function(e){N.mount(e,t)}),t)}}function D(t){var e=document.createElement("div");if(e.innerHTML=t,e.children.length>1)throw new TypeError("Adjacent elements on the root level are forbidden.");return e.firstElementChild}
+     */(t),"SparkyRouter"==n.type)){var r=n,o=r.history,i=r.routing,s=r.params,c=r.options;t.__sparkyRoot=e(e({},t.__sparkyRoot),{history:o,routing:i,params:s,basename:null==c?void 0:c.basename,isRoutingEnabled:!0,forceURLUpdate:null==c?void 0:c.forceUrlUpdate,type:null==c?void 0:c.type}),"hash"==t.__sparkyRoot.type&&k(i,(function(e){D.mount(e,t)}),t)}}function z(t){var e=document.createElement("div");if(e.innerHTML=t,e.children.length>1)throw new TypeError("Adjacent elements on the root level are forbidden.");return e.firstElementChild}
 /**
      * @internal
      */
 /**
      * @internal
      */
-var M=/** @class */function(){function t(){}return t.populate=function(t,e,n){for(var r=this,o=[[e,n,t]],a=0,i=function(){var t=o.shift(),i=t[0],c=t[1],u=t[2];s.cachedComponent[a]||(s.cachedComponent[a]=[]),i.func.forEach((function(t,e){var n=function(t,e,n){for(var r=[t];r.length>0;){var o=r.shift(),a=Array.from(o.attributes).find((function(t){if(t.name.startsWith("on"))return t.value=="SparkyFunction#"+e+"#"+n}));if(a)return{dom:o,attr:a};for(var i=0;i<o.children.length;i++)r.push(o.children[i])}}(u,i.renderId,e),r=n.attr.name.replace("on","");n.dom.__sparkyEvent={type:r,context:c.context,callbackFn:t.func},n.dom.removeAttribute(n.attr.name)})),i.children.forEach((function(t){o.push([t,c,u])})),i.nestedComponents.forEach((function(t,s){var c,p=r.cachedComponent[a][s],f=r.findComment(u,i.renderId,s,t.renderFn.name);p&&(""==p.component.renderFn.name?p.component.renderFn.toString()==t.renderFn.toString()&&(t=z(p,t)):p.component.renderFn.name==t.renderFn.name&&(t=z(p,t))),_.setCurrentContext(t.context),_.resetIndexes(),t.context.__root=n,t.context.__rootElement=n.context.__rootElement;var l=t.renderFn(Object.freeze(t.context.props));if(f){var d=D(l.html);f.parentNode.replaceChild(d,f),(c=e.func).push.apply(c,l.func),o.push([l,t,d]),r.cachedComponent[a][s]={component:t,dom:u}}})),i.nestedComponents.length>0&&a++},s=this;o.length>0;)i();return t},t.findComment=function(t,e,n,r){for(var o=[t];o.length>0;){var a=o.shift();if("#comment"==a.nodeName&&a.nodeValue.trim()=="SparkyComponent#"+r+"#"+n+"#"+e)return a;for(var i=0;i<a.childNodes.length;i++)o.push(a.childNodes[i])}},t.cachedComponent=[],t}();
+var P=/** @class */function(){function t(){}return t.populate=function(t,e,n){for(var r=this,o=[[e,n,t]],a=0,i=function(){var t=o.shift(),i=t[0],c=t[1],u=t[2];s.cachedComponent[a]||(s.cachedComponent[a]=[]),i.func.forEach((function(t,e){var n=function(t,e,n){for(var r=[t];r.length>0;){var o=r.shift(),a=Array.from(o.attributes).find((function(t){if(t.name.startsWith("on"))return t.value=="SparkyFunction#"+e+"#"+n}));if(a)return{dom:o,attr:a};for(var i=0;i<o.children.length;i++)r.push(o.children[i])}}(u,i.renderId,e),r=n.attr.name.replace("on","");n.dom.__sparkyEvent={type:r,context:c.context,callbackFn:t.func},n.dom.removeAttribute(n.attr.name)})),i.children.forEach((function(t){o.push([t,c,u])})),i.nestedComponents.forEach((function(t,s){var c,p=r.cachedComponent[a][s],f=r.findComment(u,i.renderId,s,t.renderFn.name);p&&(""==p.component.renderFn.name?p.component.renderFn.toString()==t.renderFn.toString()&&(t=q(p,t)):p.component.renderFn.name==t.renderFn.name&&(t=q(p,t))),_.setCurrentContext(t.context),_.resetIndexes(),t.context.__root=n,t.context.__rootElement=n.context.__rootElement;var l=t.renderFn(Object.freeze(t.context.props));if(f){var d=z(l.html);f.parentNode.replaceChild(d,f),(c=e.func).push.apply(c,l.func),o.push([l,t,d]),r.cachedComponent[a][s]={component:t,dom:u}}})),i.nestedComponents.length>0&&a++},s=this;o.length>0;)i();return t},t.findComment=function(t,e,n,r){for(var o=[t];o.length>0;){var a=o.shift();if("#comment"==a.nodeName&&a.nodeValue.trim()=="SparkyComponent#"+r+"#"+n+"#"+e)return a;for(var i=0;i<a.childNodes.length;i++)o.push(a.childNodes[i])}},t.cachedComponent=[],t}();
 /**
      * @internal
-     */function z(t,e){return t.component.context.props=e.context.props,e=t.component}var P=/** @class */function(){function t(){}
+     */function q(t,e){return t.component.context.props=e.context.props,e=t.component}var B=/** @class */function(){function t(){}
 /**
          * Generate a Sparky Component that can be mount.
          * @param renderFunc The function that going to be execute to render html template
@@ -218,7 +225,7 @@ var M=/** @class */function(){function t(){}return t.populate=function(t,e,n){fo
          * Create a routing component that manage history
          * @param stateRoute
          */
-t.router=function(t,e){e||(e={type:"hash"});var n="";"hash"==e.type?n=location.hash.slice(2,location.hash.length):"browser"==e.type&&(n=location.pathname);var r=C(t,n);r.hash=n;var o=[];return r.exact&&(o=j(r.path,n)),{type:"SparkyRouter",component:r.component,routing:t,history:[r],params:o,options:e}},
+t.router=function(t,e){e||(e={type:"hash"});var n="";"hash"==e.type?n=location.hash.slice(2,location.hash.length):"browser"==e.type&&(n=location.pathname);var r=E(t,n);r.hash=n;var o=[];return r.exact&&(o=j(r.path,n)),{type:"SparkyRouter",component:r.component,routing:t,history:[r],params:o,options:e}},
 /**
          * Mount a Sparky Component in the DOM Tree and keep it updated.
          * @param component Sparky Component
@@ -244,7 +251,7 @@ function(t){t.__sparkyRoot={id:a(12),isRoutingEnabled:!1,basename:"",params:[],f
 /**
      * @internal
      * @param html
-     */(t),"SparkyRouter"==n.type)){var r=n,o=r.history,i=r.routing,s=r.params,c=r.options;t.__sparkyRoot=e(e({},t.__sparkyRoot),{history:o,routing:i,params:s,basename:null==c?void 0:c.basename,isRoutingEnabled:!0,forceURLUpdate:null==c?void 0:c.forceUrlUpdate,type:null==c?void 0:c.type}),"hash"==t.__sparkyRoot.type&&x(i,(function(e){P.mount(e,t)}),t)}}(n,t);var s=o.context,u=o.renderFn,p=m(o.currentContext.indexes);s.__rootElement=n,_.setCurrentContext(s),_.resetIndexes();var f=u(Object.freeze(s.props)),l=n.__sparkyRoot.updateAt?n.firstElementChild:null,d=G(f.html),h=i(l,d=M.populate(d,f,o));if(h)return!h.isConnected&&n&&n.appendChild(h),n.__sparkyRoot.updateAt=(new Date).getTime(),c.listen(h),"development"===r&&console.timeEnd(),"undefined"!=typeof thisTest&&thisTest.testing&&(thisTest.__testUtilData={root:n,component:o,eventList:thisTestEvent}),e(e({},o.currentContext),{indexes:p})},
+     */(t),"SparkyRouter"==n.type)){var r=n,o=r.history,i=r.routing,s=r.params,c=r.options;t.__sparkyRoot=e(e({},t.__sparkyRoot),{history:o,routing:i,params:s,basename:null==c?void 0:c.basename,isRoutingEnabled:!0,forceURLUpdate:null==c?void 0:c.forceUrlUpdate,type:null==c?void 0:c.type}),"hash"==t.__sparkyRoot.type&&k(i,(function(e){B.mount(e,t)}),t)}}(n,t);var s=o.context,u=o.renderFn,p=m(o.currentContext.indexes);s.__rootElement=n,_.setCurrentContext(s),_.resetIndexes();var f=u(Object.freeze(s.props)),l=n.__sparkyRoot.updateAt?n.firstElementChild:null,d=J(f.html),h=i(l,d=P.populate(d,f,o));if(h)return!h.isConnected&&n&&n.appendChild(h),n.__sparkyRoot.updateAt=(new Date).getTime(),c.listen(h),"development"===r&&console.timeEnd(),"undefined"!=typeof thisTest&&thisTest.testing&&(thisTest.__testUtilData={root:n,component:o,eventList:thisTestEvent}),e(e({},o.currentContext),{indexes:p})},
 /**
          * Create a Store to using it on components
          * @param newStore Object that will be Store
@@ -257,7 +264,7 @@ t.createStore=function(t,e){return{type:"SparkyStore",store:t,dispatcher:functio
          * @param oldNode Node that need to be reconcile
          * @param newNode Node that have the new elements
          */
-t.reconciliate=function(t,e){return i(t,e)},t}();var q=function(t,n){var r=U(),o=e({},r.indexes);b(r,"update"),window.requestIdleCallback((function(){g(e(e({},r),{indexes:o}),"update",r.cachedUpdate,t,n)}),{timeout:250})},B=function(t){if("object"==typeof t){var e=t;if(e.type&&"SparkyStore"==e.type)return F(e)}var n=U(),r={context:n,state:n.indexes.state},o=n.cachedState[n.indexes.state];if(o)return n.indexes.state++,[o,L.bind(r)];var a=function(t){var e=U();return e.cachedState[e.indexes.state]=t,L}(t);n.indexes.state++;var i=n.indexes.state-1;return[n.cachedState[i],a.bind(r)]},W=function(t,e){var n=U();g(n,"memoize",n.cachedMemo,t,e),b(n,"memoize")},H=function(){var t=U();if(!t.__rootElement.__sparkyRoot.isRoutingEnabled)throw TypeError("To use router() function, you need to pass a Sparky.router object on the mount function");return{goToState:w.bind(t.__rootElement),goBack:S.bind(t.__rootElement),goAfter:A.bind(t.__rootElement),getParams:T.bind(t.__rootElement),cleanHistory:R.bind(t.__rootElement),getCurrentState:I.bind(t.__rootElement)}};
+t.reconciliate=function(t,e){return i(t,e)},t}();var W=function(t,n){var r=F(),o=e({},r.indexes);x(r,"update"),window.requestIdleCallback((function(){g(e(e({},r),{indexes:o}),"update",r.cachedUpdate,t,n)}),{timeout:250})},H=function(t){if("object"==typeof t){var e=t;if(e.type&&"SparkyStore"==e.type)return O(e)}var n=F(),r={context:n,state:n.indexes.state},o=n.cachedState[n.indexes.state];if(o)return n.indexes.state++,[o,N.bind(r)];var a=function(t){var e=F();return e.cachedState[e.indexes.state]=t,N}(t);n.indexes.state++;var i=n.indexes.state-1;return[n.cachedState[i],a.bind(r)]},V=function(t,e){var n=F();g(n,"memoize",n.cachedMemo,t,e),x(n,"memoize")},G=function(){var t=F();if(!t.__rootElement.__sparkyRoot.isRoutingEnabled)throw TypeError("To use router() function, you need to pass a Sparky.router object on the mount function");return{goToState:S.bind(t.__rootElement),goBack:A.bind(t.__rootElement),goAfter:T.bind(t.__rootElement),getParams:I.bind(t.__rootElement),cleanHistory:w.bind(t.__rootElement),getCurrentState:U.bind(t.__rootElement)}};
 /**
      * Returns a stateful value, and a function to update it.
      * @param initialState The value during the first render
@@ -272,12 +279,12 @@ t.reconciliate=function(t,e){return i(t,e)},t}();var q=function(t,n){var r=U(),o
      * @param children
      * @param renderId
      */
-function V(t,e,n,r,o,a,i){if("function"==typeof t[e])n.push({index:n.length-1,renderId:i,func:t[e]}),r+="'SparkyFunction#"+i+"#"+(n.length-1)+"'";else if("SparkyRender"==t[e].type){var s=t[e];r+=s.html,a.push(s)}else if("SparkyComponent"==t[e].type){var c=t[e];r+="\x3c!-- SparkyComponent#"+c.renderFn.name+"#"+o.length+"#"+i+" --\x3e",o.push(c)}else t[e]=Array.isArray(t[e])?t[e].join(""):new String(t[e]),r+=t[e];return r}function G(t){var e=document.createElement("div");if(e.innerHTML=t,e.children.length>1)throw new TypeError("Adjacent elements on the root level are forbidden.");return e.firstElementChild}t.Sparky=P,t.html=
+function $(t,e,n,r,o,a,i){if("function"==typeof t[e])n.push({index:n.length-1,renderId:i,func:t[e]}),r+="'SparkyFunction#"+i+"#"+(n.length-1)+"'";else if("SparkyRender"==t[e].type){var s=t[e];r+=s.html,a.push(s)}else if("SparkyComponent"==t[e].type){var c=t[e];r+="\x3c!-- SparkyComponent#"+c.renderFn.name+"#"+o.length+"#"+i+" --\x3e",o.push(c)}else t[e]=Array.isArray(t[e])?t[e].join(""):new String(t[e]),r+=t[e];return r}function J(t){var e=document.createElement("div");if(e.innerHTML=t,e.children.length>1)throw new TypeError("Adjacent elements on the root level are forbidden.");return e.firstElementChild}t.Sparky=B,t.html=
 /**
      * Render the html string template to HTML elements
      * @param html Array of HTML String
      * @param computedProps Computed Props used to pass Javascript into template
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
      */
-function(t){for(var e=[],n=1;n<arguments.length;n++)e[n-1]=arguments[n];var r=[],o=[],i=[],s=a(12),c="string"==typeof t?t:t.map((function(t,n){var a="";return a+=t,e[n]?a=V(e,n,r,a,o,i,s):a})),u=Array.isArray(c)?c.join(""):c;return{type:"SparkyRender",html:u,func:r,nestedComponents:o,children:i,renderId:s}},t.memoize=W,t.renderToDOMNode=G,t.router=H,t.state=B,t.update=q,Object.defineProperty(t,"__esModule",{value:!0})}));
+function(t){for(var e=[],n=1;n<arguments.length;n++)e[n-1]=arguments[n];var r=[],o=[],i=[],s=a(12),c="string"==typeof t?t:t.map((function(t,n){var a="";return a+=t,e[n]?a=$(e,n,r,a,o,i,s):a})),u=Array.isArray(c)?c.join(""):c;return{type:"SparkyRender",html:u,func:r,nestedComponents:o,children:i,renderId:s}},t.memoize=V,t.renderToDOMNode=J,t.router=G,t.state=H,t.update=W,Object.defineProperty(t,"__esModule",{value:!0})}));
 //# sourceMappingURL=sparky.js.map

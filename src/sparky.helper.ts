@@ -10,6 +10,7 @@ interface ISortArray {
  * @internal
  */
 export function arrayAreSame(array1: any[], array2: any[]) {
+    if(!array1 || !array2) return false;
     const { bigArray, smallArray } = sortArrayInObject(array1, array2);
 
     return bigArray.every((big, i) => {

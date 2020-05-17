@@ -32,6 +32,10 @@ function Main(props: IProps) {
         setList((prevState) => [new Date().toLocaleString(), ...prevState]);
     }
 
+    update(() => {
+        console.log("Esto funciona")
+    })
+
     return html`
         <div>
             <button style="${list[0] ? "color: red" : "color: blue"}" onclick=${onClick}>Hola</button>

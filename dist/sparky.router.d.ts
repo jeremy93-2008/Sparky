@@ -1,4 +1,4 @@
-import { IStateRoute } from "./sparky";
+import { IStateRoute, ISparkyComponent } from "./sparky";
 import { HTMLElementSparkyEnhanced, ISparkyRoot, IParams } from "./sparky.component";
 export declare type IRoutingTypes = "browser" | "hash" | "abstract";
 /**
@@ -51,3 +51,7 @@ export declare function getParamsByPath(path: string, url: string): IParams[];
  * @internal
  */
 export declare function matchUrl(path: string, url: string): boolean;
+/**
+ * @internal
+ */
+export declare function resetUpdateCache(component: ISparkyComponent): void;

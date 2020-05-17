@@ -412,8 +412,8 @@ For example we can have something like this:
 	}
 
 	function CommentRender({comment}) {
-        return html `<div class="comment">
-			${comment.text}
+        return html `<div class="comments">
+			${Sparky.component(comment)}
 		</div>`
     }
 ```

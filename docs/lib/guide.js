@@ -21,15 +21,23 @@ function Guide() {
     }, []);
 
     update(() => {
-        window.addEventListener("scroll", () => {
-            if(window.scrollY >= 100) {
-                setButtonShown(true)
-            } else {
-                setButtonShown(false)
+        const handleScroll = () => {
+            if (window.scrollY >= 100) {
+                setButtonShown(true);
+                setClassNameLanguageForHighlight();
             }
-            setClassNameLanguageForHighlight();
-        })
-    },[])
+            else {
+                setButtonShown(false);
+                setClassNameLanguageForHighlight();
+            }
+        };
+        window.addEventListener("scroll", handleScroll, { passive: true })
+        return () => window.removeEventListener("scroll", handleScroll);
+    },[isButtonShown]);
+    
+    update(() => {
+        setClassNameLanguageForHighlight();
+    })
 
     return html `<div class="wrapper">
         ${Header()}
