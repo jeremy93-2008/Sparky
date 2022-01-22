@@ -29,7 +29,7 @@
     "preset": "ts-jest"
   },
   "dependencies": {
-    "nanoid": "^2.1.11",
+    "nanoid": "^3.1.31",
     "requestidlecallback-polyfill": "^1.0.2"
   },
   "devDependencies": {
